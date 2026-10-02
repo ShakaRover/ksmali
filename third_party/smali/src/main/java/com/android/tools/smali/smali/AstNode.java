@@ -32,6 +32,7 @@ package com.android.tools.smali.smali;
 
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.WritableToken;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,7 +74,13 @@ public final class AstNode {
     }
 
     public static AstNode leaf(Token token) {
-        return new AstNode(token.getType(), token, token.getText());
+        // Decode the token text once and cache it on the token; the tree walker later reads the
+        // same token via $TOKEN.text, which would otherwise decode it from the input stream again.
+        String text = token.getText();
+        if (token instanceof WritableToken) {
+            ((WritableToken) token).setText(text);
+        }
+        return new AstNode(token.getType(), token, text);
     }
 
     public static AstNode retype(Token src, int type) {
@@ -161,6 +168,12 @@ public final class AstNode {
         CommonToken eof = new CommonToken(Token.EOF, "<EOF>");
         eof.setTokenIndex(tokens.size());
         tokens.add(eof);
+        for (int i = 0; i < tokens.size(); i++) {
+            Token token = tokens.get(i);
+            if (token instanceof WritableToken) {
+                ((WritableToken) token).setTokenIndex(i);
+            }
+        }
         return tokens;
     }
 

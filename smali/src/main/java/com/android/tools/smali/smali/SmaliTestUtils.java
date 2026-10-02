@@ -33,7 +33,6 @@ package com.android.tools.smali.smali;
 import com.google.common.collect.Iterables;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ListTokenSource;
 import org.antlr.v4.runtime.RecognitionException;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedClassDef;
@@ -77,10 +76,11 @@ public class SmaliTestUtils {
 
         AstNode t = result.n;
 
-        CommonTokenStream treeStream = new CommonTokenStream(new ListTokenSource(t.flatten()));
+        ListTokenStream treeStream = new ListTokenStream(t.flatten());
 
         smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
         dexGen.setBuildParseTree(false);
+        dexGen.setErrorHandler(new NoSyncErrorStrategy());
         dexGen.setApiLevel(apiLevel);
         dexGen.setVerboseErrors(true);
         dexGen.setDexBuilder(dexBuilder);

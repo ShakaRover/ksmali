@@ -40,7 +40,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ListTokenSource;
 import org.antlr.v4.runtime.Token;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder;
@@ -240,10 +239,11 @@ public class Smali {
                 System.out.println(t.toStringTree());
             }
 
-            CommonTokenStream treeStream = new CommonTokenStream(new ListTokenSource(t.flatten()));
+            ListTokenStream treeStream = new ListTokenStream(t.flatten());
 
             smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
             dexGen.setBuildParseTree(false);
+            dexGen.setErrorHandler(new NoSyncErrorStrategy());
             dexGen.setApiLevel(options.apiLevel);
 
             dexGen.setVerboseErrors(options.verboseErrors);

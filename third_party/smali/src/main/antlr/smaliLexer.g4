@@ -103,6 +103,9 @@ package com.android.tools.smali.smali;
 
   private String processClassDescriptor(String text) {
     descriptorTokenError = false;
+    if (text.indexOf('`') < 0) {
+      return text;
+    }
     StringBuilder sb = new StringBuilder();
     int i = 0;
     int len = text.length();
@@ -133,8 +136,33 @@ package com.android.tools.smali.smali;
   }
 
   private void processQuotedLiteral(String text, boolean isChar) {
-    StringBuilder sb = new StringBuilder();
     int len = text.length();
+    if (text.indexOf('\\') < 0) {
+      // No escapes: the literal text is already completely processed.
+      char closeQuote = isChar ? '\'' : '"';
+      if (len < 2 || text.charAt(len - 1) != closeQuote) {
+        int end = len;
+        if (end > 0 && (text.charAt(end - 1) == '\r' || text.charAt(end - 1) == '\n')) {
+          end--;
+        }
+        reportInvalid(text.substring(0, end),
+            isChar ? "Unterminated character literal" : "Unterminated string literal");
+        return;
+      }
+      if (isChar) {
+        if (len == 2) {
+          reportInvalid(text, "Empty character literal");
+          return;
+        }
+        if (len > 3) {
+          reportInvalid(text, "Character literal with multiple chars");
+          return;
+        }
+      }
+      setText(text);
+      return;
+    }
+    StringBuilder sb = new StringBuilder();
     int i = 1;
     sb.append(text.charAt(0));
     boolean closed = false;
