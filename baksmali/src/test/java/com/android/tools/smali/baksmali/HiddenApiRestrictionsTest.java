@@ -30,7 +30,7 @@
 
 package com.android.tools.smali.baksmali;
 
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedClassDef;
 import com.android.tools.smali.dexlib2.dexbacked.raw.ItemType;
 import com.android.tools.smali.smali.SmaliTestUtils;

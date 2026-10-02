@@ -27,14 +27,14 @@
 
 package com.android.tools.smali.smali;
 
-import org.antlr.runtime.IntStream;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.TokenStream;
 
 public class OdexedInstructionException extends RecognitionException {
-    private String odexedInstruction;
+    private final String odexedInstruction;
 
-    OdexedInstructionException(IntStream input, String odexedInstruction) {
-        super(input);
+    OdexedInstructionException(TokenStream input, String odexedInstruction) {
+        super(null, null, input, null);
         this.odexedInstruction = odexedInstruction;
     }
 

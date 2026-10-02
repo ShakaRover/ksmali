@@ -30,10 +30,11 @@
 
 package com.android.tools.smali.smali;
 
-import org.antlr.runtime.ANTLRInputStream;
-import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Token;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -151,7 +152,7 @@ public class LexerTest {
 
         com.android.tools.smali.smali.expectedTokensTestGrammarLexer expectedTokensLexer = null;
         try {
-            expectedTokensLexer = new com.android.tools.smali.smali.expectedTokensTestGrammarLexer(new ANTLRInputStream(
+            expectedTokensLexer = new com.android.tools.smali.smali.expectedTokensTestGrammarLexer(CharStreams.fromStream(
                     LexerTest.class.getClassLoader().getResourceAsStream(tokensFile)));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -167,7 +168,7 @@ public class LexerTest {
             throw new RuntimeException(ex);
         }
 
-        List<ExpectedToken> expectedTokens = expectedTokensParser.getExpectedTokens();
+        List<ExpectedToken> expectedTokens = expectedTokensParser.getExpectedTokenList();
 
         InputStream smaliStream = LexerTest.class.getClassLoader().getResourceAsStream(smaliFile);
         if (smaliStream == null) {
@@ -187,7 +188,7 @@ public class LexerTest {
         for (int i=0; i<tokens.size()-1; i++) {
             token = (CommonToken)tokens.get(i);
 
-            if (discardHiddenTokens && token.getChannel() == smaliParser.HIDDEN) {
+            if (discardHiddenTokens && token.getChannel() == Token.HIDDEN_CHANNEL) {
                 continue;
             }
 

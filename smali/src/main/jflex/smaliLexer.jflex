@@ -4,7 +4,8 @@ import static java.lang.Math.toIntExact;
 
 import java.io.*;
 import java.util.Stack;
-import org.antlr.runtime.*;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.TokenSource;
 import com.android.tools.smali.smali.util.*;
 import com.android.tools.smali.util.*;
 import static com.android.tools.smali.smali.smaliParser.*;
@@ -76,6 +77,30 @@ import static com.android.tools.smali.smali.smaliParser.*;
 
     public int getColumn() {
         return this.yycolumn;
+    }
+
+    // ---- ANTLR4 TokenSource interface --------------------------------------
+
+    private TokenFactory<?> tokenFactory = CommonTokenFactory.DEFAULT;
+
+    @Override
+    public int getCharPositionInLine() {
+        return getColumn();
+    }
+
+    @Override
+    public CharStream getInputStream() {
+        return null;
+    }
+
+    @Override
+    public TokenFactory<?> getTokenFactory() {
+        return tokenFactory;
+    }
+
+    @Override
+    public void setTokenFactory(TokenFactory<?> tokenFactory) {
+        this.tokenFactory = tokenFactory;
     }
 
     public void setSuppressErrors(boolean suppressErrors) {

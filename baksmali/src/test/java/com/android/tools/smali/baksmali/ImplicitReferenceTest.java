@@ -30,7 +30,7 @@
 
 package com.android.tools.smali.baksmali;
 
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import java.io.IOException;

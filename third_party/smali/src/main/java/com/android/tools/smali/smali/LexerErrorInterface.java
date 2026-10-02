@@ -27,21 +27,12 @@
 
 package com.android.tools.smali.smali;
 
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.Lexer;
-import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.v4.runtime.TokenSource;
 
-public interface LexerErrorInterface {
-    public int getNumberOfSyntaxErrors();
-
-    //ANTLR doesn't provide any way to add interfaces to the lexer class directly, so this is an intermediate
-    //class that implements LexerErrorInterface that we can have the ANTLR parser extend 
-    public abstract static class ANTLRLexerWithErrorInterface extends Lexer implements LexerErrorInterface {
-        public ANTLRLexerWithErrorInterface() {
-        }
-
-        public ANTLRLexerWithErrorInterface(CharStream input, RecognizerSharedState state) {
-            super(input, state);
-        }
-    }
+/**
+ * Implemented by the JFlex-based lexer so that callers can query the number of lexical errors in
+ * addition to using it as an ANTLR4 {@link TokenSource}.
+ */
+public interface LexerErrorInterface extends TokenSource {
+    int getNumberOfSyntaxErrors();
 }

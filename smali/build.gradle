@@ -42,9 +42,9 @@ buildscript {
 }
 
 configurations {
-    // Remove the full antlr library that's added by the antlr plugin. We manually
-    // add the smaller antlr_runtime library instead
-    implementation.exclude group: 'org.antlr', module: 'antlr'
+    // Remove the full antlr tool that's added by the antlr plugin. We manually
+    // add the smaller antlr4 runtime library instead
+    implementation.exclude group: 'org.antlr', module: 'antlr4'
 }
 
 sourceSets {
@@ -84,7 +84,6 @@ dependencies {
     api project(':dexlib2')
     implementation depends.antlr_runtime
     implementation depends.jcommander
-    implementation depends.stringtemplate
     implementation depends.guava
 
     testImplementation depends.junit
@@ -120,10 +119,12 @@ tasks.getByPath('build').dependsOn(fatJar)
 
 generateTestGrammarSource {
     outputDirectory = new File(outputDirectory, 'com/android/tools/smali/smali')
+    arguments = ['-no-listener', '-no-visitor']
 }
 
 generateGrammarSource {
     outputDirectory = new File(outputDirectory, 'com/android/tools/smali/smali')
+    arguments = ['-no-listener', '-no-visitor']
 }
 
 jflex {

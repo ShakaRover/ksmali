@@ -38,11 +38,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.TokenSource;
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ListTokenSource;
+import org.antlr.v4.runtime.Token;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder;
 import com.android.tools.smali.dexlib2.writer.io.FileDataStore;
@@ -199,19 +197,19 @@ public class Smali {
 
             LexerErrorInterface lexer = new smaliFlexLexer(reader, options.apiLevel);
             ((smaliFlexLexer) lexer).setSourceFile(smaliFile);
-            CommonTokenStream tokens = new CommonTokenStream((TokenSource) lexer);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
 
             if (options.printTokens) {
                 tokens.getTokens();
 
                 for (int i = 0; i < tokens.size(); i++) {
                     Token token = tokens.get(i);
-                    if (token.getChannel() == smaliParser.HIDDEN) {
+                    if (token.getChannel() == Token.HIDDEN_CHANNEL) {
                         continue;
                     }
 
                     String tokenName;
-                    if (token.getType() == -1) {
+                    if (token.getType() == Token.EOF) {
                         tokenName = "EOF";
                     } else {
                         tokenName = smaliParser.tokenNames[token.getType()];
@@ -223,31 +221,39 @@ public class Smali {
             }
 
             smaliParser parser = new smaliParser(tokens);
+            parser.setBuildParseTree(false);
             parser.setVerboseErrors(options.verboseErrors);
             parser.setAllowOdex(options.allowOdexOpcodes);
             parser.setApiLevel(options.apiLevel);
 
-            smaliParser.smali_file_return result = parser.smali_file();
+            smaliParser.Smali_fileContext result = parser.smali_file();
 
             if (parser.getNumberOfSyntaxErrors() > 0 || lexer.getNumberOfSyntaxErrors() > 0) {
                 return false;
             }
 
-            CommonTree t = result.getTree();
-
-            CommonTreeNodeStream treeStream = new CommonTreeNodeStream(t);
-            treeStream.setTokenStream(tokens);
+            AstNode t = result.n;
 
             if (options.printTokens) {
                 System.out.println(t.toStringTree());
             }
 
+            CommonTokenStream treeStream = new CommonTokenStream(new ListTokenSource(t.flatten()));
+
             smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
+            dexGen.setBuildParseTree(false);
             dexGen.setApiLevel(options.apiLevel);
 
             dexGen.setVerboseErrors(options.verboseErrors);
             dexGen.setDexBuilder(dexBuilder);
-            dexGen.smali_file();
+            try {
+                dexGen.smali_file();
+            } catch (RuntimeException ex) {
+                if (options.verboseErrors) {
+                    ex.printStackTrace(System.err);
+                }
+                return false;
+            }
 
             return dexGen.getNumberOfSyntaxErrors() == 0;
         }
@@ -260,17 +266,17 @@ public class Smali {
 
             LexerErrorInterface lexer = new smaliFlexLexer(reader, options.apiLevel);
             ((smaliFlexLexer) lexer).setSourceFile(smaliFile);
-            CommonTokenStream tokens = new CommonTokenStream((TokenSource) lexer);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
             tokens.fill();
 
             for (int i = 0; i < tokens.size(); i++) {
                 Token token = tokens.get(i);
-                if (token.getChannel() == smaliParser.HIDDEN) {
+                if (token.getChannel() == Token.HIDDEN_CHANNEL) {
                     continue;
                 }
 
                 String tokenName;
-                if (token.getType() == -1) {
+                if (token.getType() == Token.EOF) {
                     tokenName = "EOF";
                 } else {
                     tokenName = smaliParser.tokenNames[token.getType()];

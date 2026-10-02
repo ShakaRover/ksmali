@@ -32,7 +32,7 @@ package com.android.tools.smali.smali;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import com.android.tools.smali.dexlib2.Opcode;
 import com.android.tools.smali.dexlib2.ValueType;
 import com.android.tools.smali.dexlib2.iface.ClassDef;

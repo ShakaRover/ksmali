@@ -31,7 +31,7 @@
 package com.android.tools.smali.baksmali;
 
 import com.google.common.io.ByteStreams;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import com.android.tools.smali.baksmali.Adaptors.ClassDefinition;
 import com.android.tools.smali.baksmali.formatter.BaksmaliWriter;
 import com.android.tools.smali.dexlib2.iface.ClassDef;

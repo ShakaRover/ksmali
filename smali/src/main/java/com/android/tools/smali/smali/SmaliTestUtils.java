@@ -31,11 +31,9 @@
 package com.android.tools.smali.smali;
 
 import com.google.common.collect.Iterables;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenSource;
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ListTokenSource;
+import org.antlr.v4.runtime.RecognitionException;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedClassDef;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
@@ -61,25 +59,26 @@ public class SmaliTestUtils {
         Reader reader = new StringReader(smaliText);
 
         lexer = new smaliFlexLexer(reader, apiLevel);
-        tokens = new CommonTokenStream((TokenSource)lexer);
+        tokens = new CommonTokenStream(lexer);
 
         smaliParser parser = new smaliParser(tokens);
+        parser.setBuildParseTree(false);
         parser.setVerboseErrors(true);
         parser.setAllowOdex(false);
         parser.setApiLevel(apiLevel);
 
-        smaliParser.smali_file_return result = parser.smali_file();
+        smaliParser.Smali_fileContext result = parser.smali_file();
 
         if(parser.getNumberOfSyntaxErrors() > 0 || lexer.getNumberOfSyntaxErrors() > 0) {
             throw new RuntimeException("Error occurred while compiling text");
         }
 
-        CommonTree t = result.getTree();
+        AstNode t = result.n;
 
-        CommonTreeNodeStream treeStream = new CommonTreeNodeStream(t);
-        treeStream.setTokenStream(tokens);
+        CommonTokenStream treeStream = new CommonTokenStream(new ListTokenSource(t.flatten()));
 
         smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
+        dexGen.setBuildParseTree(false);
         dexGen.setApiLevel(apiLevel);
         dexGen.setVerboseErrors(true);
         dexGen.setDexBuilder(dexBuilder);
