@@ -31,6 +31,7 @@
 package com.android.tools.smali.smali;
 
 import com.google.common.collect.Iterables;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ListTokenSource;
 import org.antlr.v4.runtime.RecognitionException;
@@ -53,12 +54,13 @@ public class SmaliTestUtils {
     public static DexBackedClassDef compileSmali(String smaliText, int apiLevel)
             throws RecognitionException, IOException {
         CommonTokenStream tokens;
-        LexerErrorInterface lexer;
+        smaliLexer lexer;
         DexBuilder dexBuilder = new DexBuilder(Opcodes.forApi(apiLevel));
 
         Reader reader = new StringReader(smaliText);
 
-        lexer = new smaliFlexLexer(reader, apiLevel);
+        lexer = new smaliLexer(CharStreams.fromReader(reader));
+        lexer.setApiLevel(apiLevel);
         tokens = new CommonTokenStream(lexer);
 
         smaliParser parser = new smaliParser(tokens);

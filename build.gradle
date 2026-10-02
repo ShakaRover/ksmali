@@ -77,7 +77,6 @@ subprojects {
                 mockito: 'org.mockito:mockito-core:5.12.0',
                 antlr_runtime: 'org.antlr:antlr4-runtime:4.13.2',
                 antlr: 'org.antlr:antlr4:4.13.2',
-                jflex_plugin: 'org.xbib.gradle.plugin:gradle-plugin-jflex:1.1.0',
                 proguard_gradle: 'com.guardsquare:proguard-gradle:7.1.0',
                 dx: 'com.google.android.tools:dx:1.7',
                 gson: 'com.google.code.gson:gson:2.3.1',

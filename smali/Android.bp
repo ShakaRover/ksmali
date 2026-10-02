@@ -35,7 +35,7 @@ java_binary_host {
 
     static_libs: [
         "guava",
-        "antlr-runtime",
+        "antlr4-runtime",
         "jcommander",
         "smali-dexlib2",
         "android-smali-util",

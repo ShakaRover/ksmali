@@ -38,6 +38,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ListTokenSource;
 import org.antlr.v4.runtime.Token;
@@ -195,8 +196,9 @@ public class Smali {
         try (FileInputStream fis = new FileInputStream(smaliFile)) {
             InputStreamReader reader = new InputStreamReader(fis, StandardCharsets.UTF_8);
 
-            LexerErrorInterface lexer = new smaliFlexLexer(reader, options.apiLevel);
-            ((smaliFlexLexer) lexer).setSourceFile(smaliFile);
+            smaliLexer lexer = new smaliLexer(CharStreams.fromReader(reader));
+            lexer.setApiLevel(options.apiLevel);
+            lexer.setSourceFile(smaliFile);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
             if (options.printTokens) {
@@ -212,7 +214,7 @@ public class Smali {
                     if (token.getType() == Token.EOF) {
                         tokenName = "EOF";
                     } else {
-                        tokenName = smaliParser.tokenNames[token.getType()];
+                        tokenName = smaliParser.tokenName(token.getType());
                     }
                     System.out.println(tokenName + ": " + token.getText());
                 }
@@ -264,8 +266,9 @@ public class Smali {
         try (FileInputStream fis = new FileInputStream(smaliFile)) {
             InputStreamReader reader = new InputStreamReader(fis, StandardCharsets.UTF_8);
 
-            LexerErrorInterface lexer = new smaliFlexLexer(reader, options.apiLevel);
-            ((smaliFlexLexer) lexer).setSourceFile(smaliFile);
+            smaliLexer lexer = new smaliLexer(CharStreams.fromReader(reader));
+            lexer.setApiLevel(options.apiLevel);
+            lexer.setSourceFile(smaliFile);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             tokens.fill();
 
@@ -279,7 +282,7 @@ public class Smali {
                 if (token.getType() == Token.EOF) {
                     tokenName = "EOF";
                 } else {
-                    tokenName = smaliParser.tokenNames[token.getType()];
+                    tokenName = smaliParser.tokenName(token.getType());
                 }
                 System.out.println(tokenName + "(\"" + StringUtils.escapeString(token.getText()) + "\")");
             }

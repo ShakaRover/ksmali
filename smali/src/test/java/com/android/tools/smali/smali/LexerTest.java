@@ -55,7 +55,7 @@ public class LexerTest {
         tokenTypesByName = new HashMap<String, Integer>();
 
         for (int i=0; i<smaliParser.tokenNames.length; i++) {
-            tokenTypesByName.put(smaliParser.tokenNames[i], i);
+            tokenTypesByName.put(smaliParser.tokenName(i), i);
         }
     }
 
@@ -174,8 +174,13 @@ public class LexerTest {
         if (smaliStream == null) {
             Assert.fail("Could not load " + smaliFile);
         }
-        smaliFlexLexer lexer = new smaliFlexLexer(new InputStreamReader(smaliStream),
-            apiLevel);
+        smaliLexer lexer;
+        try {
+            lexer = new smaliLexer(CharStreams.fromStream(smaliStream));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        lexer.setApiLevel(apiLevel);
         lexer.setSourceFile(new File(test + ".smali"));
         lexer.setSuppressErrors(true);
 
@@ -230,6 +235,6 @@ public class LexerTest {
 
 
     private static String getTokenName(int tokenType) {
-        return smaliParser.tokenNames[tokenType];
+        return smaliParser.tokenName(tokenType);
     }
 }

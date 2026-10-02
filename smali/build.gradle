@@ -29,14 +29,12 @@
  */
 
 apply plugin: 'antlr'
-apply plugin: 'org.xbib.gradle.plugin.jflex'
 
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath depends.jflex_plugin
         classpath depends.proguard_gradle
     }
 }
@@ -55,6 +53,7 @@ sourceSets {
         resources {
             // This adds the generated .tokens files to the jar
             srcDir 'build/generated-src/antlr/main'
+            include '**/*.tokens'
         }
     }
     test {
@@ -127,10 +126,6 @@ generateGrammarSource {
     arguments = ['-no-listener', '-no-visitor']
 }
 
-jflex {
-    generateDir = new File(generateDir, 'com/android/tools/smali/smali')
-}
-
 publish {
     publishing {
         publications {
@@ -174,6 +169,5 @@ sourcesJar {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 sourcesJar.dependsOn('generateGrammarSource')
-sourcesJar.dependsOn('jflex')
 
 tasks.getByPath(':release').dependsOn(proguard)
