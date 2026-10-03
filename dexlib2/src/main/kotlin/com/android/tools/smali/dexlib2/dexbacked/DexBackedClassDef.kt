@@ -54,8 +54,17 @@ class DexBackedClassDef(
     private val hiddenApiRestrictionsReader: HiddenApiRestrictionsReader?
 
     private val staticFieldsOffset: Int
+
+    // These lazy caches are written while a class is being iterated. A single DexBackedClassDef
+    // instance can be iterated concurrently from several disassembly workers (SyntheticAccessor-
+    // Resolver keeps its own copy of every class and is queried from every worker), so mark them
+    // volatile to make the first-touch publication safe. Every writer computes the same value, so
+    // this changes visibility but not the produced bytes.
+    @Volatile
     private var instanceFieldsOffset = 0
+    @Volatile
     private var directMethodsOffset = 0
+    @Volatile
     private var virtualMethodsOffset = 0
 
     private val staticFieldCount: Int
@@ -63,6 +72,7 @@ class DexBackedClassDef(
     private val directMethodCount: Int
     private val virtualMethodCount: Int
 
+    @Volatile
     private var annotationsDirectory: AnnotationsDirectory? = null
 
     init {
@@ -532,8 +542,12 @@ class DexBackedClassDef(
     }
 
     private inner class HiddenApiRestrictionsReader(private val startOffset: Int) {
+        // Same lifetime/visibility reasoning as the caches above.
+        @Volatile
         private var instanceFieldsStartOffset = 0
+        @Volatile
         private var directMethodsStartOffset = 0
+        @Volatile
         private var virtualMethodsStartOffset = 0
 
         val restrictionsForStaticFields: VariableSizeListIterator<Int> get() {
