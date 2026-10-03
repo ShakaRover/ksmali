@@ -28,26 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2.iface.instruction
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
-
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
-
-    override fun getRegister(): Int = register
-
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
-        }
-    }
+interface VtableIndexInstruction : Instruction {
+    val vtableIndex: Int
 }

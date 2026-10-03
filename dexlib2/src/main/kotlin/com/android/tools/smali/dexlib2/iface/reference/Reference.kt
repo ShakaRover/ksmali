@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,26 +28,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2.iface.reference
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
+/**
+ * This class is the base interface for field/method/string/type references in a dex file.
+ */
+interface Reference {
+    /**
+     * Verifies that this reference is valid.
+     *
+     * @throws InvalidReferenceException If the reference is not valid.
+     */
+    @Throws(InvalidReferenceException::class)
+    fun validateReference()
 
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
+    class InvalidReferenceException : Exception {
+        val invalidReferenceRepresentation: String
 
-    override fun getRegister(): Int = register
+        constructor(invalidReferenceRepresentation: String) : super("Invalid reference") {
+            this.invalidReferenceRepresentation = invalidReferenceRepresentation
+        }
 
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
+        constructor(invalidReferenceRepresentation: String, msg: String) : super(msg) {
+            this.invalidReferenceRepresentation = invalidReferenceRepresentation
+        }
+
+        constructor(invalidReferenceRepresentation: String, s: String, throwable: Throwable) :
+            super(s, throwable) {
+            this.invalidReferenceRepresentation = invalidReferenceRepresentation
+        }
+
+        constructor(invalidReferenceRepresentation: String, throwable: Throwable) : super(throwable) {
+            this.invalidReferenceRepresentation = invalidReferenceRepresentation
         }
     }
 }

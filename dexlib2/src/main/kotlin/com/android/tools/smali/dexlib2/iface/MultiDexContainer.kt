@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2016, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,26 +28,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2.iface
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
+import java.io.IOException
 
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
+/**
+ * This class represents a dex container that can contain multiple, named dex files
+ */
+interface MultiDexContainer<T : DexFile> {
+    /**
+     * @return A list of the names of dex entries in this container
+     */
+    @get:Throws(IOException::class)
+    val dexEntryNames: List<String>
 
-    override fun getRegister(): Int = register
+    /**
+     * Gets the dex entry with the given name
+     *
+     * @param entryName The name of the entry
+     * @return A DexFile, or null if no entry with that name is found
+     */
+    @Throws(IOException::class)
+    fun getEntry(entryName: String): DexEntry<T>?
 
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
-        }
+    /**
+     * This class represents a dex file entry in a MultiDexContainer
+     */
+    interface DexEntry<T : DexFile> {
+        /**
+         * @return The name of this entry within its container
+         */
+        val entryName: String
+
+        /**
+         * @return The dex file associated with this entry
+         */
+        val dexFile: T
+
+        /**
+         * @return The MultiDexContainer that contains this dex file
+         */
+        val container: MultiDexContainer<out T>
     }
 }

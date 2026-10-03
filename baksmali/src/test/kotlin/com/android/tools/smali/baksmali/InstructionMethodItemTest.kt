@@ -68,51 +68,33 @@ class InstructionMethodItemTest {
     fun testInvalidReference() {
 
         val instruction = object : Instruction21c {
-            override fun getRegisterA(): Int {
-                return 0
-            }
+            override val registerA: Int = 0
 
-            override fun getReference(): Reference {
-                return object : BaseStringReference() {
+            override val reference: Reference
+                get() = object : BaseStringReference() {
                     override fun validateReference() {
                         throw Reference.InvalidReferenceException("blahblahblah")
                     }
 
-                    override fun getString(): String {
-                        throw RuntimeException("invalid reference")
-                    }
+                    override val string: String
+                        get() = throw RuntimeException("invalid reference")
                 }
-            }
 
-            override fun getReferenceType(): Int {
-                return ReferenceType.STRING
-            }
+            override val referenceType: Int = ReferenceType.STRING
 
-            override fun getOpcode(): Opcode {
-                return Opcode.CONST_STRING
-            }
+            override val opcode: Opcode = Opcode.CONST_STRING
 
-            override fun getCodeUnits(): Int {
-                return Format.Format21c.size / 2
-            }
+            override val codeUnits: Int = Format.Format21c.size / 2
         }
 
         val methodImplementation = object : MethodImplementation {
-            override fun getRegisterCount(): Int {
-                return 1
-            }
+            override val registerCount: Int = 1
 
-            override fun getInstructions(): Iterable<Instruction> {
-                return ImmutableList.of(instruction)
-            }
+            override val instructions: Iterable<Instruction> = ImmutableList.of(instruction)
 
-            override fun getTryBlocks(): List<TryBlock<ExceptionHandler>> {
-                return ImmutableList.of()
-            }
+            override val tryBlocks: List<TryBlock<ExceptionHandler>> = ImmutableList.of()
 
-            override fun getDebugItems(): Iterable<DebugItem> {
-                return ImmutableList.of()
-            }
+            override val debugItems: Iterable<DebugItem> = ImmutableList.of()
         }
 
         val method: Method = TestMethod(methodImplementation)
@@ -138,90 +120,48 @@ class InstructionMethodItemTest {
         private val methodImplementation: MethodImplementation
     ) : BaseMethodReference(), Method {
 
-        override fun getParameters(): List<MethodParameter> {
-            return ImmutableList.of()
-        }
+        override val parameters: List<MethodParameter> = ImmutableList.of()
 
-        override fun getAccessFlags(): Int {
-            return 0
-        }
+        override val accessFlags: Int = 0
 
-        override fun getAnnotations(): Set<Annotation> {
-            return ImmutableSet.of()
-        }
+        override val annotations: Set<Annotation> = ImmutableSet.of()
 
-        override fun getImplementation(): MethodImplementation? {
-            return methodImplementation
-        }
+        override val implementation: MethodImplementation? = methodImplementation
 
-        override fun getDefiningClass(): String {
-            return "Ltest;"
-        }
+        override val definingClass: String = "Ltest;"
 
-        override fun getName(): String {
-            return "test"
-        }
+        override val name: String = "test"
 
-        override fun getParameterTypes(): List<CharSequence> {
-            return ImmutableList.of()
-        }
+        override val parameterTypes: List<CharSequence> = ImmutableList.of()
 
-        override fun getReturnType(): String {
-            return "V"
-        }
+        override val returnType: String = "V"
 
-        override fun getHiddenApiRestrictions(): Set<HiddenApiRestriction> {
-            return ImmutableSet.of()
-        }
+        override val hiddenApiRestrictions: Set<HiddenApiRestriction> = ImmutableSet.of()
     }
 
     private class TestClassDef : BaseTypeReference(), ClassDef {
-        override fun getAccessFlags(): Int {
-            return 0
-        }
+        override val accessFlags: Int = 0
 
-        override fun getSuperclass(): String? {
-            return "Ljava/lang/Object;"
-        }
+        override val superclass: String? = "Ljava/lang/Object;"
 
-        override fun getInterfaces(): List<String> {
-            return ImmutableList.of()
-        }
+        override val interfaces: List<String> = ImmutableList.of()
 
-        override fun getSourceFile(): String? {
-            return null
-        }
+        override val sourceFile: String? = null
 
-        override fun getAnnotations(): Set<Annotation> {
-            return ImmutableSet.of()
-        }
+        override val annotations: Set<Annotation> = ImmutableSet.of()
 
-        override fun getStaticFields(): Iterable<Field> {
-            return ImmutableList.of()
-        }
+        override val staticFields: Iterable<Field> = ImmutableList.of()
 
-        override fun getInstanceFields(): Iterable<Field> {
-            return ImmutableList.of()
-        }
+        override val instanceFields: Iterable<Field> = ImmutableList.of()
 
-        override fun getFields(): Iterable<Field> {
-            return ImmutableList.of()
-        }
+        override val fields: Iterable<Field> = ImmutableList.of()
 
-        override fun getDirectMethods(): Iterable<Method> {
-            return ImmutableList.of()
-        }
+        override val directMethods: Iterable<Method> = ImmutableList.of()
 
-        override fun getVirtualMethods(): Iterable<Method> {
-            return ImmutableList.of()
-        }
+        override val virtualMethods: Iterable<Method> = ImmutableList.of()
 
-        override fun getMethods(): Iterable<Method> {
-            return ImmutableList.of()
-        }
+        override val methods: Iterable<Method> = ImmutableList.of()
 
-        override fun getType(): String {
-            return "Ltest;"
-        }
+        override val type: String = "Ltest;"
     }
 }

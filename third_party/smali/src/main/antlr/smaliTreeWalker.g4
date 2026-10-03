@@ -648,10 +648,10 @@ parameter[List<SmaliMethodParameter> params]
         }
 
         SmaliMethodParameter methodParameter = params.get(parameterIndex);
-        methodParameter.name = _localctx.pname != null ? _localctx.pname.value : null;
+        methodParameter.setName(_localctx.pname != null ? _localctx.pname.value : null);
         if (_localctx.anns != null && _localctx.anns.annotationsSet != null
                 && _localctx.anns.annotationsSet.size() > 0) {
-            methodParameter.annotations = _localctx.anns.annotationsSet;
+            methodParameter.setAnnotations(_localctx.anns.annotationsSet);
         }
     };
 

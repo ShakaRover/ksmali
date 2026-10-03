@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,26 +28,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
+import com.android.tools.smali.util.ExceptionWithContext
 
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
+object AnnotationVisibility {
+    const val BUILD = 0
+    const val RUNTIME = 1
+    const val SYSTEM = 2
 
-    override fun getRegister(): Int = register
+    private val NAMES = arrayOf("build", "runtime", "system")
 
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
+    @JvmStatic
+    fun getVisibility(visibility: Int): String {
+        if (visibility < 0 || visibility >= NAMES.size) {
+            throw ExceptionWithContext("Invalid annotation visibility %d", visibility)
         }
+        return NAMES[visibility]
+    }
+
+    @JvmStatic
+    fun getVisibility(visibility: String): Int {
+        val lowercase = visibility.lowercase()
+        if (lowercase == "build") {
+            return BUILD
+        }
+        if (lowercase == "runtime") {
+            return RUNTIME
+        }
+        if (lowercase == "system") {
+            return SYSTEM
+        }
+        throw ExceptionWithContext("Invalid annotation visibility: %s", visibility)
     }
 }

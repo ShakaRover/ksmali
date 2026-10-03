@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,26 +28,50 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
+object ValueType {
+    const val BYTE = 0x00
+    const val SHORT = 0x02
+    const val CHAR = 0x03
+    const val INT = 0x04
+    const val LONG = 0x06
+    const val FLOAT = 0x10
+    const val DOUBLE = 0x11
+    const val METHOD_TYPE = 0x15
+    const val METHOD_HANDLE = 0x16
+    const val STRING = 0x17
+    const val TYPE = 0x18
+    const val FIELD = 0x19
+    const val METHOD = 0x1a
+    const val ENUM = 0x1b
+    const val ARRAY = 0x1c
+    const val ANNOTATION = 0x1d
+    const val NULL = 0x1e
+    const val BOOLEAN = 0x1f
 
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
-
-    override fun getRegister(): Int = register
-
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
+    @JvmStatic
+    fun getValueTypeName(valueType: Int): String {
+        return when (valueType) {
+            BYTE -> "byte"
+            SHORT -> "short"
+            CHAR -> "char"
+            INT -> "int"
+            LONG -> "long"
+            FLOAT -> "float"
+            DOUBLE -> "double"
+            METHOD_TYPE -> "method_type"
+            METHOD_HANDLE -> "method_handle"
+            STRING -> "string"
+            TYPE -> "type"
+            FIELD -> "field"
+            METHOD -> "method"
+            ENUM -> "enum"
+            ARRAY -> "array"
+            ANNOTATION -> "annotation"
+            NULL -> "null"
+            BOOLEAN -> "boolean"
+            else -> throw IllegalArgumentException("Unknown encoded value type: $valueType")
         }
     }
 }

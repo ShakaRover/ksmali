@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,26 +28,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2.iface.debug
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
-
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
-
-    override fun getRegister(): Int = register
-
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
-        }
-    }
+interface LineNumber : DebugItem {
+    /**
+     * The line number associated with this code address. This value should be treated as an unsigned integer, with
+     * negative values indicating a value > 2^31, using the usual two's complement semantics.
+     *
+     * @return The line number associated with this code address.
+     */
+    val lineNumber: Int
 }

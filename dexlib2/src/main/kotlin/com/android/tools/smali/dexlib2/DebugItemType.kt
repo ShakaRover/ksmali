@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,26 +28,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
+object DebugItemType {
+    // The debug items that directly correspond with one of the dexlib2.iface.debug interfaces
+    const val START_LOCAL = 0x03
+    const val END_LOCAL = 0x05
+    const val RESTART_LOCAL = 0x06
+    const val PROLOGUE_END = 0x07
+    const val EPILOGUE_BEGIN = 0x08
+    const val SET_SOURCE_FILE = 0x09
+    const val LINE_NUMBER = 0x0a
 
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
-
-    override fun getRegister(): Int = register
-
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
-        }
-    }
+    // Other items, which are typically handled internally
+    const val END_SEQUENCE = 0x00
+    const val ADVANCE_PC = 0x01
+    const val ADVANCE_LINE = 0x02
+    const val START_LOCAL_EXTENDED = 0x04
 }

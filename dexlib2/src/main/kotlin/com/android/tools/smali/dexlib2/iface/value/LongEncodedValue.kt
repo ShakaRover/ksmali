@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,26 +28,52 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2.iface.value
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
+/**
+ * This class represents an encoded long value.
+ */
+interface LongEncodedValue : EncodedValue {
+    /**
+     * Gets the long value.
+     *
+     * @return the long value
+     */
+    val value: Long
 
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
+    /**
+     * Returns a hashcode for this EncodedLongValue.
+     *
+     * This hashCode is defined to be the following:
+     *
+     * <pre>
+     * {@code
+     * long v = getValue();
+     * int hashCode = (int)(v^(v>>>32));
+     * }</pre>
+     *
+     * @return The hash code value for this EncodedLongValue
+     */
+    override fun hashCode(): Int
 
-    override fun getRegister(): Int = register
+    /**
+     * Compares this LongEncodedValue to another LongEncodedValue for equality.
+     *
+     * This LongEncodedValue is equal to another LongEncodedValue if the values returned by getValue() are equal.
+     *
+     * @param o The object to be compared for equality with this LongEncodedValue
+     * @return true if the specified object is equal to this LongEncodedValue
+     */
+    override fun equals(o: Any?): Boolean
 
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
-        }
-    }
+    /**
+     * Compare this LongEncodedValue to another EncodedValue.
+     *
+     * The comparison is first done on the return values of getValueType(). If the other value is another
+     * LongEncodedValue, the return values of getValue() are compared.
+     *
+     * @param o The EncodedValue to compare with this LongEncodedValue
+     * @return An integer representing the result of the comparison
+     */
+    override fun compareTo(o: EncodedValue): Int
 }

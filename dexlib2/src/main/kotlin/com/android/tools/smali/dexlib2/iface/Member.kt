@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2015, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,26 +28,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2.iface
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
+import com.android.tools.smali.dexlib2.HiddenApiRestriction
 
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
+/**
+ * This class represents a generic class member
+ */
+interface Member : Annotatable {
+    /**
+     * Gets the type of the class that defines this member.
+     *
+     * @return The type of the class that defines this member
+     */
+    val definingClass: String
 
-    override fun getRegister(): Int = register
+    /**
+     * Gets the name of this member.
+     *
+     * @return The name of this field
+     */
+    val name: String
 
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
-        }
-    }
+    /**
+     * Gets the access flags for this member.
+     *
+     * This will be a combination of the AccessFlags.* flags that are marked as compatible for use with this type
+     * of member.
+     *
+     * @return The access flags for this member
+     */
+    val accessFlags: Int
+
+    /**
+     * Gets the hidden api restrictions for this member.
+     *
+     * This will contain at most 1 normal flag (with isDomainSpecificApiFlag() = false), and 1
+     * domain-specific api flag (with isDomainSpecificApiFlag() = true)
+     *
+     * @return A set of the hidden api restrictions for this member.
+     */
+    val hiddenApiRestrictions: Set<HiddenApiRestriction>
 }

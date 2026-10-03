@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,26 +28,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2.iface.value
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
+/**
+ * This class represents an encoded char value.
+ */
+interface CharEncodedValue : EncodedValue {
+    /**
+     * Gets the char value.
+     *
+     * @return the char value
+     */
+    val value: Char
 
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
+    /**
+     * Returns a hashcode for this EncodedCharValue.
+     *
+     * This hashCode is defined to be the following:
+     *
+     * <pre>
+     * {@code
+     * int hashCode = getValue();
+     * }</pre>
+     *
+     * @return The hash code value for this EncodedCharValue
+     */
+    override fun hashCode(): Int
 
-    override fun getRegister(): Int = register
+    /**
+     * Compares this CharEncodedValue to another CharEncodedValue for equality.
+     *
+     * This CharEncodedValue is equal to another CharEncodedValue if the values returned by getValue() are equal.
+     *
+     * @param o The object to be compared for equality with this CharEncodedValue
+     * @return true if the specified object is equal to this CharEncodedValue
+     */
+    override fun equals(o: Any?): Boolean
 
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
-        }
-    }
+    /**
+     * Compare this CharEncodedValue to another EncodedValue.
+     *
+     * The comparison is first done on the return values of getValueType(). If the other value is another
+     * CharEncodedValue, the return values of getValue() are compared.
+     *
+     * @param o The EncodedValue to compare with this CharEncodedValue
+     * @return An integer representing the result of the comparison
+     */
+    override fun compareTo(o: EncodedValue): Int
 }

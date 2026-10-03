@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,26 +28,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.smali
+package com.android.tools.smali.dexlib2.iface.value
 
-import com.google.common.collect.ImmutableSet
-import com.google.common.primitives.Ints
-import com.android.tools.smali.dexlib2.base.BaseMethodParameter
-import com.android.tools.smali.dexlib2.iface.Annotation
-import java.util.Comparator
+/**
+ * This class represents an encoded null value.
+ */
+interface NullEncodedValue : EncodedValue {
+    /**
+     * Returns a hashcode for this EncodedNullValue.
+     *
+     * This hashCode is defined to be the following:
+     *
+     * <pre>
+     * {@code
+     * int hashCode = 0;
+     * }</pre>
+     *
+     * @return The hash code value for this EncodedNullValue
+     */
+    override fun hashCode(): Int
 
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
-    override var type: String = type
-    override var annotations: Set<Annotation> = ImmutableSet.of()
-    override var name: String? = null
+    /**
+     * Compares this NullEncodedValue to another NullEncodedValue for equality.
+     *
+     * This NullEncodedValue is always equal to another other NullEncodedValue
+     *
+     * @param o The object to be compared for equality with this NullEncodedValue
+     * @return true if the specified object is equal to this NullEncodedValue
+     */
+    override fun equals(o: Any?): Boolean
 
-    override fun getRegister(): Int = register
-
-    companion object {
-        @JvmField
-        val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
-        }
-    }
+    /**
+     * Compare this NullEncodedValue to another EncodedValue.
+     *
+     * The comparison is first done on the return values of getValueType(). If the other value is another
+     * NullEncodedValue, then 0 is returned.
+     *
+     * @param o The EncodedValue to compare with this NullEncodedValue
+     * @return An integer representing the result of the comparison
+     */
+    override fun compareTo(o: EncodedValue): Int
 }
