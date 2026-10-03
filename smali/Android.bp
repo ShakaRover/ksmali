@@ -23,12 +23,28 @@ genrule {
 // build smali jar
 // ============================================================
 
+// The smali module is Kotlin-only, but ANTLR 4.13.2 has no Kotlin target, so the lexer,
+// parser and tree walker are generated as Java from the .g4 grammars (see
+// third_party/smali/src/main/antlr/).
+//
+// AOSP/Soong cannot run Gradle (and the ANTLR4 tool is not shipped in the platform; only the
+// ANTLR3 "antlr-runtime" exists under external/antlr), so the generated Java must be checked
+// in. `smali/run_antlr.sh --install` regenerates it from the build directory and copies it to
+// the clearly marked, non-source directory below, which this module then compiles:
+//
+//     src/main/antlr-generated/com/android/tools/smali/smali/
+//
+// If a prebuilt ANTLR4 tool jar is ever added to the platform, the glob below can be replaced
+// with a genrule that runs it against the grammars and emits the same Java sources.
+
 java_binary_host {
     name: "android-smali",
 
     srcs: [
-        "src/main/java/**/*.java",
+        "src/main/kotlin/**/*.kt",
         ":third_party-smali",
+        // Generated Java: smaliLexer, smaliParser and smaliTreeWalker.
+        "src/main/antlr-generated/**/*.java",
     ],
 
     manifest: "manifest.txt",
@@ -37,6 +53,13 @@ java_binary_host {
         "guava",
         "antlr4-runtime",
         "jcommander",
+        // Soong automatically injects the Kotlin stdlib for any module with .kt sources
+        // (see build/soong/java/base.go), but it is listed explicitly to document intent.
+        // The conventional AOSP module names are "kotlin-stdlib" (external/kotlinc) and
+        // "kotlinx-coroutines-core" (external/kotlinx.coroutines).
+        "kotlin-stdlib",
+        // smali uses coroutines for parallel assembly.
+        "kotlinx-coroutines-core",
         "smali-dexlib2",
         "android-smali-util",
     ],

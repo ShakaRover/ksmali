@@ -28,7 +28,7 @@ java_binary_host {
     name: "smali-baksmali",
 
     srcs: [
-        "src/main/java/**/*.java",
+        "src/main/kotlin/**/*.kt",
         ":third_party-smali-baksmali",
     ],
 
@@ -39,6 +39,10 @@ java_binary_host {
         "smali-dexlib2",
         "android-smali-util",
         "jcommander",
+        // Soong auto-injects the Kotlin stdlib for .kt sources; listed for documentation.
+        "kotlin-stdlib",
+        // baksmali uses coroutines for parallel disassembly.
+        "kotlinx-coroutines-core",
     ],
 
     java_resources: [":android-baksmali_version"],

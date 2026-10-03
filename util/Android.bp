@@ -17,8 +17,12 @@
 java_library_host {
     name: "android-smali-util",
     srcs: [
-        "src/main/java/**/*.java",
+        "src/main/kotlin/**/*.kt",
         ":third_party-smali-util",
+    ],
+    static_libs: [
+        // Soong auto-injects the Kotlin stdlib for .kt sources; listed for documentation.
+        "kotlin-stdlib",
     ],
     libs: [
         "smali-dexlib2",
