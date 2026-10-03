@@ -39,13 +39,10 @@ import com.android.tools.smali.dexlib2.iface.MultiDexContainer
 import com.android.tools.smali.util.jcommander.ColonParameterSplitter
 import com.android.tools.smali.util.jcommander.ExtendedParameter
 import com.beust.jcommander.Parameter
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.Lists
 import java.io.File
 import java.io.IOException
 
 open class AnalysisArguments {
-    @JvmField
     @field:Parameter(
         names = ["-b", "--bootclasspath", "--bcp"],
         description = "A colon separated list of the files to include in the bootclasspath when analyzing the " +
@@ -58,7 +55,6 @@ open class AnalysisArguments {
     @field:ExtendedParameter(argumentNames = ["classpath"])
     var bootClassPath: List<String>? = null
 
-    @JvmField
     @field:Parameter(
         names = ["-c", "--classpath", "--cp"],
         description = "A colon separated list of additional files to include in the classpath when analyzing the " +
@@ -66,9 +62,8 @@ open class AnalysisArguments {
         splitter = ColonParameterSplitter::class
     )
     @field:ExtendedParameter(argumentNames = ["classpath"])
-    var classPath: List<String> = Lists.newArrayList()
+    var classPath: List<String> = mutableListOf()
 
-    @JvmField
     @field:Parameter(
         names = ["-d", "--classpath-dir", "--cpd", "--dir"],
         description = "A directory to search for classpath files. This option can be used multiple times to " +
@@ -78,7 +73,6 @@ open class AnalysisArguments {
     var classPathDirectories: List<String>? = null
 
     class CheckPackagePrivateArgument {
-        @JvmField
         @field:Parameter(
             names = ["--check-package-private-access", "--package-private", "--checkpp", "--pp"],
             description = "Use the package-private access check when calculating vtable indexes. This is enabled " +
@@ -124,34 +118,33 @@ open class AnalysisArguments {
             checkPackagePrivateAccess = true
         }
 
-        if (classPathDirectories == null || classPathDirectories!!.size == 0) {
-            classPathDirectories = Lists.newArrayList(dexFileDir.path)
+        if (classPathDirectories.isNullOrEmpty()) {
+            classPathDirectories = mutableListOf(dexFileDir.path)
         }
 
-        val filteredClassPathDirectories = Lists.newArrayList<String>()
-        if (classPathDirectories != null) {
-            for (dir in classPathDirectories!!) {
-                val file = File(dir)
-                if (!file.exists()) {
-                    System.err.println(String.format("Warning: directory %s does not exist. Ignoring.", dir))
-                } else if (!file.isDirectory) {
-                    System.err.println(String.format("Warning: %s is not a directory. Ignoring.", dir))
-                } else {
-                    filteredClassPathDirectories.add(dir)
-                }
+        val filteredClassPathDirectories = mutableListOf<String>()
+        classPathDirectories?.forEach { dir ->
+            val file = File(dir)
+            if (!file.exists()) {
+                System.err.println("Warning: directory $dir does not exist. Ignoring.")
+            } else if (!file.isDirectory) {
+                System.err.println("Warning: $dir is not a directory. Ignoring.")
+            } else {
+                filteredClassPathDirectories.add(dir)
             }
         }
 
+        val bootClassPath = this.bootClassPath
         if (bootClassPath == null) {
             // TODO: we should be able to get the api from the Opcodes object associated with the dexFile..
             // except that the oat version -> api mapping doesn't fully work yet
             resolver = ClassPathResolver(filteredClassPathDirectories, classPath, dexEntry)
-        } else if (bootClassPath!!.size == 1 && bootClassPath!![0].length == 0) {
+        } else if (bootClassPath.size == 1 && bootClassPath[0].isEmpty()) {
             // --bootclasspath "" is a special case, denoting that no bootclasspath should be used
             resolver = ClassPathResolver(
-                ImmutableList.of<String>(), ImmutableList.of<String>(), classPath, dexEntry)
+                emptyList(), emptyList(), classPath, dexEntry)
         } else {
-            resolver = ClassPathResolver(filteredClassPathDirectories, bootClassPath!!, classPath, dexEntry)
+            resolver = ClassPathResolver(filteredClassPathDirectories, bootClassPath, classPath, dexEntry)
         }
 
         if (oatVersion == 0 && container is OatFile) {

@@ -69,17 +69,18 @@ open class PrintTokensCommand(commandAncestors: List<JCommander>) : Command(comm
         }
 
         try {
-            printTokens(getOptions(), args)
+            printTokens(options, args)
         } catch (ex: IOException) {
             throw RuntimeException(ex)
         }
     }
 
-    protected open fun getOptions(): SmaliOptions {
-        val options = SmaliOptions()
+    protected open val options: SmaliOptions
+        get() {
+            val smaliOptions = SmaliOptions()
 
-        options.apiLevel = apiLevel
+            smaliOptions.apiLevel = apiLevel
 
-        return options
-    }
+            return smaliOptions
+        }
 }

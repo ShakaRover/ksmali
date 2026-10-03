@@ -35,8 +35,6 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.beust.jcommander.ParametersDelegate
 import com.beust.jcommander.validators.PositiveInteger
-import com.google.common.collect.Lists
-import com.google.common.collect.Maps
 import com.android.tools.smali.dexlib2.util.SyntheticAccessorResolver
 import com.android.tools.smali.util.getConsoleWidth
 import com.android.tools.smali.util.StringWrapper
@@ -85,7 +83,7 @@ open class DisassembleCommand(commandAncestors: List<JCommander>) : DexInputComm
             "multiple times to provide resources from multiple packages."
     )
     @field:ExtendedParameter(argumentNames = ["resource prefix", "public.xml file"])
-    private var resourceIdFiles: MutableList<String> = Lists.newArrayList()
+    private var resourceIdFiles: MutableList<String> = mutableListOf()
 
     @field:Parameter(
         names = ["-j", "--jobs"],
@@ -139,7 +137,7 @@ open class DisassembleCommand(commandAncestors: List<JCommander>) : DexInputComm
             "FULLMERGE. See \"baksmali help register-info\" for more information."
     )
     @field:ExtendedParameter(argumentNames = ["register info specifier"])
-    private var registerInfoTypes: MutableList<String> = Lists.newArrayList()
+    private var registerInfoTypes: MutableList<String> = mutableListOf()
 
     @field:Parameter(
         names = ["--sequential-labels", "--seq", "--sl"],
@@ -183,7 +181,7 @@ open class DisassembleCommand(commandAncestors: List<JCommander>) : DexInputComm
         val input = inputList[0]
         loadDexFile(input)
 
-        if (showDeodexWarning() && dexFile!!.supportsOptimizedOpcodes()) {
+        if (showDeodexWarning() && requireNotNull(dexFile).supportsOptimizedOpcodes()) {
             StringWrapper.printWrappedString(
                 System.err,
                 "Warning: You are disassembling an odex/oat file without deodexing it. You won't be able to " +
@@ -200,13 +198,12 @@ open class DisassembleCommand(commandAncestors: List<JCommander>) : DexInputComm
             }
         }
 
-        if (analysisArguments.classPathDirectories == null ||
-            analysisArguments.classPathDirectories!!.isEmpty()) {
+        if (analysisArguments.classPathDirectories.isNullOrEmpty()) {
             analysisArguments.classPathDirectories =
-                Lists.newArrayList<String>(inputFile!!.absoluteFile.parent!!)
+                mutableListOf(requireNotNull(inputFile?.absoluteFile?.parent))
         }
 
-        if (!disassembleDexFile(dexFile!!, outputDirectoryFile, jobs, getOptions(), classes)) {
+        if (!disassembleDexFile(requireNotNull(dexFile), outputDirectoryFile, jobs, options, classes)) {
             System.exit(-1)
         }
     }
@@ -223,7 +220,10 @@ open class DisassembleCommand(commandAncestors: List<JCommander>) : DexInputComm
         return true
     }
 
-    protected open fun getOptions(): BaksmaliOptions {
+    protected open val options: BaksmaliOptions
+        get() = buildOptions()
+
+    private fun buildOptions(): BaksmaliOptions {
         if (dexFile == null) {
             throw IllegalStateException("You must call loadDexFile first")
         }
@@ -233,7 +233,8 @@ open class DisassembleCommand(commandAncestors: List<JCommander>) : DexInputComm
         if (needsClassPath()) {
             try {
                 options.classPath = analysisArguments.loadClassPathForDexFile(
-                    inputFile!!.absoluteFile.parentFile!!, dexEntry!!, shouldCheckPackagePrivateAccess())
+                    requireNotNull(inputFile?.absoluteFile?.parentFile),
+                    requireNotNull(dexEntry), shouldCheckPackagePrivateAccess())
             } catch (ex: Exception) {
                 System.err.println("\n\nError occurred while loading class path files. Aborting.")
                 ex.printStackTrace(System.err)
@@ -242,23 +243,21 @@ open class DisassembleCommand(commandAncestors: List<JCommander>) : DexInputComm
         }
 
         if (resourceIdFiles.isNotEmpty()) {
-            val resourceFiles = Maps.newHashMap<String, File>()
+            val resourceFiles = mutableMapOf<String, File>()
 
             assert((resourceIdFiles.size % 2) == 0)
-            var i = 0
-            while (i < resourceIdFiles.size) {
+            for (i in resourceIdFiles.indices step 2) {
                 val resourcePrefix = resourceIdFiles[i]
                 val publicXml = resourceIdFiles[i + 1]
 
                 val publicXmlFile = File(publicXml)
 
                 if (!publicXmlFile.exists()) {
-                    System.err.println(String.format("Can't find file: %s", publicXmlFile))
+                    System.err.println("Can't find file: $publicXmlFile")
                     System.exit(-1)
                 }
 
                 resourceFiles[resourcePrefix] = publicXmlFile
-                i += 2
             }
 
             try {
@@ -301,7 +300,7 @@ open class DisassembleCommand(commandAncestors: List<JCommander>) : DexInputComm
             } else if (registerInfoType.equals("FULLMERGE", ignoreCase = true)) {
                 options.registerInfo = options.registerInfo or BaksmaliOptions.FULLMERGE
             } else {
-                System.err.println(String.format("Invalid register info type: %s", registerInfoType))
+                System.err.println("Invalid register info type: $registerInfoType")
                 usage()
                 System.exit(-1)
             }
@@ -313,7 +312,7 @@ open class DisassembleCommand(commandAncestors: List<JCommander>) : DexInputComm
 
         if (accessorComments) {
             options.syntheticAccessorResolver = SyntheticAccessorResolver(
-                dexFile!!.opcodes, dexFile!!.classes)
+                requireNotNull(dexFile).opcodes, requireNotNull(dexFile).classes)
         }
 
         if (allowOdex) {

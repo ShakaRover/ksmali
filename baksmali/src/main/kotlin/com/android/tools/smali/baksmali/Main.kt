@@ -32,7 +32,6 @@ package com.android.tools.smali.baksmali
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
-import com.google.common.collect.Lists
 import com.android.tools.smali.baksmali.HelpCommand.HlepCommand
 import com.android.tools.smali.util.jcommander.Command
 import com.android.tools.smali.util.jcommander.ExtendedParameters
@@ -45,7 +44,7 @@ import java.util.Properties
     commandName = "baksmali",
     postfixDescription = "See baksmali help <command> for more information about a specific command"
 )
-open class Main : Command(Lists.newArrayList<JCommander>()) {
+open class Main : Command(mutableListOf()) {
 
     @field:Parameter(
         names = ["--help", "-h", "-?"], help = true,
@@ -57,7 +56,6 @@ open class Main : Command(Lists.newArrayList<JCommander>()) {
         names = ["--version", "-v"], help = true,
         description = "Print the version of baksmali and then exit"
     )
-    @JvmField
     var version = false
 
     private lateinit var jc: JCommander
@@ -70,7 +68,6 @@ open class Main : Command(Lists.newArrayList<JCommander>()) {
     }
 
     companion object {
-        @JvmField
         val VERSION: String = loadVersion()
 
         @JvmStatic
@@ -100,13 +97,12 @@ open class Main : Command(Lists.newArrayList<JCommander>()) {
                 return
             }
 
-            val command = jc.commands[jc.parsedCommand]!!.objects[0] as Command
+            val command = requireNotNull(jc.commands[jc.parsedCommand]).objects[0] as Command
             command.run()
         }
 
-        @JvmStatic
         protected fun version() {
-            System.out.println("baksmali " + VERSION + " (http://smali.org)")
+            System.out.println("baksmali $VERSION (http://smali.org)")
             System.out.println("Copyright (C) 2010 Ben Gruver (JesusFreke@JesusFreke.com)")
             System.out.println("BSD license (http://www.opensource.org/licenses/bsd-license.php)")
             System.exit(0)

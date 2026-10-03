@@ -36,15 +36,10 @@ import com.android.tools.smali.dexlib2.HiddenApiRestriction
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.ReferenceType
 import com.android.tools.smali.dexlib2.analysis.AnalysisException
-import com.android.tools.smali.dexlib2.analysis.AnalyzedInstruction
 import com.android.tools.smali.dexlib2.analysis.MethodAnalyzer
-import com.android.tools.smali.dexlib2.iface.Annotation
-import com.android.tools.smali.dexlib2.iface.ExceptionHandler
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.MethodImplementation
 import com.android.tools.smali.dexlib2.iface.MethodParameter
-import com.android.tools.smali.dexlib2.iface.TryBlock
-import com.android.tools.smali.dexlib2.iface.debug.DebugItem
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
@@ -55,26 +50,21 @@ import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstructio
 import com.android.tools.smali.dexlib2.util.InstructionOffsetMap
 import com.android.tools.smali.dexlib2.util.InstructionOffsetMap.InvalidInstructionOffset
 import com.android.tools.smali.dexlib2.util.SyntheticAccessorResolver
-import com.android.tools.smali.dexlib2.util.SyntheticAccessorResolver.AccessedMember
 import com.android.tools.smali.dexlib2.util.TypeUtils
 import com.android.tools.smali.util.ExceptionWithContext
 import com.android.tools.smali.util.SparseIntArray
 import com.google.common.collect.ImmutableList
-import com.google.common.collect.Lists
 import java.io.IOException
-import java.util.ArrayList
-import java.util.Collections
-import java.util.HashMap
 
 class MethodDefinition(
-    @JvmField val classDef: ClassDefinition,
-    @JvmField val method: Method,
-    @JvmField val methodImpl: MethodImplementation
+    val classDef: ClassDefinition,
+    val method: Method,
+    val methodImpl: MethodImplementation
 ) {
-    @JvmField val instructions: ImmutableList<Instruction> = ImmutableList.copyOf(methodImpl.instructions)
-    @JvmField val effectiveInstructions: MutableList<Instruction> = Lists.newArrayList(instructions)
-    @JvmField val methodParameters: ImmutableList<MethodParameter> = ImmutableList.copyOf(method.parameters)
-    @JvmField var registerFormatter: RegisterFormatter? = null
+    val instructions: ImmutableList<Instruction> = ImmutableList.copyOf(methodImpl.instructions)
+    val effectiveInstructions: MutableList<Instruction> = instructions.toMutableList()
+    val methodParameters: ImmutableList<MethodParameter> = ImmutableList.copyOf(method.parameters)
+    var registerFormatter: RegisterFormatter? = null
 
     val labelCache: LabelCache = LabelCache()
 
@@ -151,7 +141,6 @@ class MethodDefinition(
     }
 
     companion object {
-        @JvmStatic
         @Throws(IOException::class)
         fun writeEmptyMethodTo(writer: BaksmaliWriter, method: Method, classDef: ClassDefinition) {
             writer.write(".method ")
@@ -349,7 +338,7 @@ class MethodDefinition(
     }
 
     private fun getMethodItems(): List<MethodItem> {
-        val methodItems = ArrayList<MethodItem>()
+        val methodItems = mutableListOf<MethodItem>()
 
         if ((classDef.options.registerInfo != 0) || classDef.options.normalizeVirtualMethods ||
             (classDef.options.deodex && needsAnalyzed())) {
@@ -367,11 +356,11 @@ class MethodDefinition(
             setLabelSequentialNumbers()
         }
 
-        for (labelMethodItem in labelCache.getLabels()) {
+        for (labelMethodItem in labelCache.labels) {
             methodItems.add(labelMethodItem)
         }
 
-        Collections.sort(methodItems)
+        methodItems.sort()
 
         return methodItems
     }
@@ -401,9 +390,7 @@ class MethodDefinition(
 
             if (classDef.options.codeOffsets) {
                 methodItems.add(object : MethodItem(currentCodeAddress) {
-                    override fun getSortOrder(): Double {
-                        return -1000.0
-                    }
+                    override val sortOrder: Double get() = -1000.0
 
                     @Throws(IOException::class)
                     override fun writeTo(writer: BaksmaliWriter): Boolean {
@@ -425,7 +412,7 @@ class MethodDefinition(
                         methodReference.validateReference()
 
                         if (SyntheticAccessorResolver.looksLikeSyntheticAccessor(methodReference.name)) {
-                            val accessedMember = classDef.options.syntheticAccessorResolver!!
+                            val accessedMember = requireNotNull(classDef.options.syntheticAccessorResolver)
                                 .getAccessedMember(methodReference)
                             if (accessedMember != null) {
                                 methodItems.add(SyntheticAccessCommentMethodItem(
@@ -443,14 +430,14 @@ class MethodDefinition(
     }
 
     private fun addAnalyzedInstructionMethodItems(methodItems: MutableList<MethodItem>) {
-        val methodAnalyzer = MethodAnalyzer(classDef.options.classPath!!, method,
+        val methodAnalyzer = MethodAnalyzer(requireNotNull(classDef.options.classPath), method,
             classDef.options.inlineResolver, classDef.options.normalizeVirtualMethods)
 
         val analysisException = methodAnalyzer.analysisException
         if (analysisException != null) {
             // TODO: need to keep track of whether any errors occurred, so we can exit with a non-zero result
             methodItems.add(CommentMethodItem(
-                String.format("AnalysisException: %s", analysisException.message),
+                "AnalysisException: ${analysisException.message}",
                 analysisException.codeAddress, Integer.MIN_VALUE.toDouble()))
             analysisException.printStackTrace(System.err)
         }
@@ -478,9 +465,7 @@ class MethodDefinition(
 
             if (classDef.options.codeOffsets) {
                 methodItems.add(object : MethodItem(currentCodeAddress) {
-                    override fun getSortOrder(): Double {
-                        return -1000.0
-                    }
+                    override val sortOrder: Double get() = -1000.0
 
                     @Throws(IOException::class)
                     override fun writeTo(writer: BaksmaliWriter): Boolean {
@@ -495,10 +480,10 @@ class MethodDefinition(
                 !instruction.instruction.opcode.format.isPayloadFormat) {
                 methodItems.add(
                     PreInstructionRegisterInfoMethodItem(classDef.options.registerInfo,
-                        methodAnalyzer, registerFormatter!!, instruction, currentCodeAddress))
+                        methodAnalyzer, requireNotNull(registerFormatter), instruction, currentCodeAddress))
 
                 methodItems.add(
-                    PostInstructionRegisterInfoMethodItem(registerFormatter!!, instruction, currentCodeAddress))
+                    PostInstructionRegisterInfoMethodItem(requireNotNull(registerFormatter), instruction, currentCodeAddress))
             }
 
             currentCodeAddress += instruction.instruction.codeUnits
@@ -519,13 +504,11 @@ class MethodDefinition(
             val endAddress = startAddress + tryBlock.codeUnitCount
 
             if (startAddress >= codeSize) {
-                throw RuntimeException(String.format("Try start offset %d is past the end of the code block.",
-                    startAddress))
+                throw RuntimeException("Try start offset $startAddress is past the end of the code block.")
             }
             // Note: not >=. endAddress == codeSize is valid, when the try covers the last instruction
             if (endAddress > codeSize) {
-                throw RuntimeException(String.format("Try end offset %d is past the end of the code block.",
-                    endAddress))
+                throw RuntimeException("Try end offset $endAddress is past the end of the code block.")
             }
 
             /**
@@ -555,40 +538,37 @@ class MethodDefinition(
 
     private fun addDebugInfo(methodItems: MutableList<MethodItem>) {
         for (debugItem in methodImpl.debugItems) {
-            methodItems.add(DebugMethodItem.build(classDef, registerFormatter!!, debugItem))
+            methodItems.add(DebugMethodItem.build(classDef, requireNotNull(registerFormatter), debugItem))
         }
     }
 
     private fun setLabelSequentialNumbers() {
-        val nextLabelSequenceByType = HashMap<String, Int>()
-        val sortedLabels = ArrayList<LabelMethodItem>(labelCache.getLabels())
+        val nextLabelSequenceByType = mutableMapOf<String, Int>()
+        val sortedLabels = labelCache.labels.toMutableList()
 
         //sort the labels by their location in the method
-        Collections.sort(sortedLabels)
+        sortedLabels.sort()
 
         for (labelMethodItem in sortedLabels) {
-            val labelSequence = nextLabelSequenceByType[labelMethodItem.getLabelPrefix()] ?: 0
-            labelMethodItem.setLabelSequence(labelSequence)
-            nextLabelSequenceByType[labelMethodItem.getLabelPrefix()] = labelSequence + 1
+            val labelSequence = nextLabelSequenceByType[labelMethodItem.labelPrefix] ?: 0
+            labelMethodItem.labelSequence = labelSequence
+            nextLabelSequenceByType[labelMethodItem.labelPrefix] = labelSequence + 1
         }
     }
 
     class LabelCache {
-        @JvmField
-        protected var labels: HashMap<LabelMethodItem, LabelMethodItem> =
-            HashMap<LabelMethodItem, LabelMethodItem>()
+        private val labelsMap = mutableMapOf<LabelMethodItem, LabelMethodItem>()
+
+        val labels: Collection<LabelMethodItem>
+            get() = labelsMap.values
 
         fun internLabel(labelMethodItem: LabelMethodItem): LabelMethodItem {
-            val internedLabelMethodItem = labels[labelMethodItem]
+            val internedLabelMethodItem = labelsMap[labelMethodItem]
             if (internedLabelMethodItem != null) {
                 return internedLabelMethodItem
             }
-            labels[labelMethodItem] = labelMethodItem
+            labelsMap[labelMethodItem] = labelMethodItem
             return labelMethodItem
-        }
-
-        fun getLabels(): Collection<LabelMethodItem> {
-            return labels.values
         }
     }
 

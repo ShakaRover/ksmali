@@ -33,7 +33,6 @@ package com.android.tools.smali.baksmali
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
-import com.google.common.collect.Lists
 import com.android.tools.smali.dexlib2.DexFileFactory
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.util.jcommander.Command
@@ -57,7 +56,7 @@ open class ListDexCommand(commandAncestors: List<JCommander>) : Command(commandA
 
     @field:Parameter(description = "An apk or oat file.")
     @field:ExtendedParameter(argumentNames = ["file"])
-    private var inputList: MutableList<String> = Lists.newArrayList()
+    private var inputList: MutableList<String> = mutableListOf()
 
     override fun run() {
         if (help || inputList.isEmpty()) {
@@ -75,7 +74,7 @@ open class ListDexCommand(commandAncestors: List<JCommander>) : Command(commandA
         val file = File(input)
 
         if (!file.exists()) {
-            System.err.println(String.format("Could not find the file: %s", input))
+            System.err.println("Could not find the file: $input")
             System.exit(-1)
         }
 

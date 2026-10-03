@@ -48,9 +48,7 @@ class PreInstructionRegisterInfoMethodItem(
     codeAddress: Int
 ) : MethodItem(codeAddress) {
 
-    override fun getSortOrder(): Double {
-        return 99.9
-    }
+    override val sortOrder: Double get() = 99.9
 
     @Throws(IOException::class)
     override fun writeTo(writer: BaksmaliWriter): Boolean {

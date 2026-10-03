@@ -39,7 +39,6 @@ import com.android.tools.smali.smali.compileSmali
 import org.junit.Assert
 import org.junit.Test
 import java.io.IOException
-import java.io.InputStream
 import java.io.StringWriter
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
@@ -65,8 +64,6 @@ class BaksmaliTestUtils {
 
     companion object {
         private val newline = System.getProperty("line.separator")
-
-        @JvmStatic
         @Throws(IOException::class, RecognitionException::class)
         fun assertSmaliCompiledEquals(
             source: String, expected: String, options: BaksmaliOptions, stripComments: Boolean
@@ -80,21 +77,15 @@ class BaksmaliTestUtils {
             // Assert that normalized strings are now equal
             Assert.assertEquals(normalizedExpected, normalizedActual)
         }
-
-        @JvmStatic
         @Throws(IOException::class, RecognitionException::class)
         fun assertSmaliCompiledEquals(source: String, expected: String, options: BaksmaliOptions) {
             assertSmaliCompiledEquals(source, expected, options, false)
         }
-
-        @JvmStatic
         @Throws(IOException::class, RecognitionException::class)
         fun assertSmaliCompiledEquals(source: String, expected: String) {
             val options = BaksmaliOptions()
             assertSmaliCompiledEquals(source, expected, options)
         }
-
-        @JvmStatic
         fun normalizeSmali(smaliText0: String, stripComments: Boolean): String {
             var smaliText = smaliText0
             if (stripComments) {
@@ -102,8 +93,6 @@ class BaksmaliTestUtils {
             }
             return normalizeWhitespace(smaliText)
         }
-
-        @JvmStatic
         @Throws(IOException::class)
         fun getNormalizedSmali(
             classDef: ClassDef, options: BaksmaliOptions, stripComments: Boolean
@@ -117,8 +106,6 @@ class BaksmaliTestUtils {
             writer.close()
             return normalizeSmali(stringWriter.toString(), stripComments)
         }
-
-        @JvmStatic
         @Throws(IOException::class)
         fun readResourceBytesFully(fileName: String): ByteArray {
             val smaliStream = RoundtripTest::class.java.classLoader
@@ -129,30 +116,20 @@ class BaksmaliTestUtils {
 
             return ByteStreams.toByteArray(smaliStream)
         }
-
-        @JvmStatic
         @Throws(IOException::class)
         fun readResourceFully(fileName: String): String {
             return readResourceFully(fileName, StandardCharsets.UTF_8)
         }
-
-        @JvmStatic
         @Throws(IOException::class)
         fun readResourceFully(fileName: String, encoding: Charset): String {
-            return String(readResourceBytesFully(fileName), encoding)
+            return readResourceBytesFully(fileName).toString(encoding)
         }
-
-        @JvmStatic
         fun normalizeNewlines(source: String): String {
             return normalizeNewlines(source, newline)
         }
-
-        @JvmStatic
         fun normalizeNewlines(source: String, newlineValue: String): String {
             return source.replace("\r", "").replace("\n", newlineValue)
         }
-
-        @JvmStatic
         fun normalizeWhitespace(source0: String): String {
             // Go to native system new lines so that ^/$ work correctly
             var source = normalizeNewlines(source0)
@@ -176,8 +153,6 @@ class BaksmaliTestUtils {
             source = normalizeNewlines(source, "\n")
             return source
         }
-
-        @JvmStatic
         fun stripComments(source: String): String {
             val pattern = Pattern.compile("#(.*)")
             val matcher = pattern.matcher(source)

@@ -62,33 +62,35 @@ open class DeodexCommand(commandAncestors: List<JCommander>) : DisassembleComman
     @field:ExtendedParameter(argumentNames = ["file"])
     private var inlineTable: String? = null
 
-    override fun getOptions(): BaksmaliOptions {
-        val options = super.getOptions()
+    override val options: BaksmaliOptions
+        get() {
+            val options = super.options
 
-        options.deodex = true
+            options.deodex = true
 
-        if (dexFile is DexBackedOdexFile) {
-            if (inlineTable == null) {
-                options.inlineResolver = InlineMethodResolver.createInlineMethodResolver(
-                    (dexFile as DexBackedOdexFile).odexVersion)
-            } else {
-                val inlineTableFile = File(inlineTable!!)
-                if (!inlineTableFile.exists()) {
-                    System.err.println(String.format("Could not find file: %s", inlineTable))
-                    System.exit(-1)
-                }
-                try {
-                    options.inlineResolver = CustomInlineMethodResolver(options.classPath!!, inlineTableFile)
-                } catch (ex: IOException) {
-                    System.err.println(String.format("Error while reading file: %s", inlineTableFile))
-                    ex.printStackTrace(System.err)
-                    System.exit(-1)
+            if (dexFile is DexBackedOdexFile) {
+                if (inlineTable == null) {
+                    options.inlineResolver = InlineMethodResolver.createInlineMethodResolver(
+                        (dexFile as DexBackedOdexFile).odexVersion)
+                } else {
+                    val inlineTableFile = File(requireNotNull(inlineTable))
+                    if (!inlineTableFile.exists()) {
+                        System.err.println("Could not find file: $inlineTable")
+                        System.exit(-1)
+                    }
+                    try {
+                        options.inlineResolver = CustomInlineMethodResolver(
+                            requireNotNull(options.classPath), inlineTableFile)
+                    } catch (ex: IOException) {
+                        System.err.println("Error while reading file: $inlineTableFile")
+                        ex.printStackTrace(System.err)
+                        System.exit(-1)
+                    }
                 }
             }
-        }
 
-        return options
-    }
+            return options
+        }
 
     override fun shouldCheckPackagePrivateAccess(): Boolean {
         return checkPackagePrivateArgument.checkPackagePrivateAccess

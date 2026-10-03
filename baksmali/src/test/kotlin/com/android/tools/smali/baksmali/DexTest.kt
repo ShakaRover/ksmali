@@ -57,7 +57,7 @@ abstract class DexTest {
     }
 
     protected fun getInputFilename(testName: String): String {
-        return String.format("%s%s%sInput.dex", testDir, File.separatorChar, testName)
+        return "$testDir${File.separatorChar}${testName}Input.dex"
     }
 
     protected fun getInputDexFile(testName: String, options: BaksmaliOptions): DexBackedDexFile {

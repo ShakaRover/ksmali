@@ -28,8 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@file:JvmName("LocalFormatter")
-
 package com.android.tools.smali.baksmali.Adaptors.Debug
 
 import com.android.tools.smali.baksmali.formatter.BaksmaliWriter

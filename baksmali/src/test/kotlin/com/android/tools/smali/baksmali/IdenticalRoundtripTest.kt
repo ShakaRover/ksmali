@@ -45,7 +45,7 @@ abstract class IdenticalRoundtripTest : RoundtripTest {
     constructor()
 
     override fun getInputFilename(testName: String): String {
-        return String.format("%s%s%s.smali", testDir, File.separatorChar, testName)
+        return "$testDir${File.separatorChar}${testName}.smali"
     }
 
     override fun getOutputFilename(testName: String): String {

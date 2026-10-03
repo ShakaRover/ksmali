@@ -33,7 +33,6 @@ package com.android.tools.smali.baksmali
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
-import com.google.common.collect.Lists
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedOdexFile
@@ -62,7 +61,7 @@ open class ListDependenciesCommand(commandAncestors: List<JCommander>) : Command
 
     @field:Parameter(description = "An oat/odex file")
     @field:ExtendedParameter(argumentNames = ["file"])
-    private var inputList: MutableList<String> = Lists.newArrayList()
+    private var inputList: MutableList<String> = mutableListOf()
 
     override fun run() {
         if (help || inputList.isEmpty()) {
@@ -86,7 +85,7 @@ open class ListDependenciesCommand(commandAncestors: List<JCommander>) : Command
         }
 
         try {
-            val oatFile = OatFile.fromInputStream(inputStream!!)
+            val oatFile = OatFile.fromInputStream(requireNotNull(inputStream))
             for (entry in oatFile.bootClassPath) {
                 System.out.println(entry)
             }
@@ -98,7 +97,7 @@ open class ListDependenciesCommand(commandAncestors: List<JCommander>) : Command
         }
 
         try {
-            val odexFile = DexBackedOdexFile.fromInputStream(Opcodes.getDefault(), inputStream!!)
+            val odexFile = DexBackedOdexFile.fromInputStream(Opcodes.getDefault(), requireNotNull(inputStream))
             for (entry in odexFile.dependencies) {
                 System.out.println(entry)
             }

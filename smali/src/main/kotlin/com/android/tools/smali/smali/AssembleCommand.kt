@@ -87,21 +87,22 @@ open class AssembleCommand(commandAncestors: List<JCommander>) : Command(command
         }
 
         try {
-            assemble(getOptions(), args)
+            assemble(options, args)
         } catch (ex: IOException) {
             throw RuntimeException(ex)
         }
     }
 
-    protected open fun getOptions(): SmaliOptions {
-        val options = SmaliOptions()
+    protected open val options: SmaliOptions
+        get() {
+            val smaliOptions = SmaliOptions()
 
-        options.jobs = jobs
-        options.apiLevel = apiLevel
-        options.outputDexFile = output
-        options.allowOdexOpcodes = allowOdexOpcodes
-        options.verboseErrors = verbose
+            smaliOptions.jobs = jobs
+            smaliOptions.apiLevel = apiLevel
+            smaliOptions.outputDexFile = output
+            smaliOptions.allowOdexOpcodes = allowOdexOpcodes
+            smaliOptions.verboseErrors = verbose
 
-        return options
-    }
+            return smaliOptions
+        }
 }

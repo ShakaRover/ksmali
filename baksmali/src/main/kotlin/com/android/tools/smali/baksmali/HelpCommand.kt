@@ -40,7 +40,6 @@ import com.android.tools.smali.util.StringWrapper
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
-import com.google.common.collect.Lists
 
 @Parameters(commandDescription = "Shows usage information")
 @ExtendedParameters(
@@ -51,10 +50,10 @@ open class HelpCommand(commandAncestors: List<JCommander>) : Command(commandAnce
 
     @field:Parameter(description = "If specified, show the detailed usage information for the given commands")
     @field:ExtendedParameter(argumentNames = ["commands"])
-    private var commands: MutableList<String>? = Lists.newArrayList()
+    private var commands: MutableList<String>? = mutableListOf()
 
     override fun run() {
-        val parentJc = commandAncestors[commandAncestors.size - 1]
+        val parentJc = commandAncestors.last()
 
         val cmds = commands
         if (cmds == null || cmds.isEmpty()) {

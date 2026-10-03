@@ -32,7 +32,6 @@ package com.android.tools.smali.smali
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
-import com.google.common.collect.Lists
 import com.android.tools.smali.util.jcommander.Command
 import com.android.tools.smali.util.jcommander.addExtendedCommand
 import com.android.tools.smali.util.jcommander.ExtendedParameters
@@ -44,14 +43,13 @@ import java.util.Properties
     commandName = "smali",
     postfixDescription = "See smali help <command> for more information about a specific command"
 )
-open class Main : Command(Lists.newArrayList<JCommander>()) {
+open class Main : Command(mutableListOf()) {
     @field:Parameter(names = ["-h", "-?", "--help"], help = true,
         description = "Show usage information")
     private var help = false
 
     @field:Parameter(names = ["-v", "--version"], help = true,
         description = "Print the version of baksmali and then exit")
-    @JvmField
     var version = false
 
     private lateinit var jc: JCommander
@@ -62,7 +60,6 @@ open class Main : Command(Lists.newArrayList<JCommander>()) {
     protected override fun getJCommander(): JCommander = jc
 
     companion object {
-        @JvmField
         val VERSION: String = loadVersion()
 
         @JvmStatic
@@ -90,11 +87,10 @@ open class Main : Command(Lists.newArrayList<JCommander>()) {
                 return
             }
 
-            val command = jc.commands[jc.parsedCommand]!!.objects[0] as Command
+            val command = requireNotNull(jc.commands[jc.parsedCommand]).objects[0] as Command
             command.run()
         }
 
-        @JvmStatic
         protected fun version() {
             System.out.println("smali " + VERSION + " (http://smali.org)")
             System.out.println("Copyright (C) 2010 Ben Gruver (JesusFreke@JesusFreke.com)")

@@ -31,9 +31,7 @@ import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 
 //a "spacer" between instructions
 class BlankMethodItem(codeAddress: Int) : MethodItem(codeAddress) {
-    override fun getSortOrder(): Double {
-        return Integer.MAX_VALUE.toDouble()
-    }
+    override val sortOrder: Double get() = Integer.MAX_VALUE.toDouble()
 
     override fun writeTo(writer: BaksmaliWriter): Boolean {
         //we didn't technically print something, but returning true indicates that a newline should be printed

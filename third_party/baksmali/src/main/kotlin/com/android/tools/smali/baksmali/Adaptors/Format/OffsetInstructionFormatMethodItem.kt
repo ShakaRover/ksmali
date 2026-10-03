@@ -40,39 +40,35 @@ class OffsetInstructionFormatMethodItem(
     options: BaksmaliOptions, methodDef: MethodDefinition, codeAddress: Int, instruction: OffsetInstruction
 ) : InstructionMethodItem<OffsetInstruction>(methodDef, codeAddress, instruction) {
 
-    @JvmField
-    protected var label: LabelMethodItem =
+    protected val label: LabelMethodItem =
         methodDef.labelCache.internLabel(
-            LabelMethodItem(options, codeAddress + instruction.codeOffset, getLabelPrefix()))
+            LabelMethodItem(options, codeAddress + instruction.codeOffset, labelPrefix))
 
     @Throws(IOException::class)
     override fun writeTargetLabel(writer: BaksmaliWriter) {
         label.writeTo(writer)
     }
 
-    fun getLabel(): LabelMethodItem {
-        return label
-    }
-
-    private fun getLabelPrefix(): String {
-        val opcode = instruction.opcode
-        when (opcode.format) {
-            Format.Format10t, Format.Format20t, Format.Format30t -> return "goto_"
-            Format.Format21t, Format.Format22t -> return "cond_"
-            Format.Format31t -> {
-                if (opcode == Opcode.FILL_ARRAY_DATA) {
-                    return "array_"
+    private val labelPrefix: String
+        get() {
+            val opcode = instruction.opcode
+            return when (opcode.format) {
+                Format.Format10t, Format.Format20t, Format.Format30t -> "goto_"
+                Format.Format21t, Format.Format22t -> "cond_"
+                Format.Format31t -> {
+                    if (opcode == Opcode.FILL_ARRAY_DATA) {
+                        "array_"
+                    } else if (opcode == Opcode.PACKED_SWITCH) {
+                        "pswitch_data_"
+                    } else {
+                        // Opcode.SPARSE_SWITCH;
+                        "sswitch_data_"
+                    }
                 }
-                if (opcode == Opcode.PACKED_SWITCH) {
-                    return "pswitch_data_"
+                else -> {
+                    assert(false)
+                    "goto_"
                 }
-                // Opcode.SPARSE_SWITCH;
-                return "sswitch_data_"
-            }
-            else -> {
-                assert(false)
-                return "goto_"
             }
         }
-    }
 }

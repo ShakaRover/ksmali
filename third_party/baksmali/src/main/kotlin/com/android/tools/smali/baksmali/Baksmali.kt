@@ -25,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@file:JvmName("Baksmali")
-
 package com.android.tools.smali.baksmali
 
 import com.android.tools.smali.baksmali.Adaptors.ClassDefinition

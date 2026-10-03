@@ -28,8 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@file:JvmName("SmaliTestUtils")
-
 package com.android.tools.smali.smali
 
 import com.google.common.collect.Iterables
@@ -91,5 +89,5 @@ fun compileSmali(smaliText: String, apiLevel: Int): DexBackedClassDef {
 
     val dexFile = DexBackedDexFile(Opcodes.forApi(apiLevel), dataStore.buffer)
 
-    return Iterables.getFirst(dexFile.classes, null)!!
+    return requireNotNull(Iterables.getFirst(dexFile.classes, null))
 }

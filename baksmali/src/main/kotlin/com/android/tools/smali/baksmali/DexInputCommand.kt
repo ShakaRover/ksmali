@@ -32,8 +32,6 @@ package com.android.tools.smali.baksmali
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
-import com.google.common.base.Strings
-import com.google.common.collect.Lists
 import com.android.tools.smali.dexlib2.DexFileFactory
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
@@ -49,7 +47,6 @@ import java.io.IOException
  */
 abstract class DexInputCommand(commandAncestors: List<JCommander>) : Command(commandAncestors) {
 
-    @JvmField
     @field:Parameter(
         names = ["-a", "--api"],
         description = "The numeric api level of the file being disassembled."
@@ -57,22 +54,17 @@ abstract class DexInputCommand(commandAncestors: List<JCommander>) : Command(com
     @field:ExtendedParameter(argumentNames = ["api"])
     var apiLevel = -1
 
-    @JvmField
     @field:Parameter(
         description = "A dex/apk/oat/odex file. For apk or oat files that contain multiple dex " +
             "files, you can specify the specific entry to use as if the apk/oat file was a directory. " +
             "e.g. \"app.apk/classes2.dex\". For more information, see \"baksmali help input\"."
     )
     @field:ExtendedParameter(argumentNames = ["file"])
-    protected var inputList: MutableList<String> = Lists.newArrayList()
+    protected var inputList: MutableList<String> = mutableListOf()
 
-    @JvmField
     protected var inputFile: File? = null
-    @JvmField
     protected var inputEntry: String? = null
-    @JvmField
     protected var dexEntry: MultiDexContainer.DexEntry<out DexBackedDexFile>? = null
-    @JvmField
     protected var dexFile: DexBackedDexFile? = null
 
     /**
@@ -136,9 +128,9 @@ abstract class DexInputCommand(commandAncestors: List<JCommander>) : Command(com
             opcodes = Opcodes.forApi(apiLevel)
         }
 
-        if (!Strings.isNullOrEmpty(dexEntryName)) {
+        if (!dexEntryName.isNullOrEmpty()) {
             var exactMatch = false
-            var entryName = dexEntryName!!
+            var entryName = requireNotNull(dexEntryName)
             if (entryName.length > 2 && entryName[0] == '"' && entryName[entryName.length - 1] == '"') {
                 entryName = entryName.substring(1, entryName.length - 1)
                 exactMatch = true
@@ -158,20 +150,19 @@ abstract class DexInputCommand(commandAncestors: List<JCommander>) : Command(com
                 val container = DexFileFactory.loadDexContainer(foundFile, opcodes)
 
                 if (container.dexEntryNames.size == 1) {
-                    val entry = container.getEntry(container.dexEntryNames[0])
-                    assert(entry != null)
+                    val entry = requireNotNull(container.getEntry(container.dexEntryNames[0]))
                     dexEntry = entry
-                    dexFile = entry!!.dexFile
+                    dexFile = entry.dexFile
                 } else if (container.dexEntryNames.size > 1) {
                     var entry = container.getEntry("classes.dex")
                     if (entry == null) {
                         entry = container.getEntry(container.dexEntryNames[0])
                     }
-                    assert(entry != null)
+                    entry = requireNotNull(entry)
                     dexEntry = entry
-                    dexFile = entry!!.dexFile
+                    dexFile = entry.dexFile
                 } else {
-                    throw RuntimeException(String.format("\"%s\" has no dex files", input))
+                    throw RuntimeException("\"$input\" has no dex files")
                 }
             } catch (ex: IOException) {
                 throw RuntimeException(ex)

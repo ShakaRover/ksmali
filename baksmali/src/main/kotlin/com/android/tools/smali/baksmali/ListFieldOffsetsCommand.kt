@@ -70,21 +70,20 @@ open class ListFieldOffsetsCommand(commandAncestors: List<JCommander>) :
 
         val input = inputList[0]
         loadDexFile(input)
-        val options = getOptions()
+        val options = this.options
 
         val formatter = BaksmaliFormatter()
 
         try {
-            for (classDef in dexFile!!.classes) {
-                val classProto = options.classPath!!.getClass(classDef) as ClassProto
+            for (classDef in requireNotNull(dexFile).classes) {
+                val classProto = requireNotNull(options.classPath).getClass(classDef) as ClassProto
                 val fields = classProto.instanceFields
                 val className =
-                    "Class  " + formatter.getType(classDef.type) + " : " + fields.size() + " instance fields\n"
+                    "Class  ${formatter.getType(classDef.type)} : ${fields.size()} instance fields\n"
                 System.out.write(className.toByteArray())
                 for (i in 0 until fields.size()) {
                     val field =
-                        fields.keyAt(i).toString() + ":" + fields.valueAt(i).type + " " +
-                            fields.valueAt(i).name + "\n"
+                        "${fields.keyAt(i)}:${fields.valueAt(i).type} ${fields.valueAt(i).name}\n"
                     System.out.write(field.toByteArray())
                 }
                 System.out.write("\n".toByteArray())
@@ -95,24 +94,26 @@ open class ListFieldOffsetsCommand(commandAncestors: List<JCommander>) :
         }
     }
 
-    private fun getOptions(): BaksmaliOptions {
-        if (dexFile == null) {
-            throw IllegalStateException("You must call loadDexFile first")
+    private val options: BaksmaliOptions
+        get() {
+            if (dexFile == null) {
+                throw IllegalStateException("You must call loadDexFile first")
+            }
+
+            val options = BaksmaliOptions()
+
+            options.apiLevel = apiLevel
+
+            try {
+                options.classPath = analysisArguments.loadClassPathForDexFile(
+                    requireNotNull(inputFile?.absoluteFile?.parentFile),
+                    requireNotNull(dexEntry), false)
+            } catch (ex: Exception) {
+                System.err.println("Error occurred while loading class path files.")
+                ex.printStackTrace(System.err)
+                System.exit(-1)
+            }
+
+            return options
         }
-
-        val options = BaksmaliOptions()
-
-        options.apiLevel = apiLevel
-
-        try {
-            options.classPath = analysisArguments.loadClassPathForDexFile(
-                inputFile!!.absoluteFile.parentFile!!, dexEntry!!, false)
-        } catch (ex: Exception) {
-            System.err.println("Error occurred while loading class path files.")
-            ex.printStackTrace(System.err)
-            System.exit(-1)
-        }
-
-        return options
-    }
 }

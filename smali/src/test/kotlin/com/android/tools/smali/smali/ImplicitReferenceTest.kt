@@ -30,8 +30,6 @@
 
 package com.android.tools.smali.smali
 
-import com.google.common.collect.Lists
-import com.google.common.collect.Maps
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.ValueType
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -76,7 +74,7 @@ class ImplicitReferenceTest {
         val methodImpl = mainMethod!!.implementation
         Assert.assertNotNull(methodImpl)
 
-        val instructions: List<Instruction> = Lists.newArrayList(methodImpl!!.instructions)
+        val instructions: List<Instruction> = requireNotNull(methodImpl).instructions.toMutableList()
 
         var instruction = instructions[0] as Instruction35c
         Assert.assertNotNull(instruction)
@@ -110,7 +108,7 @@ class ImplicitReferenceTest {
             ".field public static field3:Ljava/lang/reflect/Method; = I()V\n" +
             ".field public static field4:Ljava/lang/Class; = I")
 
-        val fields = Maps.newHashMap<String, Field>()
+        val fields = mutableMapOf<String, Field>()
         for (field in classDef.fields) {
             fields[field.name] = field
         }
@@ -171,7 +169,7 @@ class ImplicitReferenceTest {
         val methodImpl = mainMethod!!.implementation
         Assert.assertNotNull(methodImpl)
 
-        val instructions: List<Instruction> = Lists.newArrayList(methodImpl!!.instructions)
+        val instructions: List<Instruction> = requireNotNull(methodImpl).instructions.toMutableList()
 
         var instruction = instructions[0] as Instruction21c
         Assert.assertNotNull(instruction)
@@ -204,7 +202,7 @@ class ImplicitReferenceTest {
             ".field public static field2:Ljava/lang/reflect/Field; = V:I\n" +
             ".field public static field3:Ljava/lang/reflect/Field; = I:I\n")
 
-        val fields = Maps.newHashMap<String, Field>()
+        val fields = mutableMapOf<String, Field>()
         for (field in classDef.fields) {
             fields[field.name] = field
         }

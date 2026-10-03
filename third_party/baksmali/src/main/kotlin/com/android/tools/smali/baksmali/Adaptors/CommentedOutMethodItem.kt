@@ -32,10 +32,8 @@ import java.io.IOException
 
 class CommentedOutMethodItem(
     private val commentedOutMethodItem: MethodItem
-) : MethodItem(commentedOutMethodItem.getCodeAddress()) {
-    override fun getSortOrder(): Double {
-        return commentedOutMethodItem.getSortOrder() + .001
-    }
+) : MethodItem(commentedOutMethodItem.codeAddress) {
+    override val sortOrder: Double get() = commentedOutMethodItem.sortOrder + .001
 
     @Throws(IOException::class)
     override fun writeTo(writer: BaksmaliWriter): Boolean {

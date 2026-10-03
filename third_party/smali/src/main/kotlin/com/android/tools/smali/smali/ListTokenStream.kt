@@ -112,15 +112,15 @@ class ListTokenStream(
         if (stop >= tokens.size) {
             stop = tokens.size - 1
         }
-        val buf = StringBuilder()
-        for (i in start..stop) {
-            val token = tokens[i]
-            if (token.type == Token.EOF) {
-                break
+        return buildString {
+            for (i in start..stop) {
+                val token = tokens[i]
+                if (token.type == Token.EOF) {
+                    break
+                }
+                append(token.text)
             }
-            buf.append(token.text)
         }
-        return buf.toString()
     }
 
     override fun getText(ctx: RuleContext): String = getText(ctx.sourceInterval)

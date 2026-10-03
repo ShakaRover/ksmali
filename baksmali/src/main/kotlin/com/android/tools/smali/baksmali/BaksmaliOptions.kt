@@ -38,46 +38,29 @@ import org.xml.sax.SAXException
 import org.xml.sax.helpers.DefaultHandler
 import java.io.File
 import java.io.IOException
-import java.util.HashMap
 import javax.xml.XMLConstants
 import javax.xml.parsers.ParserConfigurationException
 import javax.xml.parsers.SAXParserFactory
 
 open class BaksmaliOptions {
-    @JvmField
     var apiLevel = 15
 
-    @JvmField
     var parameterRegisters = true
-    @JvmField
     var localsDirective = false
-    @JvmField
     var sequentialLabels = false
-    @JvmField
     var debugInfo = true
-    @JvmField
     var codeOffsets = false
-    @JvmField
     var accessorComments = true
-    @JvmField
     var allowOdex = false
-    @JvmField
     var deodex = false
-    @JvmField
     var implicitReferences = false
-    @JvmField
     var normalizeVirtualMethods = false
 
-    @JvmField
     var registerInfo = 0
 
-    @JvmField
-    var resourceIds: MutableMap<Int, String> = HashMap<Int, String>()
-    @JvmField
+    var resourceIds: MutableMap<Int, String> = mutableMapOf()
     var inlineResolver: InlineMethodResolver? = null
-    @JvmField
     var classPath: ClassPath? = null
-    @JvmField
     var syntheticAccessorResolver: SyntheticAccessorResolver? = null
 
     /**
@@ -87,14 +70,13 @@ open class BaksmaliOptions {
      */
     @Throws(SAXException::class, IOException::class)
     fun loadResourceIds(resourceFiles: Map<String, File>) {
-        for (entry in resourceFiles.entries) {
+        for ((prefix, resourceFile) in resourceFiles) {
             try {
                 val parserFactory = SAXParserFactory.newInstance()
                 parserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
                 val parser = parserFactory.newSAXParser()
 
-                val prefix = entry.key
-                parser.parse(entry.value, object : DefaultHandler() {
+                parser.parse(resourceFile, object : DefaultHandler() {
                     @Throws(SAXException::class)
                     override fun startElement(
                         uri: String?, localName: String?, qName: String?, attr: Attributes
@@ -103,8 +85,7 @@ open class BaksmaliOptions {
                             val resourceType = attr.getValue("type")
                             val resourceName = attr.getValue("name").replace('.', '_')
                             val resourceId = Integer.decode(attr.getValue("id"))
-                            val qualifiedResourceName =
-                                String.format("%s.%s.%s", prefix, resourceType, resourceName)
+                            val qualifiedResourceName = "$prefix.$resourceType.$resourceName"
                             resourceIds[resourceId] = qualifiedResourceName
                         }
                     }

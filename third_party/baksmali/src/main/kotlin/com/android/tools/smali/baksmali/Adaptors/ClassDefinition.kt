@@ -33,25 +33,21 @@ import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedClassDef
-import com.android.tools.smali.dexlib2.iface.Annotation
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.Field
 import com.android.tools.smali.dexlib2.iface.Method
-import com.android.tools.smali.dexlib2.iface.MethodImplementation
 import com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction21c
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.Reference
 import java.io.IOException
-import java.util.HashSet
 
 class ClassDefinition(
-    @JvmField val options: BaksmaliOptions,
-    @JvmField val classDef: ClassDef
+    val options: BaksmaliOptions,
+    val classDef: ClassDef
 ) {
-    @JvmField
     protected var validationErrors = false
 
-    private val fieldsSetInStaticConstructor: HashSet<String>
+    private val fieldsSetInStaticConstructor: MutableSet<String>
     val formatter: BaksmaliFormatter
 
     init {
@@ -59,12 +55,11 @@ class ClassDefinition(
         fieldsSetInStaticConstructor = findFieldsSetInStaticConstructor(classDef)
     }
 
-    fun hadValidationErrors(): Boolean {
-        return validationErrors
-    }
+    val hadValidationErrors: Boolean
+        get() = validationErrors
 
-    private fun findFieldsSetInStaticConstructor(classDef: ClassDef): HashSet<String> {
-        val fieldsSetInStaticConstructor = HashSet<String>()
+    private fun findFieldsSetInStaticConstructor(classDef: ClassDef): MutableSet<String> {
+        val fieldsSetInStaticConstructor = mutableSetOf<String>()
 
         for (method in classDef.directMethods) {
             if (method.name == "<clinit>") {
@@ -173,7 +168,7 @@ class ClassDefinition(
     @Throws(IOException::class)
     private fun writeStaticFields(writer: BaksmaliWriter): Set<String> {
         var wroteHeader = false
-        val writtenFields = HashSet<String>()
+        val writtenFields = mutableSetOf<String>()
 
         val staticFields: Iterable<Field> = if (classDef is DexBackedClassDef) {
             classDef.getStaticFields(false)
@@ -195,7 +190,7 @@ class ClassDefinition(
             if (!writtenFields.add(fieldString)) {
                 writer.write("# duplicate field ignored\n")
                 fieldWriter = getCommentingWriter(writer)
-                System.err.println(String.format("Ignoring duplicate field: %s->%s", classDef.type, fieldString))
+                System.err.println("Ignoring duplicate field: ${classDef.type}->$fieldString")
                 setInStaticConstructor = false
             } else {
                 setInStaticConstructor = fieldsSetInStaticConstructor.contains(fieldString)
@@ -208,7 +203,7 @@ class ClassDefinition(
     @Throws(IOException::class)
     private fun writeInstanceFields(writer: BaksmaliWriter, staticFields: Set<String>) {
         var wroteHeader = false
-        val writtenFields = HashSet<String>()
+        val writtenFields = mutableSetOf<String>()
 
         val instanceFields: Iterable<Field> = if (classDef is DexBackedClassDef) {
             classDef.getInstanceFields(false)
@@ -229,10 +224,9 @@ class ClassDefinition(
             if (!writtenFields.add(fieldString)) {
                 writer.write("# duplicate field ignored\n")
                 fieldWriter = getCommentingWriter(writer)
-                System.err.println(String.format("Ignoring duplicate field: %s->%s", classDef.type, fieldString))
+                System.err.println("Ignoring duplicate field: ${classDef.type}->$fieldString")
             } else if (staticFields.contains(fieldString)) {
-                System.err.println(String.format("Duplicate static+instance field found: %s->%s",
-                    classDef.type, fieldString))
+                System.err.println("Duplicate static+instance field found: ${classDef.type}->$fieldString")
                 System.err.println("You will need to rename one of these fields, including all references.")
 
                 writer.write("# There is both a static and instance field with this signature.\n" +
@@ -245,7 +239,7 @@ class ClassDefinition(
     @Throws(IOException::class)
     private fun writeDirectMethods(writer: BaksmaliWriter): Set<String> {
         var wroteHeader = false
-        val writtenMethods = HashSet<String>()
+        val writtenMethods = mutableSetOf<String>()
 
         val directMethods: Iterable<Method> = if (classDef is DexBackedClassDef) {
             classDef.getDirectMethods(false)
@@ -284,7 +278,7 @@ class ClassDefinition(
     @Throws(IOException::class)
     private fun writeVirtualMethods(writer: BaksmaliWriter, directMethods: Set<String>) {
         var wroteHeader = false
-        val writtenMethods = HashSet<String>()
+        val writtenMethods = mutableSetOf<String>()
 
         val virtualMethods: Iterable<Method> = if (classDef is DexBackedClassDef) {
             classDef.getVirtualMethods(false)
@@ -310,8 +304,7 @@ class ClassDefinition(
             } else if (directMethods.contains(methodString)) {
                 writer.write("# There is both a direct and virtual method with this signature.\n" +
                     "# You will need to rename one of these methods, including all references.\n")
-                System.err.println(String.format("Duplicate direct+virtual method found: %s->%s",
-                    classDef.type, methodString))
+                System.err.println("Duplicate direct+virtual method found: ${classDef.type}->$methodString")
                 System.err.println("You will need to rename one of these methods, including all references.")
             }
 

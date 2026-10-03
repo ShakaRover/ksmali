@@ -37,7 +37,6 @@ import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 import com.android.tools.smali.dexlib2.DexFileFactory
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.analysis.ClassPath
-import com.android.tools.smali.dexlib2.analysis.ClassProvider
 import com.android.tools.smali.dexlib2.iface.DexFile
 import org.junit.Assert
 import org.junit.Test
@@ -46,7 +45,6 @@ import java.io.IOException
 import java.io.StringWriter
 import java.net.URISyntaxException
 import java.net.URL
-import java.util.ArrayList
 
 class AnalysisTest {
 
@@ -99,7 +97,7 @@ class AnalysisTest {
 
     @Throws(IOException::class, URISyntaxException::class)
     fun runTest(test: String, registerInfo: Boolean, isArt: Boolean) {
-        val dexFilePath = String.format("%s%sclasses.dex", test, File.separatorChar)
+        val dexFilePath = "$test${File.separatorChar}classes.dex"
 
         val dexFile: DexFile = DexFileFactory.loadDexFile(findResource(dexFilePath), Opcodes.getDefault())
 
@@ -107,7 +105,7 @@ class AnalysisTest {
         if (registerInfo) {
             options.registerInfo = BaksmaliOptions.ALL or BaksmaliOptions.FULLMERGE
             if (isArt) {
-                options.classPath = ClassPath(ArrayList<ClassProvider>(), true, 56)
+                options.classPath = ClassPath(mutableListOf(), true, 56)
             } else {
                 options.classPath = ClassPath()
             }
@@ -122,9 +120,8 @@ class AnalysisTest {
             writer.close()
 
             val className = classDef.type
-            val smaliPath = String.format(
-                "%s%s%s.smali", test, File.separatorChar,
-                className.substring(1, className.length - 1))
+            val smaliPath =
+                "$test${File.separatorChar}${className.substring(1, className.length - 1)}.smali"
             val smaliContents = readResource(smaliPath)
 
             Assert.assertEquals(

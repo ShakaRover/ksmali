@@ -30,7 +30,6 @@
 
 package com.android.tools.smali.smali.util
 
-import java.io.IOException
 import java.io.Reader
 
 open class BlankReader : Reader() {
@@ -40,7 +39,6 @@ open class BlankReader : Reader() {
     }
 
     companion object {
-        @JvmField
         val INSTANCE = BlankReader()
     }
 }

@@ -130,8 +130,8 @@ class LexerTest {
     }
 
     fun runTest(test: String, discardHiddenTokens: Boolean, apiLevel: Int) {
-        val smaliFile = String.format("LexerTest%s%s.smali", File.separatorChar, test)
-        val tokensFile = String.format("LexerTest%s%s.tokens", File.separatorChar, test)
+        val smaliFile = "LexerTest${File.separatorChar}$test.smali"
+        val tokensFile = "LexerTest${File.separatorChar}$test.tokens"
 
         val expectedTokensLexer: expectedTokensTestGrammarLexer
         try {
@@ -161,7 +161,7 @@ class LexerTest {
         }
         val lexer: smaliLexer
         try {
-            lexer = smaliLexer(CharStreams.fromStream(smaliStream!!))
+            lexer = smaliLexer(CharStreams.fromStream(requireNotNull(smaliStream)))
         } catch (ex: IOException) {
             throw RuntimeException(ex)
         }
@@ -200,8 +200,7 @@ class LexerTest {
 
             if (token.type != expectedTokenType) {
                 Assert.fail(
-                    String.format(
-                        "Invalid token at index %d. Expecting %s, got %s(%s)",
+                    "Invalid token at index %d. Expecting %s, got %s(%s)".format(
                         expectedTokenIndex - 1, expectedToken.tokenName, getTokenName(token.type), token.text
                     )
                 )
@@ -210,8 +209,7 @@ class LexerTest {
             if (expectedToken.tokenText != null) {
                 if (expectedToken.tokenText != token.text) {
                     Assert.fail(
-                        String.format(
-                            "Invalid token text at index %d. Expecting text \"%s\", got \"%s\"",
+                        "Invalid token text at index %d. Expecting text \"%s\", got \"%s\"".format(
                             expectedTokenIndex - 1, expectedToken.tokenText, token.text
                         )
                     )
@@ -221,16 +219,15 @@ class LexerTest {
 
         if (expectedTokenIndex < expectedTokens.size) {
             Assert.fail(
-                String.format(
-                    "Not enough tokens. Expecting %d tokens, but got %d", expectedTokens.size,
-                    expectedTokenIndex
+                "Not enough tokens. Expecting %d tokens, but got %d".format(
+                    expectedTokens.size, expectedTokenIndex
                 )
             )
         }
     }
 
     companion object {
-        private val tokenTypesByName: HashMap<String, Int> = HashMap<String, Int>().apply {
+        private val tokenTypesByName: MutableMap<String, Int> = mutableMapOf<String, Int>().apply {
             for (i in smaliParser.tokenNames.indices) {
                 this[smaliParser.tokenName(i)] = i
             }

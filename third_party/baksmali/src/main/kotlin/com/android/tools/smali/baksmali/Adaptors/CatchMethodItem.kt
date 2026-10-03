@@ -40,9 +40,9 @@ class CatchMethodItem(
     endAddress: Int,
     handlerAddress: Int
 ) : MethodItem(codeAddress) {
-    private val tryStartLabel: LabelMethodItem
-    private val tryEndLabel: LabelMethodItem
-    private val handlerLabel: LabelMethodItem
+    val tryStartLabel: LabelMethodItem
+    val tryEndLabel: LabelMethodItem
+    val handlerLabel: LabelMethodItem
 
     init {
         tryStartLabel = labelCache.internLabel(LabelMethodItem(options, startAddress, "try_start_"))
@@ -58,22 +58,8 @@ class CatchMethodItem(
         }
     }
 
-    fun getTryStartLabel(): LabelMethodItem {
-        return tryStartLabel
-    }
-
-    fun getTryEndLabel(): LabelMethodItem {
-        return tryEndLabel
-    }
-
-    fun getHandlerLabel(): LabelMethodItem {
-        return handlerLabel
-    }
-
-    override fun getSortOrder(): Double {
-        //sort after instruction and end_try label
-        return 102.0
-    }
+    //sort after instruction and end_try label
+    override val sortOrder: Double get() = 102.0
 
     @Throws(IOException::class)
     override fun writeTo(writer: BaksmaliWriter): Boolean {

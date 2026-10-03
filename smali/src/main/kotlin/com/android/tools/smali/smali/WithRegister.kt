@@ -31,5 +31,5 @@
 package com.android.tools.smali.smali
 
 interface WithRegister {
-    fun getRegister(): Int
+    val register: Int
 }

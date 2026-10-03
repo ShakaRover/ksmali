@@ -31,7 +31,6 @@
 package com.android.tools.smali.baksmali
 
 import com.android.tools.smali.baksmali.formatter.BaksmaliFormatter
-import com.android.tools.smali.dexlib2.iface.reference.Reference
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
 
@@ -62,7 +61,7 @@ abstract class ListReferencesCommand(
 
         val formatter = BaksmaliFormatter()
 
-        for (reference in dexFile!!.getReferences(referenceType)) {
+        for (reference in requireNotNull(dexFile).getReferences(referenceType)) {
             System.out.println(formatter.getReference(reference))
         }
     }

@@ -30,17 +30,15 @@ package com.android.tools.smali.baksmali.Adaptors
 import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 import java.io.IOException
 
-abstract class MethodItem(@JvmField protected val codeAddress: Int) : Comparable<MethodItem> {
-    fun getCodeAddress(): Int = codeAddress
-
-    //return an arbitrary double that determines how this item will be sorted with others at the same address
-    abstract fun getSortOrder(): Double
+abstract class MethodItem(val codeAddress: Int) : Comparable<MethodItem> {
+    //an arbitrary double that determines how this item will be sorted with others at the same address
+    abstract val sortOrder: Double
 
     override fun compareTo(methodItem: MethodItem): Int {
         val result = codeAddress.compareTo(methodItem.codeAddress)
 
         if (result == 0) {
-            return getSortOrder().compareTo(methodItem.getSortOrder())
+            return sortOrder.compareTo(methodItem.sortOrder)
         }
         return result
     }

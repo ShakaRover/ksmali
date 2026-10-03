@@ -36,7 +36,6 @@ import com.android.tools.smali.dexlib2.formatter.DexFormattedWriter
 import com.android.tools.smali.dexlib2.iface.AnnotationElement
 import com.android.tools.smali.dexlib2.iface.reference.CallSiteReference
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
-import com.android.tools.smali.dexlib2.iface.reference.MethodHandleReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.value.AnnotationEncodedValue
 import com.android.tools.smali.dexlib2.iface.value.ArrayEncodedValue
@@ -68,7 +67,6 @@ open class BaksmaliWriter : DexFormattedWriter {
 
     private val classContext: String?
 
-    @JvmField
     protected val buffer = CharArray(24)
 
     constructor(writer: Writer) : this(writer, null)
@@ -126,8 +124,7 @@ open class BaksmaliWriter : DexFormattedWriter {
                 hasSpace = true
             } else if (c == '/') {
                 if (i == startIndex) {
-                    throw IllegalArgumentException(
-                        String.format("Invalid type string: %s", type))
+                    throw IllegalArgumentException("Invalid type string: $type")
                 }
 
                 writeSimpleName(type.subSequence(startIndex, i), hasSpace)
@@ -136,8 +133,7 @@ open class BaksmaliWriter : DexFormattedWriter {
                 startIndex = i + 1
             } else if (c == ';') {
                 if (i == startIndex) {
-                    throw IllegalArgumentException(
-                        String.format("Invalid type string: %s", type))
+                    throw IllegalArgumentException("Invalid type string: $type")
                 }
 
                 writeSimpleName(type.subSequence(startIndex, i), hasSpace)
@@ -148,19 +144,14 @@ open class BaksmaliWriter : DexFormattedWriter {
         }
 
         if (i != type.length - 1 || type[i] != ';') {
-            throw IllegalArgumentException(
-                String.format("Invalid type string: %s", type))
+            throw IllegalArgumentException("Invalid type string: $type")
         }
     }
 
     @Throws(IOException::class)
     public override fun writeSimpleName(simpleName: CharSequence) {
-        var hasSpace = false
-        for (i in 0 until simpleName.length) {
-            if (Character.getType(simpleName[i]) == Character.SPACE_SEPARATOR.toInt()) {
-                hasSpace = true
-                break
-            }
+        val hasSpace = simpleName.any {
+            Character.getType(it) == Character.SPACE_SEPARATOR.toInt()
         }
         writeSimpleName(simpleName, hasSpace)
     }

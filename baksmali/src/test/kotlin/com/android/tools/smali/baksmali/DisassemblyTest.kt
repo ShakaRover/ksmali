@@ -49,7 +49,7 @@ import java.io.IOException
 open class DisassemblyTest : DexTest() {
 
     protected fun getOutputFilename(testName: String): String {
-        return String.format("%s%s%sOutput.smali", testDir, File.separatorChar, testName)
+        return "$testDir${File.separatorChar}${testName}Output.smali"
     }
 
     protected fun runTest(testName: String) {

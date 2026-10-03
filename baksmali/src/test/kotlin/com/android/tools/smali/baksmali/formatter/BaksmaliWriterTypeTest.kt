@@ -30,7 +30,6 @@
 
 package com.android.tools.smali.baksmali.formatter
 
-import com.google.common.collect.Lists
 import org.junit.Assert
 import org.junit.Test
 import java.io.IOException
@@ -79,7 +78,7 @@ class BaksmaliWriterTypeTest {
         Assert.assertEquals("L` ab`;", performWriteType("L ab;"))
         Assert.assertEquals("L`ab `;", performWriteType("Lab ;"))
 
-        val spaceCharacters = Lists.newArrayList(
+        val spaceCharacters = mutableListOf(
             '\u0020',
             '\u00A0',
             '\u1680',
@@ -92,9 +91,9 @@ class BaksmaliWriterTypeTest {
 
         for (c in spaceCharacters) {
             Assert.assertEquals(
-                String.format("Error while testing character \\u%04x", c.code),
-                String.format("Lmy/`%c`/package;", c),
-                performWriteType(String.format("Lmy/%c/package;", c)))
+                "Error while testing character \\u%04x".format(c.code),
+                "Lmy/`%c`/package;".format(c),
+                performWriteType("Lmy/%c/package;".format(c)))
         }
     }
 

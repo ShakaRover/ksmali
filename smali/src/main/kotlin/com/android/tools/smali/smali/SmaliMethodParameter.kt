@@ -36,18 +36,15 @@ import com.android.tools.smali.dexlib2.base.BaseMethodParameter
 import com.android.tools.smali.dexlib2.iface.Annotation
 import java.util.Comparator
 
-open class SmaliMethodParameter(register: Int, type: String) : BaseMethodParameter(), WithRegister {
-    @JvmField var register: Int = register
+open class SmaliMethodParameter(override val register: Int, type: String) : BaseMethodParameter(), WithRegister {
     override var type: String = type
     override var annotations: Set<Annotation> = ImmutableSet.of()
     override var name: String? = null
 
-    override fun getRegister(): Int = register
-
     companion object {
         @JvmField
         val COMPARATOR: Comparator<WithRegister> = Comparator { o1, o2 ->
-            Ints.compare(o1.getRegister(), o2.getRegister())
+            Ints.compare(o1.register, o2.register)
         }
     }
 }

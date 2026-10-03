@@ -29,7 +29,6 @@ package com.android.tools.smali.baksmali.Adaptors.Format
 
 import com.android.tools.smali.baksmali.Adaptors.MethodItem
 import com.android.tools.smali.baksmali.Adaptors.MethodDefinition
-import com.android.tools.smali.baksmali.BaksmaliOptions
 import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 import com.android.tools.smali.dexlib2.Format
 import com.android.tools.smali.dexlib2.Opcode
@@ -54,18 +53,15 @@ import com.android.tools.smali.dexlib2.iface.reference.Reference
 import com.android.tools.smali.util.ExceptionWithContext
 import com.android.tools.smali.util.NumberUtils
 import java.io.IOException
-import java.util.Map
 
 open class InstructionMethodItem<T : Instruction>(
-    @JvmField protected val methodDef: MethodDefinition,
+    protected val methodDef: MethodDefinition,
     codeAddress: Int,
-    @JvmField protected val instruction: T
+    protected val instruction: T
 ) : MethodItem(codeAddress) {
 
-    override fun getSortOrder(): Double {
-        //instructions should appear after everything except an "end try" label and .catch directive
-        return 100.0
-    }
+    //instructions should appear after everything except an "end try" label and .catch directive
+    override val sortOrder: Double get() = 100.0
 
     private fun isAllowedOdex(opcode: Opcode): Boolean {
         val options = methodDef.classDef.options
@@ -113,7 +109,7 @@ open class InstructionMethodItem<T : Instruction>(
             } catch (ex: Reference.InvalidReferenceException) {
                 commentOutInstruction = true
                 writer.write("#")
-                writer.write(ex.message!!)
+                writer.write(requireNotNull(ex.message))
                 writer.write("\n")
                 referenceWritable = Writable { writer.write(ex.invalidReferenceRepresentation) }
             }
@@ -126,7 +122,7 @@ open class InstructionMethodItem<T : Instruction>(
                 } catch (ex: Reference.InvalidReferenceException) {
                     commentOutInstruction = true
                     writer.write("#")
-                    writer.write(ex.message!!)
+                    writer.write(requireNotNull(ex.message))
                     writer.write("\n")
                     // Note: the original Java implementation assigns to referenceWritable here.
                     referenceWritable = Writable { writer.write(ex.invalidReferenceRepresentation) }
@@ -216,17 +212,17 @@ open class InstructionMethodItem<T : Instruction>(
             Format.Format20bc -> {
                 writeOpcode(writer)
                 writer.write(' ')
-                writer.write(verificationErrorName!!)
+                writer.write(requireNotNull(verificationErrorName))
                 writer.write(", ")
                 assert(referenceWritable != null)
-                referenceWritable!!.write()
+                requireNotNull(referenceWritable).write()
             }
             Format.Format21c, Format.Format31c -> {
                 writeOpcode(writer)
                 writer.write(' ')
                 writeFirstRegister(writer)
                 writer.write(", ")
-                referenceWritable!!.write()
+                requireNotNull(referenceWritable).write()
             }
             Format.Format21ih, Format.Format21lh, Format.Format21s, Format.Format31i, Format.Format51l -> {
                 writeOpcode(writer)
@@ -265,7 +261,7 @@ open class InstructionMethodItem<T : Instruction>(
                 writeSecondRegister(writer)
                 writer.write(", ")
                 assert(referenceWritable != null)
-                referenceWritable!!.write()
+                requireNotNull(referenceWritable).write()
             }
             Format.Format22cs -> {
                 writeOpcode(writer)
@@ -307,7 +303,7 @@ open class InstructionMethodItem<T : Instruction>(
                 writeInvokeRegisters(writer)
                 writer.write(", ")
                 assert(referenceWritable != null)
-                referenceWritable!!.write()
+                requireNotNull(referenceWritable).write()
             }
             Format.Format35mi -> {
                 writeOpcode(writer)
@@ -329,7 +325,7 @@ open class InstructionMethodItem<T : Instruction>(
                 writeInvokeRangeRegisters(writer)
                 writer.write(", ")
                 assert(referenceWritable != null)
-                referenceWritable!!.write()
+                requireNotNull(referenceWritable).write()
             }
             Format.Format3rmi -> {
                 writeOpcode(writer)
@@ -351,10 +347,10 @@ open class InstructionMethodItem<T : Instruction>(
                 writeInvokeRegisters(writer)
                 writer.write(", ")
                 assert(referenceWritable != null)
-                referenceWritable!!.write()
+                requireNotNull(referenceWritable).write()
                 writer.write(", ")
                 assert(referenceWritable2 != null)
-                referenceWritable2!!.write()
+                requireNotNull(referenceWritable2).write()
             }
             Format.Format4rcc -> {
                 writeOpcode(writer)
@@ -362,10 +358,10 @@ open class InstructionMethodItem<T : Instruction>(
                 writeInvokeRangeRegisters(writer)
                 writer.write(", ")
                 assert(referenceWritable != null)
-                referenceWritable!!.write()
+                requireNotNull(referenceWritable).write()
                 writer.write(", ")
                 assert(referenceWritable2 != null)
-                referenceWritable2!!.write()
+                requireNotNull(referenceWritable2).write()
             }
             else -> {
                 assert(false)
@@ -394,7 +390,7 @@ open class InstructionMethodItem<T : Instruction>(
 
     @Throws(IOException::class)
     protected fun writeRegister(writer: BaksmaliWriter, registerNumber: Int) {
-        methodDef.registerFormatter!!.writeTo(writer, registerNumber)
+        requireNotNull(methodDef.registerFormatter).writeTo(writer, registerNumber)
     }
 
     @Throws(IOException::class)
@@ -465,7 +461,7 @@ open class InstructionMethodItem<T : Instruction>(
             writer.write("{}")
         } else {
             val startRegister = rangeInstruction.startRegister
-            methodDef.registerFormatter!!.writeRegisterRange(
+            requireNotNull(methodDef.registerFormatter).writeRegisterRange(
                 writer, startRegister, startRegister + regCount - 1)
         }
     }

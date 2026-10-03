@@ -30,7 +30,6 @@
 
 package com.android.tools.smali.baksmali
 
-import com.google.common.collect.Lists
 import com.android.tools.smali.dexlib2.analysis.ClassPath
 import com.android.tools.smali.dexlib2.analysis.ClassProto
 import com.android.tools.smali.dexlib2.analysis.DexClassProvider
@@ -44,7 +43,7 @@ class FieldGapOrderTest : DexTest() {
         val dexFile: DexFile = getInputDexFile("FieldGapOrder", BaksmaliOptions())
         Assert.assertEquals(3, dexFile.classes.size)
 
-        val classPath = ClassPath(Lists.newArrayList(DexClassProvider(dexFile)), false, 66)
+        val classPath = ClassPath(mutableListOf(DexClassProvider(dexFile)), false, 66)
         val classProto = classPath.getClass("LGapOrder;") as ClassProto
         Assert.assertEquals("r1", classProto.getFieldByOffset(12)!!.name)
         Assert.assertEquals("r2", classProto.getFieldByOffset(16)!!.name)
@@ -58,7 +57,7 @@ class FieldGapOrderTest : DexTest() {
         val dexFile: DexFile = getInputDexFile("FieldGapOrder", BaksmaliOptions())
         Assert.assertEquals(3, dexFile.classes.size)
 
-        val classPath = ClassPath(Lists.newArrayList(DexClassProvider(dexFile)), false, 67)
+        val classPath = ClassPath(mutableListOf(DexClassProvider(dexFile)), false, 67)
         val classProto = classPath.getClass("LGapOrder;") as ClassProto
         Assert.assertEquals("s", classProto.getFieldByOffset(10)!!.name)
         Assert.assertEquals("r1", classProto.getFieldByOffset(12)!!.name)

@@ -37,10 +37,8 @@ class SyntheticAccessCommentMethodItem(
     private val accessedMember: SyntheticAccessorResolver.AccessedMember,
     codeAddress: Int
 ) : MethodItem(codeAddress) {
-    override fun getSortOrder(): Double {
-        //just before the pre-instruction register information, if any
-        return 99.8
-    }
+    //just before the pre-instruction register information, if any
+    override val sortOrder: Double get() = 99.8
 
     @Throws(IOException::class)
     override fun writeTo(writer: BaksmaliWriter): Boolean {

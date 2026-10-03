@@ -42,13 +42,10 @@ import com.android.tools.smali.dexlib2.iface.debug.SetSourceFile
 import com.android.tools.smali.dexlib2.iface.debug.StartLocal
 import com.android.tools.smali.util.ExceptionWithContext
 
-abstract class DebugMethodItem(codeAddress: Int, private val sortOrder: Int) : MethodItem(codeAddress) {
-    override fun getSortOrder(): Double {
-        return sortOrder.toDouble()
-    }
+abstract class DebugMethodItem(codeAddress: Int, private val sortOrderValue: Int) : MethodItem(codeAddress) {
+    override val sortOrder: Double get() = sortOrderValue.toDouble()
 
     companion object {
-        @JvmStatic
         fun build(
             classDef: ClassDefinition, registerFormatter: RegisterFormatter, debugItem: DebugItem
         ): DebugMethodItem {

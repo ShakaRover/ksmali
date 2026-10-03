@@ -92,20 +92,20 @@ open class ListVtablesCommand(commandAncestors: List<JCommander>) :
         val input = inputList[0]
         loadDexFile(input)
 
-        val options = getOptions() ?: return
+        val options = this.options ?: return
 
         try {
             val classList = classes
             if (classList != null && !classList.isEmpty()) {
                 for (cls in classList) {
-                    listClassVtable(options.classPath!!.getClass(cls) as ClassProto)
+                    listClassVtable(requireNotNull(options.classPath).getClass(cls) as ClassProto)
                 }
                 return
             }
 
-            for (classDef in dexFile!!.classes) {
+            for (classDef in requireNotNull(dexFile).classes) {
                 if (!AccessFlags.INTERFACE.isSet(classDef.accessFlags)) {
-                    listClassVtable(options.classPath!!.getClass(classDef) as ClassProto)
+                    listClassVtable(requireNotNull(options.classPath).getClass(classDef) as ClassProto)
                 }
             }
         } catch (ex: IOException) {
@@ -116,41 +116,49 @@ open class ListVtablesCommand(commandAncestors: List<JCommander>) :
     @Throws(IOException::class)
     private fun listClassVtable(classProto: ClassProto) {
         val methods: List<Method> = classProto.vtable
-        val className = "Class " + classProto.type + " extends " + classProto.superclass +
-            " : " + methods.size + " methods\n"
+        val className =
+            "Class ${classProto.type} extends ${classProto.superclass} : ${methods.size} methods\n"
         System.out.write(className.toByteArray())
-        for (i in methods.indices) {
-            val method = methods[i]
-
-            var methodString = i.toString() + ":" + method.definingClass + "->" + method.name + "("
-            for (parameter in method.parameterTypes) {
-                methodString += parameter
+        for ((i, method) in methods.withIndex()) {
+            val methodString = buildString {
+                append(i)
+                append(':')
+                append(method.definingClass)
+                append("->")
+                append(method.name)
+                append('(')
+                for (parameter in method.parameterTypes) {
+                    append(parameter)
+                }
+                append(')')
+                append(method.returnType)
+                append('\n')
             }
-            methodString += ")" + method.returnType + "\n"
             System.out.write(methodString.toByteArray())
         }
         System.out.write("\n".toByteArray())
     }
 
-    protected fun getOptions(): BaksmaliOptions? {
-        if (dexFile == null) {
-            throw IllegalStateException("You must call loadDexFile first")
+    protected val options: BaksmaliOptions?
+        get() {
+            if (dexFile == null) {
+                throw IllegalStateException("You must call loadDexFile first")
+            }
+
+            val options = BaksmaliOptions()
+
+            options.apiLevel = apiLevel
+
+            try {
+                options.classPath = analysisArguments.loadClassPathForDexFile(
+                    requireNotNull(inputFile?.absoluteFile?.parentFile),
+                    requireNotNull(dexEntry), checkPackagePrivateArgument.checkPackagePrivateAccess, oatVersion)
+            } catch (ex: Exception) {
+                System.err.println("Error occurred while loading class path files.")
+                ex.printStackTrace(System.err)
+                return null
+            }
+
+            return options
         }
-
-        val options = BaksmaliOptions()
-
-        options.apiLevel = apiLevel
-
-        try {
-            options.classPath = analysisArguments.loadClassPathForDexFile(
-                inputFile!!.absoluteFile.parentFile!!,
-                dexEntry!!, checkPackagePrivateArgument.checkPackagePrivateAccess, oatVersion)
-        } catch (ex: Exception) {
-            System.err.println("Error occurred while loading class path files.")
-            ex.printStackTrace(System.err)
-            return null
-        }
-
-        return options
-    }
 }

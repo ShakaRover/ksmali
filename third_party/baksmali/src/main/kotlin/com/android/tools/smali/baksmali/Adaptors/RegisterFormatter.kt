@@ -35,9 +35,9 @@ import java.io.IOException
  * This class contains the logic used for formatting registers
  */
 class RegisterFormatter(
-    @JvmField val options: BaksmaliOptions,
-    @JvmField val registerCount: Int,
-    @JvmField val parameterRegisterCount: Int
+    val options: BaksmaliOptions,
+    val registerCount: Int,
+    val parameterRegisterCount: Int
 ) {
     /**
      * Write out the register range value used by Format3rc. If baksmali.noParameterRegisters is true, it will always

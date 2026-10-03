@@ -30,7 +30,6 @@ package com.android.tools.smali.baksmali.Adaptors
 import com.android.tools.smali.baksmali.BaksmaliOptions
 import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 import com.android.tools.smali.dexlib2.analysis.AnalyzedInstruction
-import com.android.tools.smali.dexlib2.analysis.RegisterType
 import java.io.IOException
 import java.util.BitSet
 
@@ -39,9 +38,7 @@ class PostInstructionRegisterInfoMethodItem(
     private val analyzedInstruction: AnalyzedInstruction,
     codeAddress: Int
 ) : MethodItem(codeAddress) {
-    override fun getSortOrder(): Double {
-        return 100.1
-    }
+    override val sortOrder: Double get() = 100.1
 
     @Throws(IOException::class)
     override fun writeTo(writer: BaksmaliWriter): Boolean {

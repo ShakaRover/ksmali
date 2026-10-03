@@ -53,7 +53,8 @@ open class ListHelpCommand(commandAncestors: List<JCommander>) : Command(command
     private var commands: MutableList<String>? = null
 
     override fun run() {
-        if (commands == null || commands!!.isEmpty()) {
+        val cmds = commands
+        if (cmds.isNullOrEmpty()) {
             System.out.println(
                 HelpFormatter()
                     .width(getConsoleWidth())
@@ -62,7 +63,7 @@ open class ListHelpCommand(commandAncestors: List<JCommander>) : Command(command
         } else {
             var printedHelp = false
             val parentJc = Iterables.getLast(commandAncestors)
-            for (cmd in commands!!) {
+            for (cmd in cmds) {
                 val command = getSubcommand(parentJc, cmd)
                 if (command == null) {
                     System.err.println("No such command: $cmd")

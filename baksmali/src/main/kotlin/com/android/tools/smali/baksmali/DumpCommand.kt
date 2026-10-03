@@ -71,7 +71,7 @@ open class DumpCommand(commandAncestors: List<JCommander>) : DexInputCommand(com
         loadDexFile(input)
 
         try {
-            dump(dexFile!!, System.out)
+            dump(requireNotNull(dexFile), System.out)
         } catch (ex: IOException) {
             System.err.println("There was an error while dumping the dex file")
             ex.printStackTrace(System.err)
@@ -88,7 +88,6 @@ open class DumpCommand(commandAncestors: List<JCommander>) : DexInputCommand(com
          *
          * @throws IOException
          */
-        @JvmStatic
         @Throws(IOException::class)
         fun dump(dexFile: DexBackedDexFile, output: OutputStream) {
             BufferedWriter(OutputStreamWriter(output)).use { writer ->

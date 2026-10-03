@@ -33,7 +33,6 @@ import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 import com.android.tools.smali.dexlib2.iface.instruction.formats.SparseSwitchPayload
 import com.android.tools.smali.dexlib2.immutable.value.ImmutableIntEncodedValue
 import java.io.IOException
-import java.util.ArrayList
 
 class SparseSwitchMethodItem(
     methodDef: MethodDefinition, codeAddress: Int, instruction: SparseSwitchPayload
@@ -46,7 +45,7 @@ class SparseSwitchMethodItem(
     init {
         val baseCodeAddress = methodDef.getSparseSwitchBaseAddress(codeAddress)
 
-        val newTargets = ArrayList<SparseSwitchTarget>()
+        val newTargets = mutableListOf<SparseSwitchTarget>()
         if (baseCodeAddress >= 0) {
             for (switchElement in instruction.switchElements) {
                 val label = methodDef.labelCache.internLabel(
@@ -74,10 +73,10 @@ class SparseSwitchMethodItem(
         writer.write(".sparse-switch\n")
         writer.indent(4)
         for (target in targets) {
-            writer.writeEncodedValue(ImmutableIntEncodedValue(target.getKey()))
+            writer.writeEncodedValue(ImmutableIntEncodedValue(target.key))
             writer.write(" -> ")
             target.writeTargetTo(writer)
-            writeCommentIfResourceId(writer, target.getKey())
+            writeCommentIfResourceId(writer, target.key)
             writer.write('\n')
         }
         writer.deindent(4)
@@ -85,9 +84,7 @@ class SparseSwitchMethodItem(
         return true
     }
 
-    private abstract class SparseSwitchTarget(private val key: Int) {
-        fun getKey(): Int = key
-
+    private abstract class SparseSwitchTarget(val key: Int) {
         @Throws(IOException::class)
         abstract fun writeTargetTo(writer: BaksmaliWriter)
     }

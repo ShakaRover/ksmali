@@ -66,7 +66,7 @@ class ListClassesCommand(commandAncestors: List<JCommander>) : DexInputCommand(c
 
         val formatter = BaksmaliFormatter()
 
-        for (classDef in dexFile!!.classes) {
+        for (classDef in requireNotNull(dexFile).classes) {
             System.out.println(formatter.getType(classDef.type))
         }
     }

@@ -34,13 +34,11 @@ import java.io.IOException
 open class LabelMethodItem(
     private val options: BaksmaliOptions,
     codeAddress: Int,
-    private val labelPrefix: String
+    val labelPrefix: String
 ) : MethodItem(codeAddress) {
-    private var labelSequence = 0
+    var labelSequence = 0
 
-    override fun getSortOrder(): Double {
-        return 0.0
-    }
+    override val sortOrder: Double get() = 0.0
 
     override fun compareTo(methodItem: MethodItem): Int {
         var result = super.compareTo(methodItem)
@@ -55,7 +53,7 @@ open class LabelMethodItem(
 
     override fun hashCode(): Int {
         //force it to call equals when two labels are at the same address
-        return getCodeAddress()
+        return codeAddress
     }
 
     override fun equals(o: Any?): Boolean {
@@ -72,24 +70,10 @@ open class LabelMethodItem(
         if (options.sequentialLabels) {
             writer.writeUnsignedLongAsHex(labelSequence.toLong())
         } else {
-            writer.writeUnsignedLongAsHex(this.getLabelAddress().toLong())
+            writer.writeUnsignedLongAsHex(labelAddress.toLong())
         }
         return true
     }
 
-    fun getLabelPrefix(): String {
-        return labelPrefix
-    }
-
-    open fun getLabelAddress(): Int {
-        return this.getCodeAddress()
-    }
-
-    fun getLabelSequence(): Int {
-        return labelSequence
-    }
-
-    fun setLabelSequence(labelSequence: Int) {
-        this.labelSequence = labelSequence
-    }
+    open val labelAddress: Int get() = codeAddress
 }

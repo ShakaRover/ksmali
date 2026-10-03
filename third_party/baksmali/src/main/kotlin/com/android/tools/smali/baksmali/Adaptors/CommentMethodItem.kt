@@ -33,12 +33,8 @@ import java.io.IOException
 class CommentMethodItem(
     private val comment: String,
     codeAddress: Int,
-    private val sortOrder: Double
+    override val sortOrder: Double
 ) : MethodItem(codeAddress) {
-    override fun getSortOrder(): Double {
-        return sortOrder
-    }
-
     @Throws(IOException::class)
     override fun writeTo(writer: BaksmaliWriter): Boolean {
         writer.write('#')

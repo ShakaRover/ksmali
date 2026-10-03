@@ -28,8 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@file:JvmName("Smali")
-
 package com.android.tools.smali.smali
 
 import com.android.tools.smali.dexlib2.Opcodes

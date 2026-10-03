@@ -25,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@file:JvmName("InstructionMethodItemFactory")
-
 package com.android.tools.smali.baksmali.Adaptors.Format
 
 import com.android.tools.smali.baksmali.Adaptors.MethodDefinition

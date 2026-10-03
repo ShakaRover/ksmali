@@ -56,11 +56,11 @@ abstract class RoundtripTest {
     }
 
     protected open fun getInputFilename(testName: String): String {
-        return String.format("%s%s%sInput.smali", testDir, File.separatorChar, testName)
+        return "$testDir${File.separatorChar}${testName}Input.smali"
     }
 
     protected open fun getOutputFilename(testName: String): String {
-        return String.format("%s%s%sOutput.smali", testDir, File.separatorChar, testName)
+        return "$testDir${File.separatorChar}${testName}Output.smali"
     }
 
     protected fun runTest(testName: String) {

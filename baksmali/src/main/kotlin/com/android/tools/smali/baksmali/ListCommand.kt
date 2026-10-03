@@ -74,7 +74,7 @@ class ListCommand(commandAncestors: List<JCommander>) : Command(commandAncestors
             return
         }
 
-        val command = jc.commands[jc.parsedCommand]!!.objects[0] as Command
+        val command = requireNotNull(jc.commands[jc.parsedCommand]).objects[0] as Command
         command.run()
     }
 }

@@ -38,7 +38,6 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
-import java.util.ArrayList
 
 /**
  * Assembles every smali fixture used by the on-device integration tests and the bundled examples.
@@ -48,7 +47,7 @@ class AssembleIntegrationTest {
 
     @Test
     fun assembleAllFixtures() {
-        val fixtures = ArrayList<File>()
+        val fixtures = mutableListOf<File>()
         for (root in FIXTURE_ROOTS) {
             val dir = File(root)
             if (dir.isDirectory) {
@@ -59,7 +58,7 @@ class AssembleIntegrationTest {
         Assume.assumeFalse("smali fixture directories not present", fixtures.isEmpty())
 
         var assembled = 0
-        val failures = ArrayList<String>()
+        val failures = mutableListOf<String>()
         for (fixture in fixtures) {
             if (isUnsupported(fixture)) {
                 continue
@@ -123,12 +122,10 @@ class AssembleIntegrationTest {
             }
         }
 
-        private fun join(items: List<String>): String {
-            val sb = StringBuilder()
+        private fun join(items: List<String>): String = buildString {
             for (item in items) {
-                sb.append("  ").append(item).append('\n')
+                append("  ").append(item).append('\n')
             }
-            return sb.toString()
         }
     }
 }

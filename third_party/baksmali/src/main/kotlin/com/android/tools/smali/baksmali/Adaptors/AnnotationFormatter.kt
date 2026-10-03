@@ -25,8 +25,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@file:JvmName("AnnotationFormatter")
-
 package com.android.tools.smali.baksmali.Adaptors
 
 import com.android.tools.smali.baksmali.formatter.BaksmaliWriter

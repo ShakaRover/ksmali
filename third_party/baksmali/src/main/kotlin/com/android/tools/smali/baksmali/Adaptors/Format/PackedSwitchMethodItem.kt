@@ -33,7 +33,6 @@ import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 import com.android.tools.smali.dexlib2.iface.instruction.formats.PackedSwitchPayload
 import com.android.tools.smali.dexlib2.immutable.value.ImmutableIntEncodedValue
 import java.io.IOException
-import java.util.ArrayList
 
 class PackedSwitchMethodItem(
     methodDef: MethodDefinition, codeAddress: Int, instruction: PackedSwitchPayload
@@ -47,7 +46,7 @@ class PackedSwitchMethodItem(
     init {
         val baseCodeAddress = methodDef.getPackedSwitchBaseAddress(codeAddress)
 
-        val newTargets = ArrayList<PackedSwitchTarget>()
+        val newTargets = mutableListOf<PackedSwitchTarget>()
 
         var first = true
         var tempFirstKey = 0

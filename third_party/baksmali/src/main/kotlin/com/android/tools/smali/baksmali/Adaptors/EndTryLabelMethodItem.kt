@@ -34,12 +34,8 @@ class EndTryLabelMethodItem(
     codeAddress: Int,
     private var endTryAddress: Int
 ) : LabelMethodItem(options, codeAddress, "try_end_") {
-    override fun getSortOrder(): Double {
-        //sort after instruction, but before catch directive
-        return 101.0
-    }
+    //sort after instruction, but before catch directive
+    override val sortOrder: Double get() = 101.0
 
-    override fun getLabelAddress(): Int {
-        return endTryAddress
-    }
+    override val labelAddress: Int get() = endTryAddress
 }
