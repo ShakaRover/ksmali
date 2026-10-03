@@ -10,3 +10,6 @@
 *.ipr
 *.iws
 .idea
+
+# Local round-trip test artifacts (real APKs and outputs)
+/tests
