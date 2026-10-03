@@ -57,7 +57,6 @@ abstract class BaseAnnotation : Annotation {
     }
 
     companion object {
-        @JvmField
         val BY_TYPE: Comparator<in Annotation> = Comparator { annotation1, annotation2 ->
             annotation1.type.compareTo(annotation2.type)
         }

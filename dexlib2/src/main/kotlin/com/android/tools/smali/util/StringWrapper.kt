@@ -42,7 +42,6 @@ object StringWrapper {
      * @param maxWidth The maximum length of any line
      * @return An iterable of Strings containing the wrapped lines
      */
-    @JvmStatic
     fun wrapStringOnBreaks(string: String, maxWidth: Int): Iterable<String> {
         // TODO: should we strip any trailing newlines?
         val breakIterator = BreakIterator.getLineInstance()
@@ -127,7 +126,6 @@ object StringWrapper {
      *         array. If there is no null entry, then the size of the array exactly matches the number of lines.
      *         The returned lines will not contain an ending newline
      */
-    @JvmStatic
     fun wrapString(str: String, maxWidth: Int, output: Array<String?>?): Array<String?> {
         var result: Array<String?> = output ?: arrayOfNulls((str.length / maxWidth * 1.5 + 1).toInt())
 
@@ -187,7 +185,6 @@ object StringWrapper {
         return newArr
     }
 
-    @JvmStatic
     fun printWrappedString(stream: PrintStream, string: String, maxWidth: Int) {
         for (str in wrapStringOnBreaks(string, maxWidth)) {
             stream.println(str)

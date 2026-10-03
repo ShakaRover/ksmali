@@ -47,7 +47,7 @@ import com.android.tools.smali.util.ChainedIterable
 import java.util.AbstractList
 
 class DexBackedClassDef(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     private val classDefOffset: Int,
     hiddenApiRestrictionsOffset: Int
 ) : BaseTypeReference(), ClassDef {

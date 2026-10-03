@@ -45,7 +45,6 @@ object NumberUtils {
 
     private val format = DecimalFormat("0.####################E0")
 
-    @JvmStatic
     fun isLikelyFloat(value: Int): Boolean {
         // Check for some common named float values
         // We don't check for Float.MIN_VALUE, which has an integer representation of 1
@@ -97,7 +96,6 @@ object NumberUtils {
         return asFloat.length < asInt.length
     }
 
-    @JvmStatic
     fun isLikelyDouble(value: Long): Boolean {
         // Check for some common named double values
         // We don't check for Double.MIN_VALUE, which has a long representation of 1

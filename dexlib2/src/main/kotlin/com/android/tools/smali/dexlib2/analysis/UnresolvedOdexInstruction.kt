@@ -40,9 +40,9 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
  * effect (namely, an NPE)
  */
 open class UnresolvedOdexInstruction(
-    @JvmField val originalInstruction: Instruction,
+    val originalInstruction: Instruction,
     //the register number that holds the (null) reference type that the instruction operates on
-    @JvmField val objectRegisterNum: Int
+    val objectRegisterNum: Int
 ) : Instruction {
     override val opcode: Opcode
         get() = originalInstruction.opcode

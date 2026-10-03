@@ -32,9 +32,9 @@ package com.android.tools.smali.dexlib2.dexbacked
 
 import com.android.tools.smali.util.ExceptionWithContext
 
-open class DexBuffer @JvmOverloads constructor(
-    @JvmField internal val buf: ByteArray,
-    @JvmField internal val baseOffset: Int = 0
+open class DexBuffer constructor(
+    internal val buf: ByteArray,
+    internal val baseOffset: Int = 0
 ) {
     fun readSmallUint(offset: Int): Int {
         val buf = this.buf

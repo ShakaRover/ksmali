@@ -190,19 +190,19 @@ abstract class DexWriter<
     // - DexWriter.overflowableSections
     // - DexPool.sections
 
-    @JvmField val stringSection: StringSectionType
-    @JvmField val typeSection: TypeSectionType
-    @JvmField val protoSection: ProtoSectionType
-    @JvmField val fieldSection: FieldSectionType
-    @JvmField val methodSection: MethodSectionType
-    @JvmField val classSection: ClassSectionType
-    @JvmField val callSiteSection: CallSiteSectionType
-    @JvmField val methodHandleSection: MethodHandleSectionType
+    val stringSection: StringSectionType
+    val typeSection: TypeSectionType
+    val protoSection: ProtoSectionType
+    val fieldSection: FieldSectionType
+    val methodSection: MethodSectionType
+    val classSection: ClassSectionType
+    val callSiteSection: CallSiteSectionType
+    val methodHandleSection: MethodHandleSectionType
 
-    @JvmField val typeListSection: TypeListSectionType
-    @JvmField val annotationSection: AnnotationSectionType
-    @JvmField val annotationSetSection: AnnotationSetSectionType
-    @JvmField val encodedArraySection: EncodedArraySectionType
+    val typeListSection: TypeListSectionType
+    val annotationSection: AnnotationSectionType
+    val annotationSetSection: AnnotationSetSectionType
+    val encodedArraySection: EncodedArraySectionType
 
     private val overflowableSections: Array<IndexSection<*>>
 
@@ -319,9 +319,8 @@ abstract class DexWriter<
         return false
     }
 
-    @JvmOverloads
     @Throws(IOException::class)
-    fun writeTo(dest: DexDataStore, tempFactory: DeferredOutputStreamFactory = MemoryDeferredOutputStream.getFactory()) {
+    fun writeTo(dest: DexDataStore, tempFactory: DeferredOutputStreamFactory = MemoryDeferredOutputStream.factory) {
         try {
             val dataSectionOffset = getDataSectionOffset()
 

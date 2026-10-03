@@ -36,13 +36,11 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import com.google.common.collect.ImmutableSet
 
 object TestUtils {
-    @JvmStatic
     fun makeClassDef(classType: String, superType: String?, vararg interfaces: String): ClassDef {
         return ImmutableClassDef(classType, 0, superType, ImmutableSet.copyOf(interfaces),
             null, null, null, null, null, null)
     }
 
-    @JvmStatic
     fun makeInterfaceDef(classType: String, vararg interfaces: String): ClassDef {
         return ImmutableClassDef(classType, AccessFlags.INTERFACE.value, "Ljava/lang/Object;",
             ImmutableSet.copyOf(interfaces), null, null, null, null, null, null)

@@ -50,7 +50,6 @@ open class ImmutableAnnotation(
     ) : this(visibility, type, ImmutableAnnotationElement.immutableSetOf(elements))
 
     companion object {
-        @JvmStatic
         fun of(annotation: Annotation): ImmutableAnnotation {
             if (annotation is ImmutableAnnotation) {
                 return annotation
@@ -62,7 +61,6 @@ open class ImmutableAnnotation(
             )
         }
 
-        @JvmStatic
         fun immutableSetOf(list: Iterable<Annotation>?): Set<ImmutableAnnotation> {
             return CONVERTER.toSet(list)
         }

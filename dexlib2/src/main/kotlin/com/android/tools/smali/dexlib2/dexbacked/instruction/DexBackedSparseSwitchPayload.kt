@@ -41,7 +41,6 @@ class DexBackedSparseSwitchPayload(
     instructionStart: Int
 ) : DexBackedInstruction(dexFile, Opcode.SPARSE_SWITCH_PAYLOAD, instructionStart),
     SparseSwitchPayload {
-    @JvmField
     val elementCount: Int
 
     init {

@@ -41,7 +41,6 @@ object MethodIdItem {
     const val PROTO_OFFSET = 2
     const val NAME_OFFSET = 4
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {
@@ -61,7 +60,6 @@ object MethodIdItem {
         }
     }
 
-    @JvmStatic
     fun asString(dexFile: DexBackedDexFile, methodIndex: Int): String {
         val methodOffset = dexFile.methodSection.getOffset(methodIndex)
         val classIndex = dexFile.buffer.readUshort(methodOffset + CLASS_OFFSET)
@@ -73,25 +71,23 @@ object MethodIdItem {
         val nameIndex = dexFile.buffer.readSmallUint(methodOffset + NAME_OFFSET)
         val methodName = dexFile.stringSection.get(nameIndex)
 
-        return String.format("%s->%s%s", classType, methodName, protoString)
+        return "${classType}->${methodName}${protoString}"
     }
 
-    @JvmStatic
     fun getReferenceAnnotation(dexFile: DexBackedDexFile, methodIndex: Int): String {
         try {
             val methodString = asString(dexFile, methodIndex)
-            return String.format("method_id_item[%d]: %s", methodIndex, methodString)
+            return "method_id_item[${methodIndex}]: ${methodString}"
         } catch (ex: Exception) {
             ex.printStackTrace(System.err)
         }
-        return String.format("method_id_item[%d]", methodIndex)
+        return "method_id_item[${methodIndex}]"
     }
 
-    @JvmStatic
     fun getMethods(dexFile: DexBackedDexFile): Array<String> {
         val mapItem = dexFile.getMapItemForSection(ItemType.METHOD_ID_ITEM) ?: return emptyArray()
 
-        val methodCount = mapItem.getItemCount()
+        val methodCount = mapItem.itemCount
         return Array(methodCount) { i -> asString(dexFile, i) }
     }
 }

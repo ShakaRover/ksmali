@@ -55,7 +55,6 @@ object OdexHeaderItem {
      * @param offset The offset within the buffer to the beginning of the odex header
      * @return True if the magic value is valid
      */
-    @JvmStatic
     fun verifyMagic(buf: ByteArray, offset: Int): Boolean {
         if (buf.size - offset < 8) {
             return false
@@ -87,7 +86,6 @@ object OdexHeaderItem {
      * @param offset The offset within the buffer to the beginning of the odex header
      * @return The odex version if the header is valid or -1 if the header is invalid
      */
-    @JvmStatic
     fun getVersion(buf: ByteArray, offset: Int): Int {
         if (!verifyMagic(buf, offset)) {
             return -1
@@ -104,7 +102,6 @@ object OdexHeaderItem {
         return version
     }
 
-    @JvmStatic
     fun isSupportedOdexVersion(version: Int): Boolean {
         for (i in SUPPORTED_ODEX_VERSIONS.indices) {
             if (SUPPORTED_ODEX_VERSIONS[i] == version) {
@@ -114,13 +111,11 @@ object OdexHeaderItem {
         return false
     }
 
-    @JvmStatic
     fun getDexOffset(buf: ByteArray): Int {
         val bdb = DexBuffer(buf)
         return bdb.readSmallUint(DEX_OFFSET)
     }
 
-    @JvmStatic
     fun getDependenciesOffset(buf: ByteArray): Int {
         val bdb = DexBuffer(buf)
         return bdb.readSmallUint(DEPENDENCIES_OFFSET)

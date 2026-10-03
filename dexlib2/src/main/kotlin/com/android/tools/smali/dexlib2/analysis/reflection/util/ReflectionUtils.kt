@@ -61,7 +61,6 @@ object ReflectionUtils {
         return Collections.unmodifiableMap(temp)
     }
 
-    @JvmStatic
     fun javaToDexName(javaName: String): String {
         if (javaName[0] == '[') {
             return javaName.replace('.', '/')
@@ -75,7 +74,6 @@ object ReflectionUtils {
         return "L" + javaName.replace('.', '/') + ";"
     }
 
-    @JvmStatic
     fun dexToJavaName(dexName: String): String {
         if (dexName[0] == '[') {
             return dexName.replace('/', '.')

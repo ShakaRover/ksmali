@@ -39,9 +39,9 @@ open class Label : ItemWithLocation {
     }
 
     val codeAddress: Int
-        get() = getLocation().codeAddress
+        get() = requireLocation().codeAddress
 
-    fun getLocation(): MethodLocation {
+    fun requireLocation(): MethodLocation {
         if (location == null) {
             throw IllegalStateException("Cannot get the location of a label that hasn't been placed yet.")
         }

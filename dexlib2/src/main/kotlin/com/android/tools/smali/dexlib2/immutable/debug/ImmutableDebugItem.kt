@@ -46,7 +46,6 @@ abstract class ImmutableDebugItem(
     override val codeAddress: Int
 ) : DebugItem {
     companion object {
-        @JvmStatic
         fun of(debugItem: DebugItem): ImmutableDebugItem {
             if (debugItem is ImmutableDebugItem) {
                 return debugItem
@@ -65,7 +64,6 @@ abstract class ImmutableDebugItem(
             }
         }
 
-        @JvmStatic
         fun immutableListOf(list: Iterable<DebugItem>?): List<ImmutableDebugItem> {
             return CONVERTER.toList(list)
         }

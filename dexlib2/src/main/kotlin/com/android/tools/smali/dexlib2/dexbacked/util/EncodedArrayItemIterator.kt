@@ -79,7 +79,6 @@ abstract class EncodedArrayItemIterator {
     }
 
     companion object {
-        @JvmField
         val EMPTY: EncodedArrayItemIterator = object : EncodedArrayItemIterator() {
             override fun getNextOrNull(): EncodedValue? = null
 
@@ -91,7 +90,6 @@ abstract class EncodedArrayItemIterator {
             override fun getItemCount(): Int = 0
         }
 
-        @JvmStatic
         fun newOrEmpty(dexFile: DexBackedDexFile, offset: Int): EncodedArrayItemIterator {
             if (offset == 0) {
                 return EMPTY

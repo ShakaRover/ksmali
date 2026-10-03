@@ -57,12 +57,10 @@ import java.util.AbstractList
 import java.util.AbstractSet
 
 object RewriterUtils {
-    @JvmStatic
     fun <T> rewriteNullable(rewriter: Rewriter<T>, value: T?): T? {
         return if (value == null) null else rewriter.rewrite(value)
     }
 
-    @JvmStatic
     fun <T> rewriteSet(rewriter: Rewriter<T>, set: Set<T>): Set<T> {
         return object : AbstractSet<T>() {
             override fun iterator(): MutableIterator<T> {
@@ -73,7 +71,7 @@ object RewriterUtils {
                     }
 
                     override fun next(): T {
-                        return rewriteNullable(rewriter, iterator.next())!!
+                        return rewriter.rewrite(iterator.next())
                     }
 
                     override fun remove() {
@@ -87,11 +85,10 @@ object RewriterUtils {
         }
     }
 
-    @JvmStatic
     fun <T> rewriteList(rewriter: Rewriter<T>, list: List<T>): List<T> {
         return object : AbstractList<T>() {
             override fun get(i: Int): T {
-                return rewriteNullable(rewriter, list[i])!!
+                return rewriter.rewrite(list[i])
             }
 
             override val size: Int
@@ -99,7 +96,6 @@ object RewriterUtils {
         }
     }
 
-    @JvmStatic
     fun <T> rewriteIterable(rewriter: Rewriter<T>, iterable: Iterable<T>): Iterable<T> {
         return object : Iterable<T> {
             override fun iterator(): MutableIterator<T> {
@@ -110,7 +106,7 @@ object RewriterUtils {
                     }
 
                     override fun next(): T {
-                        return rewriteNullable(rewriter, iterator.next())!!
+                        return rewriter.rewrite(iterator.next())
                     }
 
                     override fun remove() {
@@ -121,7 +117,6 @@ object RewriterUtils {
         }
     }
 
-    @JvmStatic
     fun rewriteTypeReference(typeRewriter: Rewriter<String>, typeReference: TypeReference): TypeReference {
         return object : BaseTypeReference() {
             override val type: String
@@ -129,7 +124,6 @@ object RewriterUtils {
         }
     }
 
-    @JvmStatic
     fun rewriteMethodHandleReference(
         rewriters: Rewriters,
         methodHandleReference: MethodHandleReference
@@ -169,7 +163,6 @@ object RewriterUtils {
         }
     }
 
-    @JvmStatic
     fun rewriteMethodProtoReference(
         typeRewriter: Rewriter<String>,
         methodProtoReference: MethodProtoReference
@@ -186,7 +179,6 @@ object RewriterUtils {
         }
     }
 
-    @JvmStatic
     fun rewriteValue(rewriters: Rewriters, encodedValue: EncodedValue): EncodedValue {
         when (encodedValue.valueType) {
             ValueType.INT,

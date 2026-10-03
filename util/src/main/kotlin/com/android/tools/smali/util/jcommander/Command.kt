@@ -33,10 +33,9 @@ package com.android.tools.smali.util.jcommander
 import com.android.tools.smali.util.getConsoleWidth
 import com.beust.jcommander.JCommander
 import com.google.common.collect.Iterables
-import com.google.common.collect.Lists
 
 abstract class Command(
-    @JvmField protected val commandAncestors: List<JCommander>
+    protected val commandAncestors: List<JCommander>
 ) {
     open fun usage() {
         System.out.println(
@@ -63,7 +62,7 @@ abstract class Command(
     internal fun getJCommanderInternal(): JCommander = getJCommander()
 
     open fun getCommandHierarchy(): List<JCommander> {
-        val commandHierarchy: MutableList<JCommander> = Lists.newArrayList(commandAncestors)
+        val commandHierarchy: MutableList<JCommander> = commandAncestors.toMutableList()
         commandHierarchy.add(getJCommander())
         return commandHierarchy
     }

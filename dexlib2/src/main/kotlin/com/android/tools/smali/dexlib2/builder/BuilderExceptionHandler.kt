@@ -34,13 +34,10 @@ package com.android.tools.smali.dexlib2.builder
 import com.android.tools.smali.dexlib2.base.BaseExceptionHandler
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
-abstract class BuilderExceptionHandler private constructor(@JvmField protected val handler: Label) :
+abstract class BuilderExceptionHandler private constructor(val handler: Label) :
     BaseExceptionHandler() {
 
-    fun getHandler(): Label = handler
-
     companion object {
-        @JvmStatic
         fun newExceptionHandler(type: TypeReference?, handler: Label): BuilderExceptionHandler {
             if (type == null) {
                 return newExceptionHandler(handler)
@@ -57,7 +54,6 @@ abstract class BuilderExceptionHandler private constructor(@JvmField protected v
             }
         }
 
-        @JvmStatic
         fun newExceptionHandler(handler: Label): BuilderExceptionHandler {
             return object : BuilderExceptionHandler(handler) {
                 override val exceptionType: String?
@@ -68,7 +64,6 @@ abstract class BuilderExceptionHandler private constructor(@JvmField protected v
             }
         }
 
-        @JvmStatic
         fun newExceptionHandler(type: String?, handler: Label): BuilderExceptionHandler {
             if (type == null) {
                 return newExceptionHandler(handler)

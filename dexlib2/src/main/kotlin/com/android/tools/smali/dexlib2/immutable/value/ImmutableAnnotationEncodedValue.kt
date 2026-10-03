@@ -46,7 +46,6 @@ open class ImmutableAnnotationEncodedValue(
         this(type, ImmutableAnnotationElement.immutableSetOf(elements))
 
     companion object {
-        @JvmStatic
         fun of(annotationEncodedValue: AnnotationEncodedValue): ImmutableAnnotationEncodedValue {
             if (annotationEncodedValue is ImmutableAnnotationEncodedValue) {
                 return annotationEncodedValue

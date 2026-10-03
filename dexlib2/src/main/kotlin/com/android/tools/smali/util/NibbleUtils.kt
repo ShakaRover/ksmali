@@ -37,7 +37,6 @@ object NibbleUtils {
      * @param value the value to extract the nibble from
      * @return the extracted signed nibble value
      */
-    @JvmStatic
     fun extractHighSignedNibble(value: Int): Int {
         return (value shl 24) shr 28
     }
@@ -48,7 +47,6 @@ object NibbleUtils {
      * @param value the value to extract the nibble from
      * @return the extracted signed nibble value
      */
-    @JvmStatic
     fun extractLowSignedNibble(value: Int): Int {
         return (value shl 28) shr 28
     }
@@ -59,7 +57,6 @@ object NibbleUtils {
      * @param value the value to extract the nibble from
      * @return the extracted unsigned nibble value
      */
-    @JvmStatic
     fun extractHighUnsignedNibble(value: Int): Int {
         return (value and 0xF0) ushr 4
     }
@@ -70,7 +67,6 @@ object NibbleUtils {
      * @param value the value to extract the nibble from
      * @return the extracted unsigned nibble value
      */
-    @JvmStatic
     fun extractLowUnsignedNibble(value: Int): Int {
         return value and 0x0F
     }

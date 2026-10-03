@@ -50,15 +50,11 @@ object ParamUtil {
                 findTypeEnd(str, i)
             }
             else -> throw IllegalArgumentException(
-                String.format(
-                    "Param string \"%s\" contains invalid type prefix: %s",
-                    str, c.toString()
-                )
+                "Param string \"${str}\" contains invalid type prefix: ${c.toString()}"
             )
         }
     }
 
-    @JvmStatic
     fun parseParamString(params: String): Iterable<ImmutableMethodParameter> {
         return object : Iterable<ImmutableMethodParameter> {
             override fun iterator(): Iterator<ImmutableMethodParameter> {

@@ -32,13 +32,8 @@
 package com.android.tools.smali.dexlib2.builder
 
 abstract class ItemWithLocation {
-    @JvmField
     var location: MethodLocation? = null
 
     val isPlaced: Boolean
         get() = location != null
-
-    fun setLocation(methodLocation: MethodLocation?) {
-        location = methodLocation
-    }
 }

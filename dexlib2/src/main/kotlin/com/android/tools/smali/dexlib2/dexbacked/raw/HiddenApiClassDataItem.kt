@@ -42,7 +42,6 @@ object HiddenApiClassDataItem {
 
     const val OFFSET_ITEM_SIZE = 0x4
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {

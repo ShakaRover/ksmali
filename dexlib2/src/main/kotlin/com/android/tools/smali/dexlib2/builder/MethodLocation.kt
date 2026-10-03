@@ -43,18 +43,14 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 open class MethodLocation internal constructor(
-    @JvmField var instruction: BuilderInstruction?,
-    @JvmField var codeAddress: Int,
-    @JvmField var index: Int
+    var instruction: BuilderInstruction?,
+    var codeAddress: Int,
+    var index: Int
 ) {
     private val labels: LocatedItems<Label> = LocatedLabels()
     private val debugItems: LocatedItems<BuilderDebugItem> = LocatedDebugItems()
 
     fun getInstruction(): Instruction? = instruction
-
-    fun getCodeAddress(): Int = codeAddress
-
-    fun getIndex(): Int = index
 
     fun mergeInto(nextLocation: MethodLocation) {
         labels.mergeItemsIntoNext(nextLocation, nextLocation.labels)

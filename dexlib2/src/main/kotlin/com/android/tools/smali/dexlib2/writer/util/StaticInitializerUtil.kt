@@ -44,7 +44,6 @@ import java.util.function.Predicate
 import java.util.stream.Collectors
 
 object StaticInitializerUtil {
-    @JvmStatic
     fun getStaticInitializers(sortedStaticFields: SortedSet<out Field>): ArrayEncodedValue? {
         val lastIndex = CollectionUtils.lastIndexOf(sortedStaticFields, HAS_INITIALIZER)
         if (lastIndex > -1) {

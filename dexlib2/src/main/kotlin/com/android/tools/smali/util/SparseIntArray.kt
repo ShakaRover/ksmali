@@ -210,7 +210,6 @@ class SparseIntArray {
     }
 
     companion object {
-        @JvmStatic
         private fun binarySearch(a: IntArray, start: Int, len: Int, key: Int): Int {
             var high = start + len
             var low = start - 1

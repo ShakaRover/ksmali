@@ -49,7 +49,7 @@ import com.android.tools.smali.dexlib2.iface.value.MethodEncodedValue
 import com.android.tools.smali.dexlib2.iface.value.TypeEncodedValue
 
 open class EncodedValueRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<EncodedValue> {
     override fun rewrite(encodedValue: EncodedValue): EncodedValue {
         when (encodedValue.valueType) {

@@ -49,10 +49,8 @@ open class ImmutableInstruction3rms(
         get() = FORMAT
 
     companion object {
-        @JvmField
         val FORMAT: Format = Format.Format3rms
 
-        @JvmStatic
         fun of(instruction: Instruction3rms): ImmutableInstruction3rms {
             if (instruction is ImmutableInstruction3rms) {
                 return instruction

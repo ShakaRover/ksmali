@@ -57,7 +57,7 @@ class DexBackedInstruction20bc(
                 return object : Reference {
                     override fun validateReference() {
                         throw InvalidReferenceException(
-                            String.format("%d@%d", ex.referenceType, referenceIndex), ex
+                            "${ex.referenceType}@${referenceIndex}", ex
                         )
                     }
                 }

@@ -39,7 +39,7 @@ import com.android.tools.smali.dexlib2.dexbacked.util.FixedSizeList
 import com.android.tools.smali.dexlib2.iface.reference.Reference.InvalidReferenceException
 
 class DexBackedMethodReference(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     private val methodIndex: Int
 ) : BaseMethodReference() {
     private var protoIdItemOffset: Int = 0

@@ -39,7 +39,7 @@ import com.android.tools.smali.dexlib2.dexbacked.util.VariableSizeSet
 import com.android.tools.smali.dexlib2.iface.value.AnnotationEncodedValue
 
 class DexBackedAnnotationEncodedValue(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     reader: DexReader<out DexBuffer>
 ) : BaseAnnotationEncodedValue(), AnnotationEncodedValue {
     override val type: String
@@ -65,7 +65,6 @@ class DexBackedAnnotationEncodedValue(
         }
 
     companion object {
-        @JvmStatic
         fun skipFrom(reader: DexReader<out DexBuffer>) {
             reader.skipUleb128() // type
             val elementCount = reader.readSmallUleb128()

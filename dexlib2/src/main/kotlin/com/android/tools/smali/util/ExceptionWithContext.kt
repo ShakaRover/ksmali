@@ -131,7 +131,6 @@ open class ExceptionWithContext : RuntimeException {
          * @param str non-null; context to add
          * @return non-null; an appropriate instance
          */
-        @JvmStatic
         fun withContext(ex: Throwable, str: String, vararg formatArgs: Any?): ExceptionWithContext {
             val ewc: ExceptionWithContext
 

@@ -34,13 +34,13 @@ import com.android.tools.smali.util.Range
 import com.android.tools.smali.util.UnmodifiableRangeMap
 
 enum class Opcode(
-    @JvmField val apiToValueMap: UnmodifiableRangeMap<Int, Short>,
-    @JvmField val artVersionToValueMap: UnmodifiableRangeMap<Int, Short>,
-    @JvmField val mnemonic: String,
-    @JvmField val referenceType: Int,
-    @JvmField val referenceType2: Int,
-    @JvmField val format: Format,
-    @JvmField val flags: Int
+    val apiToValueMap: UnmodifiableRangeMap<Int, Short>,
+    val artVersionToValueMap: UnmodifiableRangeMap<Int, Short>,
+    val mnemonic: String,
+    val referenceType: Int,
+    val referenceType2: Int,
+    val format: Format,
+    val flags: Int
 ) {
     NOP(0x00, "nop", ReferenceType.NONE, Format.Format10x, FLAG_CAN_CONTINUE),
     MOVE(0x01, "move", ReferenceType.NONE, Format.Format12x, FLAG_CAN_CONTINUE or FLAG_SETS_REGISTER),

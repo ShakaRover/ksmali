@@ -50,7 +50,6 @@ object CdexHeaderItem {
      * @param offset The offset within the buffer to the beginning of the cdex header
      * @return True if the magic value is valid
      */
-    @JvmStatic
     fun verifyMagic(buf: ByteArray, offset: Int): Boolean {
         if (buf.size - offset < 8) {
             return false
@@ -82,7 +81,6 @@ object CdexHeaderItem {
      * @param offset The offset within the buffer to the beginning of the odex header
      * @return The odex version if the header is valid or -1 if the header is invalid
      */
-    @JvmStatic
     fun getVersion(buf: ByteArray, offset: Int): Int {
         if (!verifyMagic(buf, offset)) {
             return -1
@@ -99,7 +97,6 @@ object CdexHeaderItem {
         return version
     }
 
-    @JvmStatic
     fun isSupportedCdexVersion(version: Int): Boolean {
         for (i in SUPPORTED_CDEX_VERSIONS.indices) {
             if (SUPPORTED_CDEX_VERSIONS[i] == version) {
@@ -109,7 +106,6 @@ object CdexHeaderItem {
         return false
     }
 
-    @JvmStatic
     fun annotateCdexHeaderFields(out: AnnotatedBytes, buf: DexBuffer) {
         out.annotate(4, "feature_flags: 0x%x", buf.readInt(out.cursor))
         out.annotate(4, "debug_info_offsets_pos: 0x%x", buf.readInt(out.cursor))

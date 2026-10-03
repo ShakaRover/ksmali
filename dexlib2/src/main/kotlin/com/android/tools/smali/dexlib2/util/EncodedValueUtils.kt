@@ -54,7 +54,6 @@ import java.io.IOException
 import java.io.Writer
 
 object EncodedValueUtils {
-    @JvmStatic
     fun isDefaultValue(encodedValue: EncodedValue): Boolean {
         when (encodedValue.valueType) {
             ValueType.BOOLEAN -> return !(encodedValue as BooleanEncodedValue).value
@@ -74,7 +73,6 @@ object EncodedValueUtils {
      * @deprecated use [DexFormatter] instead.
      */
     @Deprecated("use DexFormatter instead")
-    @JvmStatic
     @Throws(IOException::class)
     fun writeEncodedValue(writer: Writer, encodedValue: EncodedValue) {
         when (encodedValue.valueType) {

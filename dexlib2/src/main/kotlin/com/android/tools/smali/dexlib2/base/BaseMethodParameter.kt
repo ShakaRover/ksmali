@@ -62,13 +62,13 @@ abstract class BaseMethodParameter : BaseTypeReference(), MethodParameter {
             }
             val values = signatureValues ?: return null
 
-            val sb = StringBuilder()
-            for (signatureValue in values.value) {
-                if (signatureValue.valueType != ValueType.STRING) {
-                    return null
+            return buildString {
+                for (signatureValue in values.value) {
+                    if (signatureValue.valueType != ValueType.STRING) {
+                        return null
+                    }
+                    append((signatureValue as StringEncodedValue).value)
                 }
-                sb.append((signatureValue as StringEncodedValue).value)
             }
-            return sb.toString()
         }
 }

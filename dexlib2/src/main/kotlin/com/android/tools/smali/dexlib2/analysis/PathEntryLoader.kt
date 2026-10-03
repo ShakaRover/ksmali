@@ -41,20 +41,10 @@ import java.io.IOException
 import java.util.ArrayList
 import java.util.HashSet
 
-open class PathEntryLoader(@JvmField var opcodes: Opcodes) {
-    @JvmField
+open class PathEntryLoader(var opcodes: Opcodes) {
     val loadedFiles: MutableSet<File> = HashSet()
 
-    @JvmField
     val classProviders: MutableList<ClassProvider> = ArrayList()
-
-    fun getOpcodes(): Opcodes {
-        return opcodes
-    }
-
-    fun getClassProviders(): List<ClassProvider> {
-        return classProviders
-    }
 
     fun getResolvedClassProviders(): List<ClassProvider> {
         return classProviders

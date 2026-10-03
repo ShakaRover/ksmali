@@ -58,7 +58,6 @@ open class ImmutableField(
         else Collections.unmodifiableSet(HashSet(hiddenApiRestrictions))
 
     companion object {
-        @JvmStatic
         fun of(field: Field): ImmutableField {
             if (field is ImmutableField) {
                 return field
@@ -74,7 +73,6 @@ open class ImmutableField(
             )
         }
 
-        @JvmStatic
         fun immutableSetOf(list: Iterable<Field>?): SortedSet<ImmutableField> {
             return CONVERTER.toSortedSet(CollectionUtils.naturalOrdering(), list)
         }

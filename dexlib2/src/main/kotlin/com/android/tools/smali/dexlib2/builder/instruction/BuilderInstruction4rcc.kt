@@ -59,7 +59,6 @@ open class BuilderInstruction4rcc(
         get() = FORMAT
 
     companion object {
-        @JvmField
         val FORMAT: Format = Format.Format4rcc
     }
 }

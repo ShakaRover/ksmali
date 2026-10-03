@@ -36,7 +36,6 @@ import com.android.tools.smali.dexlib2.immutable.reference.ImmutableFieldReferen
 
 open class ImmutableFieldEncodedValue(override val value: ImmutableFieldReference) : BaseFieldEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmStatic
         fun of(value: FieldEncodedValue): ImmutableFieldEncodedValue {
             if (value is ImmutableFieldEncodedValue) {
                 return value

@@ -35,7 +35,7 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
 import com.android.tools.smali.util.ExceptionWithContext
 
-abstract class BuilderOffsetInstruction(opcode: Opcode, @JvmField protected val target: Label) :
+abstract class BuilderOffsetInstruction(opcode: Opcode, val target: Label) :
     BuilderInstruction(opcode), OffsetInstruction {
 
     override val codeOffset: Int
@@ -60,8 +60,6 @@ abstract class BuilderOffsetInstruction(opcode: Opcode, @JvmField protected val 
         }
 
     internal fun internalGetCodeOffset(): Int {
-        return target.codeAddress - this.getLocation().codeAddress
+        return target.codeAddress - this.requireLocation().codeAddress
     }
-
-    fun getTarget(): Label = target
 }

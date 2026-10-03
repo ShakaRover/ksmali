@@ -38,7 +38,6 @@ class DexBackedAnnotationElement(
     private val dexFile: DexBackedDexFile,
     reader: DexReader<out DexBuffer>
 ) : BaseAnnotationElement() {
-    @JvmField
     val nameIndex: Int
 
     override val value: EncodedValue

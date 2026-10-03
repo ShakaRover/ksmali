@@ -48,9 +48,9 @@ import java.util.Collections
 import java.util.EnumSet
 
 class DexBackedMethod(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     reader: DexReader<out DexBuffer>,
-    @JvmField val classDef: DexBackedClassDef,
+    val classDef: DexBackedClassDef,
     previousMethodIndex: Int,
     methodAnnotationIterator: AnnotationIterator?,
     paramaterAnnotationIterator: AnnotationIterator?,
@@ -63,7 +63,6 @@ class DexBackedMethod(
     private val methodAnnotationSetOffset: Int
     private val hiddenApiRestrictionFlags: Int
 
-    @JvmField
     val methodIndex: Int
     private val startOffset: Int
 
@@ -95,10 +94,6 @@ class DexBackedMethod(
         hiddenApiRestrictions: Int
     ) : this(dexFile, reader, classDef, previousMethodIndex, null, null, hiddenApiRestrictions)
 
-    fun getMethodIndex(): Int {
-        return methodIndex
-    }
-
     override val definingClass: String
         get() = classDef.type
 
@@ -124,8 +119,8 @@ class DexBackedMethod(
                     override fun iterator(): MutableIterator<MethodParameter> {
                         return ParameterIterator(
                             parameterTypes,
-                            getParameterAnnotations(),
-                            getParameterNames()
+                            parameterAnnotations,
+                            parameterNames
                         )
                     }
 
@@ -136,19 +131,19 @@ class DexBackedMethod(
             return emptyList()
         }
 
-    fun getParameterAnnotations(): List<Set<DexBackedAnnotation>> {
-        return AnnotationsDirectory.getParameterAnnotations(
+    val parameterAnnotations: List<Set<DexBackedAnnotation>>
+        get() = AnnotationsDirectory.getParameterAnnotations(
             dexFile, parameterAnnotationSetListOffset
         )
-    }
 
-    fun getParameterNames(): MutableIterator<String?> {
-        val methodImpl = implementation
-        if (methodImpl != null) {
-            return methodImpl.getParameterNames(null)
+    val parameterNames: MutableIterator<String?>
+        get() {
+            val methodImpl = implementation
+            if (methodImpl != null) {
+                return methodImpl.getParameterNames(null)
+            }
+            return Collections.emptyIterator()
         }
-        return Collections.emptyIterator()
-    }
 
     override val parameterTypes: List<String>
         get() {
@@ -252,7 +247,6 @@ class DexBackedMethod(
          * @param reader The reader to skip
          * @param count The number of encoded_method structures to skip over
          */
-        @JvmStatic
         fun skipMethods(reader: DexReader<out DexBuffer>, count: Int) {
             for (i in 0 until count) {
                 reader.skipUleb128()

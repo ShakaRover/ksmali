@@ -35,7 +35,6 @@ import com.android.tools.smali.dexlib2.iface.value.LongEncodedValue
 
 open class ImmutableLongEncodedValue(override val value: Long) : BaseLongEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmStatic
         fun of(value: LongEncodedValue): ImmutableLongEncodedValue {
             if (value is ImmutableLongEncodedValue) {
                 return value

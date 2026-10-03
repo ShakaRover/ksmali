@@ -65,17 +65,14 @@ open class CDexBackedDexFile : DexBackedDexFile {
     override val baseDataOffset: Int
         get() = buffer.readSmallUint(HeaderItem.DATA_START_OFFSET)
 
-    fun getDebugInfoOffsetsPos(): Int {
-        return buffer.readSmallUint(CdexHeaderItem.DEBUG_INFO_OFFSETS_POS_OFFSET)
-    }
+    val debugInfoOffsetsPos: Int
+        get() = buffer.readSmallUint(CdexHeaderItem.DEBUG_INFO_OFFSETS_POS_OFFSET)
 
-    fun getDebugInfoOffsetsTableOffset(): Int {
-        return buffer.readSmallUint(CdexHeaderItem.DEBUG_INFO_OFFSETS_TABLE_OFFSET)
-    }
+    val debugInfoOffsetsTableOffset: Int
+        get() = buffer.readSmallUint(CdexHeaderItem.DEBUG_INFO_OFFSETS_TABLE_OFFSET)
 
-    fun getDebugInfoBase(): Int {
-        return buffer.readSmallUint(CdexHeaderItem.DEBUG_INFO_BASE)
-    }
+    val debugInfoBase: Int
+        get() = buffer.readSmallUint(CdexHeaderItem.DEBUG_INFO_BASE)
 
     override fun createMethodImplementation(
         dexFile: DexBackedDexFile,
@@ -86,7 +83,6 @@ open class CDexBackedDexFile : DexBackedDexFile {
     }
 
     companion object {
-        @JvmStatic
         fun isCdex(buf: ByteArray, offset: Int): Boolean {
             if (offset + 4 > buf.size) {
                 return false

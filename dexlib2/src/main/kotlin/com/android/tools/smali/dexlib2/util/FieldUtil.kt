@@ -28,7 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@file:JvmName("FieldUtil")
 
 package com.android.tools.smali.dexlib2.util
 
@@ -36,10 +35,8 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.iface.Field
 import java.util.function.Predicate
 
-@JvmField
 val FIELD_IS_STATIC: Predicate<Field> = Predicate { input -> input != null && isStatic(input) }
 
-@JvmField
 val FIELD_IS_INSTANCE: Predicate<Field> = Predicate { input -> input != null && !isStatic(input) }
 
 fun isStatic(field: Field): Boolean {

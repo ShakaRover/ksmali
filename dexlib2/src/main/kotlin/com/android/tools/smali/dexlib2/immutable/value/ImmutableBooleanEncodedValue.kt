@@ -37,10 +37,8 @@ open class ImmutableBooleanEncodedValue private constructor(
     override val value: Boolean
 ) : BaseBooleanEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmField
         val TRUE_VALUE: ImmutableBooleanEncodedValue = ImmutableBooleanEncodedValue(true)
 
-        @JvmField
         val FALSE_VALUE: ImmutableBooleanEncodedValue = ImmutableBooleanEncodedValue(false)
 
         @JvmStatic
@@ -48,7 +46,6 @@ open class ImmutableBooleanEncodedValue private constructor(
             return if (value) TRUE_VALUE else FALSE_VALUE
         }
 
-        @JvmStatic
         fun of(booleanEncodedValue: BooleanEncodedValue): ImmutableBooleanEncodedValue {
             return forBoolean(booleanEncodedValue.value)
         }

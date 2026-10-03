@@ -30,7 +30,6 @@
 
 package com.android.tools.smali.util
 
-import java.util.Arrays
 import java.util.Collections
 
 /**
@@ -309,7 +308,6 @@ class SparseArray<E> {
     companion object {
         private val DELETED = Any()
 
-        @JvmStatic
         private fun binarySearch(a: IntArray, start: Int, len: Int, key: Int): Int {
             var high = start + len
             var low = start - 1
@@ -341,6 +339,6 @@ class SparseArray<E> {
      */
     @Suppress("UNCHECKED_CAST")
     fun getValues(): List<E> {
-        return Collections.unmodifiableList(Arrays.asList(*(mValues as Array<E>)))
+        return Collections.unmodifiableList(listOf(*(mValues as Array<E>)))
     }
 }

@@ -49,7 +49,6 @@ open class BuilderInstruction31i(opcode: Opcode, registerA: Int, literal: Int) :
         get() = FORMAT
 
     companion object {
-        @JvmField
         val FORMAT: Format = Format.Format31i
     }
 }

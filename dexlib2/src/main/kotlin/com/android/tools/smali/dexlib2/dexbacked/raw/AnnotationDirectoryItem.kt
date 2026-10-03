@@ -39,7 +39,6 @@ object AnnotationDirectoryItem {
     const val ANNOTATED_METHOD_SIZE_OFFSET = 8
     const val ANNOTATED_PARAMETERS_SIZE = 12
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {

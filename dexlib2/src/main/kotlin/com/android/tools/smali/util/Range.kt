@@ -173,7 +173,6 @@ class Range<C : Comparable<C>> private constructor(
     }
 
     companion object {
-        @JvmField
         val RANGE_LEX_COMPARATOR: Comparator<Range<*>> = Comparator { left, right ->
             compareLexicographically(left, right)
         }
@@ -202,7 +201,6 @@ class Range<C : Comparable<C>> private constructor(
             return cmp
         }
 
-        @JvmStatic
         fun <C : Comparable<C>> closed(lowerBound: C, upperBound: C): Range<C> {
             if (lowerBound.compareTo(upperBound) > 0) {
                 throw IllegalArgumentException("lowerBound must be <= upperBound")
@@ -210,14 +208,12 @@ class Range<C : Comparable<C>> private constructor(
             return Range(lowerBound, upperBound, false, false, false)
         }
 
-        @JvmStatic
         fun <C : Comparable<C>> open(lowerBound: C, upperBound: C): Range<C> {
             if (lowerBound.compareTo(upperBound) > 0) {
                 throw IllegalArgumentException("lowerBound must be <= upperBound")
             }
             return Range(lowerBound, upperBound, true, true, false)
         }
-        @JvmStatic
         fun <C : Comparable<C>> openClosed(lowerBound: C, upperBound: C): Range<C> {
             if (lowerBound.compareTo(upperBound) > 0) {
                 throw IllegalArgumentException("lowerBound must be <= upperBound")
@@ -225,7 +221,6 @@ class Range<C : Comparable<C>> private constructor(
             return Range(lowerBound, upperBound, true, false, false)
         }
 
-        @JvmStatic
         fun <C : Comparable<C>> closedOpen(lowerBound: C, upperBound: C): Range<C> {
             if (lowerBound.compareTo(upperBound) > 0) {
                 throw IllegalArgumentException("lowerBound must be <= upperBound")
@@ -233,17 +228,14 @@ class Range<C : Comparable<C>> private constructor(
             return Range(lowerBound, upperBound, false, true, false)
         }
 
-        @JvmStatic
         fun <C : Comparable<C>> atLeast(lowerBound: C): Range<C> {
             return Range(lowerBound, null, false, false, false)
         }
 
-        @JvmStatic
         fun <C : Comparable<C>> atMost(upperBound: C): Range<C> {
             return Range(null, upperBound, false, false, false)
         }
 
-        @JvmStatic
         fun <C : Comparable<C>> allValues(): Range<C> {
             return Range(null, null, false, false, true)
         }

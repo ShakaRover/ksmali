@@ -53,7 +53,6 @@ object ItemType {
     const val ANNOTATION_DIRECTORY_ITEM = 0x2006
     const val HIDDENAPI_CLASS_DATA_ITEM = 0xF000
 
-    @JvmStatic
     fun getItemTypeName(itemType: Int): String {
         return when (itemType) {
             HEADER_ITEM -> "header_item"

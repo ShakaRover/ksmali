@@ -39,7 +39,7 @@ import com.android.tools.smali.dexlib2.iface.value.ArrayEncodedValue
 import com.android.tools.smali.dexlib2.iface.value.EncodedValue
 
 class DexBackedArrayEncodedValue(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     reader: DexReader<out DexBuffer>
 ) : BaseArrayEncodedValue(), ArrayEncodedValue {
     private val elementCount: Int
@@ -62,7 +62,6 @@ class DexBackedArrayEncodedValue(
         }
 
     companion object {
-        @JvmStatic
         fun skipFrom(reader: DexReader<out DexBuffer>) {
             val elementCount = reader.readSmallUleb128()
             skipElementsFrom(reader, elementCount)

@@ -33,7 +33,6 @@ package com.android.tools.smali.dexlib2
 object VersionMap {
     const val NO_VERSION = -1
 
-    @JvmStatic
     fun mapDexVersionToApi(dexVersion: Int): Int {
         return when (dexVersion) {
             35 -> 23
@@ -46,7 +45,6 @@ object VersionMap {
         }
     }
 
-    @JvmStatic
     fun mapApiToDexVersion(api: Int): Int {
         if (api <= 23) {  // Android M/6
             return 35
@@ -61,7 +59,6 @@ object VersionMap {
         }
     }
 
-    @JvmStatic
     fun mapArtVersionToApi(artVersion: Int): Int {
         if (artVersion >= 244) {
             return 35
@@ -105,7 +102,6 @@ object VersionMap {
         return 19
     }
 
-    @JvmStatic
     fun mapApiToArtVersion(api: Int): Int {
         if (api < 19) {
             return NO_VERSION

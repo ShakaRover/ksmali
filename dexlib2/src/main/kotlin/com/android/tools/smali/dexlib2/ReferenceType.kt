@@ -50,7 +50,6 @@ object ReferenceType {
     const val METHOD_HANDLE = 6
     const val NONE = 7
 
-    @JvmStatic
     fun getReferenceType(reference: Reference): Int {
         return when (reference) {
             is StringReference -> STRING
@@ -69,7 +68,6 @@ object ReferenceType {
      *
      * @throws InvalidReferenceTypeException
      */
-    @JvmStatic
     fun validateReferenceType(referenceType: Int) {
         if (referenceType < 0 || referenceType > 4) {
             throw InvalidReferenceTypeException(referenceType)

@@ -38,7 +38,6 @@ import com.android.tools.smali.util.StringUtils
 object StringIdItem {
     const val ITEM_SIZE = 4
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {
@@ -65,12 +64,10 @@ object StringIdItem {
         }
     }
 
-    @JvmStatic
     fun getReferenceAnnotation(dexFile: DexBackedDexFile, stringIndex: Int): String {
         return getReferenceAnnotation(dexFile, stringIndex, false)
     }
 
-    @JvmStatic
     fun getReferenceAnnotation(
         dexFile: DexBackedDexFile,
         stringIndex: Int,
@@ -79,21 +76,19 @@ object StringIdItem {
         try {
             var string = dexFile.stringSection.get(stringIndex)
             if (quote) {
-                string = String.format("\"%s\"", StringUtils.escapeString(string))
+                string = "\"${StringUtils.escapeString(string)}\""
             }
-            return String.format("string_id_item[%d]: %s", stringIndex, string)
+            return "string_id_item[${stringIndex}]: ${string}"
         } catch (ex: Exception) {
             ex.printStackTrace(System.err)
         }
-        return String.format("string_id_item[%d]", stringIndex)
+        return "string_id_item[${stringIndex}]"
     }
 
-    @JvmStatic
     fun getOptionalReferenceAnnotation(dexFile: DexBackedDexFile, stringIndex: Int): String {
         return getOptionalReferenceAnnotation(dexFile, stringIndex, false)
     }
 
-    @JvmStatic
     fun getOptionalReferenceAnnotation(
         dexFile: DexBackedDexFile,
         stringIndex: Int,

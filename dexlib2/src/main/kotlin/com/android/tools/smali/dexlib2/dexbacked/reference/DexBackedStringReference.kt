@@ -38,8 +38,8 @@ import com.android.tools.smali.dexlib2.dexbacked.raw.StringIdItem
 import com.android.tools.smali.dexlib2.iface.reference.Reference.InvalidReferenceException
 
 class DexBackedStringReference(
-    @JvmField val dexFile: DexBackedDexFile,
-    @JvmField val stringIndex: Int
+    val dexFile: DexBackedDexFile,
+    val stringIndex: Int
 ) : BaseStringReference() {
     override val string: String
         get() = dexFile.stringSection.get(stringIndex)

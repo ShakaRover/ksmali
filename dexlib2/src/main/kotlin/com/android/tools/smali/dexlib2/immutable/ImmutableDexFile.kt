@@ -45,7 +45,6 @@ open class ImmutableDexFile(
         this(opcodes, ImmutableClassDef.immutableSetOf(classes))
 
     companion object {
-        @JvmStatic
         fun of(dexFile: DexFile): ImmutableDexFile {
             if (dexFile is ImmutableDexFile) {
                 return dexFile

@@ -181,13 +181,11 @@ class ArraySortedSet<T> private constructor(
     }
 
     companion object {
-        @JvmStatic
         fun <T> of(comparator: Comparator<in T>, arr: Array<T>): ArraySortedSet<T> {
             @Suppress("UNCHECKED_CAST")
             return ArraySortedSet(comparator, arr as Array<Any?>)
         }
 
-        @JvmStatic
         fun <T> of(
             comparator: Comparator<in T>,
             collection: Collection<out T>
@@ -196,7 +194,6 @@ class ArraySortedSet<T> private constructor(
         }
 
         /* Copies without duplicates and sorts the given collection to create an ArraySortedSet from it */
-        @JvmStatic
         @Suppress("UNCHECKED_CAST")
         fun <T> copyOf(
             comparator: Comparator<in T>,

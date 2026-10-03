@@ -49,10 +49,8 @@ open class ImmutablePackedSwitchPayload(
         get() = OPCODE.format
 
     companion object {
-        @JvmField
         val OPCODE: Opcode = Opcode.PACKED_SWITCH_PAYLOAD
 
-        @JvmStatic
         fun of(instruction: PackedSwitchPayload): ImmutablePackedSwitchPayload {
             if (instruction is ImmutablePackedSwitchPayload) {
                 return instruction

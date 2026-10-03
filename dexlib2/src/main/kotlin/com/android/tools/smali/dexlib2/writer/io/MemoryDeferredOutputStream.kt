@@ -36,7 +36,7 @@ import java.io.OutputStream
 /**
  * A deferred output stream that is stored in memory
  */
-class MemoryDeferredOutputStream @JvmOverloads constructor(bufferSize: Int = DEFAULT_BUFFER_SIZE) :
+class MemoryDeferredOutputStream constructor(bufferSize: Int = DEFAULT_BUFFER_SIZE) :
     DeferredOutputStream() {
     private val buffers = ArrayList<ByteArray>()
     private var currentBuffer: ByteArray = ByteArray(bufferSize)
@@ -96,12 +96,9 @@ class MemoryDeferredOutputStream @JvmOverloads constructor(bufferSize: Int = DEF
     companion object {
         private const val DEFAULT_BUFFER_SIZE = 16 * 1024
 
-        @JvmStatic
-        fun getFactory(): DeferredOutputStreamFactory {
-            return getFactory(DEFAULT_BUFFER_SIZE)
-        }
+        val factory: DeferredOutputStreamFactory
+            get() = getFactory(DEFAULT_BUFFER_SIZE)
 
-        @JvmStatic
         fun getFactory(bufferSize: Int): DeferredOutputStreamFactory {
             return object : DeferredOutputStreamFactory {
                 override fun makeDeferredOutputStream(): DeferredOutputStream {

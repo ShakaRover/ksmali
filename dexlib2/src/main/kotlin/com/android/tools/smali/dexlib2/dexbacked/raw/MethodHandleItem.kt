@@ -41,7 +41,6 @@ object MethodHandleItem {
     const val METHOD_HANDLE_TYPE_OFFSET = 0
     const val MEMBER_ID_OFFSET = 4
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {

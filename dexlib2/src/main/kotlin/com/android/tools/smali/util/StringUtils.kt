@@ -40,7 +40,6 @@ object StringUtils {
      * com.android.tools.smali.baksmali.formatter.BaksmaliWriter}#writeCharEncodedValue()
      */
     @Deprecated("Use BaksmaliWriter#writeCharEncodedValue()")
-    @JvmStatic
     @Throws(IOException::class)
     fun writeEscapedChar(writer: Writer, c: Char) {
         var c = c
@@ -78,7 +77,6 @@ object StringUtils {
      * @deprecated Use [DexFormattedWriter.writeQuotedString]
      */
     @Deprecated("Use DexFormattedWriter#writeQuotedString(CharSequence)")
-    @JvmStatic
     @Throws(IOException::class)
     fun writeEscapedString(writer: Writer, value: String) {
         for (i in value.indices) {
@@ -115,7 +113,6 @@ object StringUtils {
         }
     }
 
-    @JvmStatic
     fun escapeString(value: String): String {
         val len = value.length
         val sb = StringBuilder(len * 3 / 2)
@@ -156,7 +153,6 @@ object StringUtils {
         return sb.toString()
     }
 
-    @JvmStatic
     fun join(parts: Collection<*>, separator: String): String {
         val builder = StringBuilder()
         val it = parts.iterator()
@@ -171,7 +167,6 @@ object StringUtils {
     }
 
     // Base on the repeat method in guava Strings, of the same signature.
-    @JvmStatic
     fun repeat(string: String?, count: Int): String {
         if (string == null) {
             throw NullPointerException("string == null")

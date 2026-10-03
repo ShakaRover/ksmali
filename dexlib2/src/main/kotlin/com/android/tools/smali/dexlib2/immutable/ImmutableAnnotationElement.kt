@@ -47,7 +47,6 @@ open class ImmutableAnnotationElement(
         this(name, ImmutableEncodedValueFactory.of(value))
 
     companion object {
-        @JvmStatic
         fun of(annotationElement: AnnotationElement): ImmutableAnnotationElement {
             if (annotationElement is ImmutableAnnotationElement) {
                 return annotationElement
@@ -58,7 +57,6 @@ open class ImmutableAnnotationElement(
             )
         }
 
-        @JvmStatic
         fun immutableSetOf(list: Iterable<AnnotationElement>?): Set<ImmutableAnnotationElement> {
             return CONVERTER.toSet(list)
         }

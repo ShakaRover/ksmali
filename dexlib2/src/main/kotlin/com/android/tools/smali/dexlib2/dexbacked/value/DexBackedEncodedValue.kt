@@ -49,7 +49,6 @@ import com.android.tools.smali.util.ExceptionWithContext
 
 abstract class DexBackedEncodedValue {
     companion object {
-        @JvmStatic
         fun readFrom(dexFile: DexBackedDexFile, reader: DexReader<out DexBuffer>): EncodedValue {
             val startOffset = reader.offset
 
@@ -150,7 +149,6 @@ abstract class DexBackedEncodedValue {
             }
         }
 
-        @JvmStatic
         fun skipFrom(reader: DexReader<out DexBuffer>) {
             val startOffset = reader.offset
 

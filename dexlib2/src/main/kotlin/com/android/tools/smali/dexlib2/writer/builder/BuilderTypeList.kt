@@ -14,7 +14,6 @@ class BuilderTypeList(internal val types: List<out BuilderTypeReference>) : Abst
         get() = types.size
 
     companion object {
-        @JvmField
         val EMPTY = BuilderTypeList(emptyList())
     }
 }

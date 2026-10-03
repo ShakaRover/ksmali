@@ -41,7 +41,7 @@ open class BuilderSwitchElement(
     private val target: Label
 ) : SwitchElement {
     override val offset: Int
-        get() = target.codeAddress - parent.getReferrer().codeAddress
+        get() = target.codeAddress - parent.requireReferrer().codeAddress
 
     fun getTarget(): Label = target
 }

@@ -34,7 +34,6 @@ import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import java.util.Arrays
 import java.util.Comparator
 
 @RunWith(JUnit4::class)
@@ -51,7 +50,7 @@ class ArraySortedSetTest {
 
     @Test
     fun testOfCollection() {
-        val list = Arrays.asList(1, 2, 3)
+        val list = listOf(1, 2, 3)
         val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), list)
         Assert.assertEquals(set.size, 3)
         Assert.assertTrue(set.contains(1))
@@ -67,12 +66,12 @@ class ArraySortedSetTest {
 
     @Test(expected = AssertionError::class)
     fun testOfCollectionUnsorted() {
-        ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(3, 1, 2))
+        ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(3, 1, 2))
     }
 
     @Test
     fun testIterator() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
         val it = set.iterator()
         Assert.assertEquals(it.next(), 1)
         Assert.assertEquals(it.next(), 2)
@@ -90,13 +89,13 @@ class ArraySortedSetTest {
 
     @Test
     fun testToArray() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
         Assert.assertArrayEquals(set.toArray(), arrayOf<Any?>(1, 2, 3))
     }
 
     @Test
     fun testToArrayWithArg() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
 
         // Array smaller than set
         val small = arrayOfNulls<Int>(0)
@@ -118,70 +117,70 @@ class ArraySortedSetTest {
 
     @Test(expected = UnsupportedOperationException::class)
     fun testAdd() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
         set.add(4)
     }
 
     @Test(expected = UnsupportedOperationException::class)
     fun testRemove() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
         set.remove(2)
     }
 
     @Test
     fun testContainsAll() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
-        Assert.assertTrue(set.containsAll(Arrays.asList(1, 2)))
-        Assert.assertTrue(set.containsAll(Arrays.asList(1, 2, 3)))
-        Assert.assertFalse(set.containsAll(Arrays.asList(1, 2, 3, 4)))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
+        Assert.assertTrue(set.containsAll(listOf(1, 2)))
+        Assert.assertTrue(set.containsAll(listOf(1, 2, 3)))
+        Assert.assertFalse(set.containsAll(listOf(1, 2, 3, 4)))
     }
 
     @Test(expected = UnsupportedOperationException::class)
     fun testAddAll() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
-        set.addAll(Arrays.asList(4))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
+        set.addAll(listOf(4))
     }
 
     @Test(expected = UnsupportedOperationException::class)
     fun testRemoveAll() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
-        set.removeAll(Arrays.asList(2))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
+        set.removeAll(listOf(2))
     }
 
     @Test(expected = UnsupportedOperationException::class)
     fun testClear() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
         set.clear()
     }
 
     @Test
     fun testComparator() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
         Assert.assertEquals(set.comparator(), Comparator.naturalOrder<Int>())
     }
 
     @Test
     fun testFirst() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
         Assert.assertEquals(set.first(), 1)
     }
 
     @Test
     fun testLast() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
         Assert.assertEquals(set.last(), 3)
     }
 
     @Test
     fun testHashCode() {
-        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
         Assert.assertEquals(set.hashCode(), 6)
     }
 
     @Test
     fun testEquals() {
-        val set1 = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
-        val set2 = ArraySortedSet.of(Comparator.naturalOrder<Int>(), Arrays.asList(1, 2, 3))
+        val set1 = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
+        val set2 = ArraySortedSet.of(Comparator.naturalOrder<Int>(), listOf(1, 2, 3))
         Assert.assertTrue(set1 == set2)
     }
 }

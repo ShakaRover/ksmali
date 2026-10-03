@@ -48,10 +48,8 @@ open class ImmutableInstruction31i(
         get() = FORMAT
 
     companion object {
-        @JvmField
         val FORMAT: Format = Format.Format31i
 
-        @JvmStatic
         fun of(instruction: Instruction31i): ImmutableInstruction31i {
             if (instruction is ImmutableInstruction31i) {
                 return instruction

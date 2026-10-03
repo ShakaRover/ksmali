@@ -70,7 +70,6 @@ abstract class AnnotationsDirectory {
         fun reset()
 
         companion object {
-            @JvmField
             val EMPTY: AnnotationIterator = object : AnnotationIterator {
                 override fun seekTo(key: Int): Int = 0
 
@@ -81,7 +80,6 @@ abstract class AnnotationsDirectory {
     }
 
     companion object {
-        @JvmField
         val EMPTY: AnnotationsDirectory = object : AnnotationsDirectory() {
             override fun getFieldAnnotationCount(): Int = 0
 
@@ -97,7 +95,6 @@ abstract class AnnotationsDirectory {
                 AnnotationIterator.EMPTY
         }
 
-        @JvmStatic
         fun newOrEmpty(
             dexFile: DexBackedDexFile,
             directoryAnnotationsOffset: Int
@@ -108,7 +105,6 @@ abstract class AnnotationsDirectory {
             return AnnotationsDirectoryImpl(dexFile, directoryAnnotationsOffset)
         }
 
-        @JvmStatic
         fun getAnnotations(
             dexFile: DexBackedDexFile,
             annotationSetOffset: Int
@@ -131,7 +127,6 @@ abstract class AnnotationsDirectory {
             return emptySet()
         }
 
-        @JvmStatic
         fun getParameterAnnotations(
             dexFile: DexBackedDexFile,
             annotationSetListOffset: Int
@@ -156,7 +151,7 @@ abstract class AnnotationsDirectory {
     }
 
     private class AnnotationsDirectoryImpl(
-        @JvmField val dexFile: DexBackedDexFile,
+        val dexFile: DexBackedDexFile,
         private val directoryOffset: Int
     ) : AnnotationsDirectory() {
         override fun getFieldAnnotationCount(): Int {

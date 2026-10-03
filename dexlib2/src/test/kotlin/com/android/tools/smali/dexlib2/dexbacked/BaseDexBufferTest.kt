@@ -223,10 +223,10 @@ class BaseDexBufferTest {
             val expectException = value < 0
             try {
                 val returnedVal = dexBuf.readSmallUint(0)
-                Assert.assertFalse(String.format("Didn't throw an exception for value: %x", value), expectException)
+                Assert.assertFalse("Didn't throw an exception for value: %x".format(value), expectException)
                 Assert.assertEquals(value, returnedVal)
             } catch (ex: Exception) {
-                Assert.assertTrue(String.format("Threw an exception for value: %x", value), expectException)
+                Assert.assertTrue("Threw an exception for value: %x".format(value), expectException)
             }
 
             Assert.assertEquals(value, dexBuf.readInt(0))

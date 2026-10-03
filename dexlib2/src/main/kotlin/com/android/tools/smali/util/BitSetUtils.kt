@@ -33,7 +33,6 @@ package com.android.tools.smali.util
 import java.util.BitSet
 
 object BitSetUtils {
-    @JvmStatic
     fun bitSetOfIndexes(vararg indexes: Int): BitSet {
         val bitSet = BitSet()
         for (index in indexes) {

@@ -137,7 +137,6 @@ class PayloadAlignmentTest {
     }
 
     companion object {
-        @JvmStatic
         private fun checkInstructions(instructions: List<Instruction>, expectedOpcodes: Array<Opcode>) {
             Assert.assertEquals(expectedOpcodes.size, instructions.size)
 

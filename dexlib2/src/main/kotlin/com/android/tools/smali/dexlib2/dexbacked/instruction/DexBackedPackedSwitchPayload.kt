@@ -41,7 +41,6 @@ class DexBackedPackedSwitchPayload(
     instructionStart: Int
 ) : DexBackedInstruction(dexFile, Opcode.PACKED_SWITCH_PAYLOAD, instructionStart),
     PackedSwitchPayload {
-    @JvmField
     val elementCount: Int
 
     init {

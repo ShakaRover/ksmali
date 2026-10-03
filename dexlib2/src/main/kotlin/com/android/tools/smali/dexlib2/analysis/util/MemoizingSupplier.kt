@@ -66,7 +66,6 @@ open class MemoizingSupplier<T> private constructor(delegate: Supplier<T>?) : Su
     }
 
     companion object {
-        @JvmStatic
         fun <T> memoize(delegate: Supplier<T>): MemoizingSupplier<T> {
             if (delegate is MemoizingSupplier<*>) {
                 @Suppress("UNCHECKED_CAST")

@@ -38,7 +38,6 @@ open class ImmutableTypeReference(
     override val type: String
 ) : BaseTypeReference(), ImmutableReference {
     companion object {
-        @JvmStatic
         fun of(typeReference: TypeReference): ImmutableTypeReference {
             if (typeReference is ImmutableTypeReference) {
                 return typeReference
@@ -46,7 +45,6 @@ open class ImmutableTypeReference(
             return ImmutableTypeReference(typeReference.type)
         }
 
-        @JvmStatic
         fun immutableListOf(list: List<TypeReference>?): List<ImmutableTypeReference> {
             return CONVERTER.toList(list)
         }

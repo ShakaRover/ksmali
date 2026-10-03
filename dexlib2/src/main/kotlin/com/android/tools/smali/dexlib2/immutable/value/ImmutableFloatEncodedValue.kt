@@ -35,7 +35,6 @@ import com.android.tools.smali.dexlib2.iface.value.FloatEncodedValue
 
 open class ImmutableFloatEncodedValue(override val value: Float) : BaseFloatEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmStatic
         fun of(value: FloatEncodedValue): ImmutableFloatEncodedValue {
             if (value is ImmutableFloatEncodedValue) {
                 return value

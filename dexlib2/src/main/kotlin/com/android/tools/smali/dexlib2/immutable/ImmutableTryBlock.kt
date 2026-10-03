@@ -44,7 +44,6 @@ open class ImmutableTryBlock(
         ImmutableExceptionHandler.immutableListOf(exceptionHandlers)
 
     companion object {
-        @JvmStatic
         fun of(tryBlock: TryBlock<out ExceptionHandler>): ImmutableTryBlock {
             if (tryBlock is ImmutableTryBlock) {
                 return tryBlock
@@ -56,7 +55,6 @@ open class ImmutableTryBlock(
             )
         }
 
-        @JvmStatic
         fun immutableListOf(list: List<TryBlock<out ExceptionHandler>>?): List<ImmutableTryBlock> {
             return CONVERTER.toList(list)
         }

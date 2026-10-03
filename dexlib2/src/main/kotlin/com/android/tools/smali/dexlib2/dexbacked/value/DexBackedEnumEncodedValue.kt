@@ -38,7 +38,7 @@ import com.android.tools.smali.dexlib2.dexbacked.reference.DexBackedFieldReferen
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 
 class DexBackedEnumEncodedValue(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     reader: DexReader<out DexBuffer>,
     valueArg: Int
 ) : BaseEnumEncodedValue() {

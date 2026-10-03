@@ -40,11 +40,9 @@ import com.android.tools.smali.util.ExceptionWithContext
 import com.android.tools.smali.util.StringUtils
 
 open class ArrayProto(override val classPath: ClassPath, type: String) : TypeProto {
-    @JvmField
-    protected val dimensions: Int
+    val dimensions: Int
 
-    @JvmField
-    protected val elementType: String
+    val elementType: String
 
     init {
         var i = 0
@@ -68,18 +66,10 @@ open class ArrayProto(override val classPath: ClassPath, type: String) : TypePro
     override val type: String
         get() = makeArrayType(elementType, dimensions)
 
-    fun getDimensions(): Int = dimensions
-
     override fun isInterface(): Boolean = false
 
     /**
      * @return The base element type of this array. E.g. This would return Ljava/lang/String; for [[Ljava/lang/String;
-     */
-    fun getElementType(): String = elementType
-
-    /**
-     * @return The immediate element type of this array. E.g. This would return [Ljava/lang/String; for
-     * [[Ljava/lang/String;
      */
     fun getImmediateElementType(): String {
         if (dimensions > 1) {

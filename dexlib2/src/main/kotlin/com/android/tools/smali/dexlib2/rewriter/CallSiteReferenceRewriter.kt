@@ -37,7 +37,7 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodProtoReference
 import com.android.tools.smali.dexlib2.iface.value.EncodedValue
 
 open class CallSiteReferenceRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<CallSiteReference> {
     override fun rewrite(callSiteReference: CallSiteReference): CallSiteReference {
         return RewrittenCallSiteReference(callSiteReference)

@@ -30,7 +30,6 @@
 
 package com.android.tools.smali.util
 
-import com.google.common.collect.Lists
 import com.google.common.collect.Ordering
 import org.junit.Assert
 import org.junit.Test
@@ -38,7 +37,7 @@ import org.junit.Test
 class LinearSearchTest {
     @Test
     fun testLinearSearch() {
-        val list = Lists.newArrayList(0, 1, 3, 4)
+        val list = mutableListOf(0, 1, 3, 4)
 
         doTest(list, 5, 10)
         doTest(list, 5, 4)

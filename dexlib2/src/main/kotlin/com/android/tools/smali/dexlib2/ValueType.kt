@@ -50,7 +50,6 @@ object ValueType {
     const val NULL = 0x1e
     const val BOOLEAN = 0x1f
 
-    @JvmStatic
     fun getValueTypeName(valueType: Int): String {
         return when (valueType) {
             BYTE -> "byte"

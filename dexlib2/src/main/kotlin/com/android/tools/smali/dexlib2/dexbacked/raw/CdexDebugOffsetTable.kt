@@ -63,7 +63,6 @@ import com.android.tools.smali.dexlib2.dexbacked.raw.util.DexAnnotator
  * the beginning of the debug offset table.
  */
 object CdexDebugOffsetTable {
-    @JvmStatic
     fun annotate(annotator: DexAnnotator, buffer: DexBuffer) {
         val reader: DexReader<out DexBuffer> = buffer.readerAt(annotator.cursor)
 
@@ -81,13 +80,14 @@ object CdexDebugOffsetTable {
 
             var bitmask = reader.readUbyte() shl 8
             bitmask = bitmask or reader.readUbyte()
-            val sb = StringBuilder()
-            for (i in 0 until 16) {
-                sb.append((bitmask shr i) and 1)
-            }
-            annotator.annotate(2, "bitmask: 0b%s", sb.reverse())
+            val bitString = buildString {
+                for (i in 0 until 16) {
+                    append((bitmask shr i) and 1)
+                }
+            }.reversed()
+            annotator.annotate(2, "bitmask: 0b%s", bitString)
 
-            var debugOffset = (annotator.dexFile as CDexBackedDexFile).getDebugInfoBase()
+            var debugOffset = (annotator.dexFile as CDexBackedDexFile).debugInfoBase
             for (i in 0 until 16) {
                 if ((bitmask and 1) != 0) {
                     val offsetDelta = reader.readBigUleb128()

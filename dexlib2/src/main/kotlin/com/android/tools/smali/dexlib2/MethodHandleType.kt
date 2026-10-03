@@ -68,7 +68,6 @@ object MethodHandleType {
         inverse = Collections.unmodifiableMap(namesToTypes)
     }
 
-    @JvmStatic
     fun toString(methodHandleType: Int): String {
         val v = methodHandleTypeNames[methodHandleType]
             ?: throw InvalidMethodHandleTypeException(methodHandleType)

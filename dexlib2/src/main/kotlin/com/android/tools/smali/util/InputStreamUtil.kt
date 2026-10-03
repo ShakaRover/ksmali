@@ -58,7 +58,6 @@ object InputStreamUtil {
      * @return a byte array containing all the bytes from the stream
      * @throws IOException if an I/O error occurs
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun toByteArray(`in`: InputStream): ByteArray {
         var totalLen = 0
@@ -135,7 +134,6 @@ object InputStreamUtil {
      * Discards `n` bytes of data from the input stream. This method will block until the full
      * amount has been skipped. Does not close the stream.
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun skipFully(`in`: InputStream, n: Long) {
         val skipped = skipUpTo(`in`, n)
@@ -151,7 +149,6 @@ object InputStreamUtil {
      * either the full amount has been skipped or until the end of the stream is reached, whichever
      * happens first. Returns the total number of bytes skipped.
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun skipUpTo(`in`: InputStream, n: Long): Long {
         var totalSkipped = 0L
@@ -196,7 +193,6 @@ object InputStreamUtil {
     /**
      * Attempts to read enough bytes from the stream to fill the given byte array.
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun readFully(`in`: InputStream, b: ByteArray) {
         val read = read(`in`, b, 0, b.size)
@@ -210,7 +206,6 @@ object InputStreamUtil {
     /**
      * Reads some bytes from an input stream and stores them into the buffer array `b`.
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun read(`in`: InputStream, b: ByteArray, off: Int, len: Int): Int {
         if (off < 0 || len < 0 || off + len > b.size) {
@@ -232,7 +227,6 @@ object InputStreamUtil {
      * Copies all bytes from the input stream to the output stream. Does not close or flush either
      * stream.
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun copy(from: InputStream, to: OutputStream): Long {
         val buf = ByteArray(BUFFER_SIZE)

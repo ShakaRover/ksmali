@@ -40,7 +40,6 @@ import com.android.tools.smali.dexlib2.iface.MultiDexContainer.DexEntry
 import com.android.tools.smali.util.StringUtils
 import java.io.File
 import java.io.IOException
-import java.util.Arrays
 
 open class ClassPathResolver @Throws(IOException::class) constructor(
     bootClassPathDirs: List<String>,
@@ -216,7 +215,6 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
     }
 
     companion object {
-        @JvmStatic
         private fun splitDevicePath(path: String): List<String> {
             return path.split("/")
         }
@@ -238,7 +236,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
             }
 
             if (apiLevel <= 8) {
-                return Arrays.asList(
+                return listOf(
                     "/system/framework/core.jar",
                     "/system/framework/ext.jar",
                     "/system/framework/framework.jar",
@@ -246,7 +244,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
                     "/system/framework/services.jar"
                 )
             } else if (apiLevel <= 11) {
-                return Arrays.asList(
+                return listOf(
                     "/system/framework/core.jar",
                     "/system/framework/bouncycastle.jar",
                     "/system/framework/ext.jar",
@@ -256,7 +254,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
                     "/system/framework/core-junit.jar"
                 )
             } else if (apiLevel <= 13) {
-                return Arrays.asList(
+                return listOf(
                     "/system/framework/core.jar",
                     "/system/framework/apache-xml.jar",
                     "/system/framework/bouncycastle.jar",
@@ -267,7 +265,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
                     "/system/framework/core-junit.jar"
                 )
             } else if (apiLevel <= 15) {
-                return Arrays.asList(
+                return listOf(
                     "/system/framework/core.jar",
                     "/system/framework/core-junit.jar",
                     "/system/framework/bouncycastle.jar",
@@ -280,7 +278,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
                 )
             } else if (apiLevel <= 17) {
                 // this is correct as of api 17/4.2.2
-                return Arrays.asList(
+                return listOf(
                     "/system/framework/core.jar",
                     "/system/framework/core-junit.jar",
                     "/system/framework/bouncycastle.jar",
@@ -293,7 +291,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
                     "/system/framework/apache-xml.jar"
                 )
             } else if (apiLevel <= 18) {
-                return Arrays.asList(
+                return listOf(
                     "/system/framework/core.jar",
                     "/system/framework/core-junit.jar",
                     "/system/framework/bouncycastle.jar",
@@ -307,7 +305,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
                     "/system/framework/apache-xml.jar"
                 )
             } else if (apiLevel <= 19) {
-                return Arrays.asList(
+                return listOf(
                     "/system/framework/core.jar",
                     "/system/framework/conscrypt.jar",
                     "/system/framework/core-junit.jar",
@@ -324,7 +322,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
                     "/system/framework/webviewchromium.jar"
                 )
             } else if (apiLevel <= 22) {
-                return Arrays.asList(
+                return listOf(
                     "/system/framework/core-libart.jar",
                     "/system/framework/conscrypt.jar",
                     "/system/framework/okhttp.jar",
@@ -340,7 +338,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
                     "/system/framework/apache-xml.jar"
                 )
             } else if (apiLevel <= 23) {
-                return Arrays.asList(
+                return listOf(
                     "/system/framework/core-libart.jar",
                     "/system/framework/conscrypt.jar",
                     "/system/framework/okhttp.jar",
@@ -355,7 +353,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
                     "/system/framework/org.apache.http.legacy.boot.jar"
                 )
             } else /*if (apiLevel <= 24)*/ {
-                return Arrays.asList(
+                return listOf(
                     "/system/framework/core-oj.jar",
                     "/system/framework/core-libart.jar",
                     "/system/framework/conscrypt.jar",
@@ -376,7 +374,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
         private fun bootClassPathForOat(oatFile: OatFile): List<String> {
             val bcp = oatFile.bootClassPath
             if (bcp.isEmpty()) {
-                return Arrays.asList("boot.oat")
+                return listOf("boot.oat")
             } else {
                 return replaceElementsSuffix(bcp, ".art", ".oat")
             }

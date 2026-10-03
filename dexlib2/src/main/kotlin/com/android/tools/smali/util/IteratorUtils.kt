@@ -34,7 +34,6 @@ import java.util.ArrayList
 import java.util.function.Predicate
 
 object IteratorUtils {
-    @JvmStatic
     fun <T : Any> getLast(iterator: Iterator<T>): T {
         while (true) {
             val current = iterator.next()
@@ -44,7 +43,6 @@ object IteratorUtils {
         }
     }
 
-    @JvmStatic
     fun <T : Any> filter(
         unfiltered: Iterable<T>,
         retainIfTrue: Predicate<in T>
@@ -52,7 +50,6 @@ object IteratorUtils {
         return filter(unfiltered.iterator(), retainIfTrue)
     }
 
-    @JvmStatic
     fun <T : Any> filter(
         unfiltered: Iterator<T>,
         retainIfTrue: Predicate<in T>
@@ -70,12 +67,10 @@ object IteratorUtils {
         }
     }
 
-    @JvmStatic
     fun <T : Any> toList(iterable: Iterable<T>): MutableList<T> {
         return toList(iterable.iterator())
     }
 
-    @JvmStatic
     fun <T : Any> toList(iterator: Iterator<T>): MutableList<T> {
         val list = ArrayList<T>()
         while (iterator.hasNext()) {
@@ -84,14 +79,12 @@ object IteratorUtils {
         return list
     }
 
-    @JvmStatic
     fun <T : Any> addAll(collection: MutableCollection<T>, iterator: Iterator<T>) {
         while (iterator.hasNext()) {
             collection.add(iterator.next())
         }
     }
 
-    @JvmStatic
     fun elementsEqual(iterator1: Iterator<*>, iterator2: Iterator<*>): Boolean {
         while (iterator1.hasNext()) {
             if (!iterator2.hasNext()) {
@@ -106,7 +99,6 @@ object IteratorUtils {
         return !iterator2.hasNext()
     }
 
-    @JvmStatic
     fun size(iterable: Iterable<*>): Int {
         val iterator = iterable.iterator()
         var count = 0

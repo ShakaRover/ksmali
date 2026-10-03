@@ -52,7 +52,6 @@ open class ImmutableSetSourceFile(
         get() = DebugItemType.SET_SOURCE_FILE
 
     companion object {
-        @JvmStatic
         fun of(setSourceFile: SetSourceFile): ImmutableSetSourceFile {
             if (setSourceFile is ImmutableSetSourceFile) {
                 return setSourceFile

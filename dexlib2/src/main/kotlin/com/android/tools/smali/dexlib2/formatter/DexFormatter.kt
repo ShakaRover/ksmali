@@ -166,7 +166,6 @@ open class DexFormatter {
     }
 
     companion object {
-        @JvmField
         val INSTANCE: DexFormatter = DexFormatter()
     }
 }

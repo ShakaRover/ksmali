@@ -64,61 +64,61 @@ import java.util.Comparator
 import java.util.HashMap
 
 class DexAnnotator(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     width: Int
 ) : AnnotatedBytes(width) {
     private val annotators: MutableMap<Int, SectionAnnotator> = HashMap()
 
     init {
         for (mapItem in dexFile.mapItems) {
-            when (mapItem.getType()) {
+            when (mapItem.type) {
                 ItemType.HEADER_ITEM ->
-                    annotators[mapItem.getType()] = HeaderItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = HeaderItem.makeAnnotator(this, mapItem)
                 ItemType.STRING_ID_ITEM ->
-                    annotators[mapItem.getType()] = StringIdItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = StringIdItem.makeAnnotator(this, mapItem)
                 ItemType.TYPE_ID_ITEM ->
-                    annotators[mapItem.getType()] = TypeIdItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = TypeIdItem.makeAnnotator(this, mapItem)
                 ItemType.PROTO_ID_ITEM ->
-                    annotators[mapItem.getType()] = ProtoIdItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = ProtoIdItem.makeAnnotator(this, mapItem)
                 ItemType.FIELD_ID_ITEM ->
-                    annotators[mapItem.getType()] = FieldIdItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = FieldIdItem.makeAnnotator(this, mapItem)
                 ItemType.METHOD_ID_ITEM ->
-                    annotators[mapItem.getType()] = MethodIdItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = MethodIdItem.makeAnnotator(this, mapItem)
                 ItemType.CLASS_DEF_ITEM ->
-                    annotators[mapItem.getType()] = ClassDefItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = ClassDefItem.makeAnnotator(this, mapItem)
                 ItemType.MAP_LIST ->
-                    annotators[mapItem.getType()] = MapItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = MapItem.makeAnnotator(this, mapItem)
                 ItemType.TYPE_LIST ->
-                    annotators[mapItem.getType()] = TypeListItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = TypeListItem.makeAnnotator(this, mapItem)
                 ItemType.ANNOTATION_SET_REF_LIST ->
-                    annotators[mapItem.getType()] =
+                    annotators[mapItem.type] =
                         AnnotationSetRefList.makeAnnotator(this, mapItem)
                 ItemType.ANNOTATION_SET_ITEM ->
-                    annotators[mapItem.getType()] = AnnotationSetItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = AnnotationSetItem.makeAnnotator(this, mapItem)
                 ItemType.CLASS_DATA_ITEM ->
-                    annotators[mapItem.getType()] = ClassDataItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = ClassDataItem.makeAnnotator(this, mapItem)
                 ItemType.CODE_ITEM ->
-                    annotators[mapItem.getType()] = CodeItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = CodeItem.makeAnnotator(this, mapItem)
                 ItemType.STRING_DATA_ITEM ->
-                    annotators[mapItem.getType()] = StringDataItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = StringDataItem.makeAnnotator(this, mapItem)
                 ItemType.DEBUG_INFO_ITEM ->
-                    annotators[mapItem.getType()] = DebugInfoItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = DebugInfoItem.makeAnnotator(this, mapItem)
                 ItemType.ANNOTATION_ITEM ->
-                    annotators[mapItem.getType()] = AnnotationItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = AnnotationItem.makeAnnotator(this, mapItem)
                 ItemType.ENCODED_ARRAY_ITEM ->
-                    annotators[mapItem.getType()] = EncodedArrayItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = EncodedArrayItem.makeAnnotator(this, mapItem)
                 ItemType.ANNOTATION_DIRECTORY_ITEM ->
-                    annotators[mapItem.getType()] =
+                    annotators[mapItem.type] =
                         AnnotationDirectoryItem.makeAnnotator(this, mapItem)
                 ItemType.CALL_SITE_ID_ITEM ->
-                    annotators[mapItem.getType()] = CallSiteIdItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = CallSiteIdItem.makeAnnotator(this, mapItem)
                 ItemType.METHOD_HANDLE_ITEM ->
-                    annotators[mapItem.getType()] = MethodHandleItem.makeAnnotator(this, mapItem)
+                    annotators[mapItem.type] = MethodHandleItem.makeAnnotator(this, mapItem)
                 ItemType.HIDDENAPI_CLASS_DATA_ITEM ->
-                    annotators[mapItem.getType()] =
+                    annotators[mapItem.type] =
                         HiddenApiClassDataItem.makeAnnotator(this, mapItem)
                 else -> throw RuntimeException(
-                    String.format("Unrecognized item type: 0x%x", mapItem.getType())
+                    "Unrecognized item type: 0x%x".format(mapItem.type)
                 )
             }
         }
@@ -130,8 +130,8 @@ class DexAnnotator(
         // sort the map items based on the order defined by sectionAnnotationOrder
         val comparator = Comparator<MapItem> { o1, o2 ->
             Integer.compare(
-                sectionAnnotationOrder[o1.getType()]!!,
-                sectionAnnotationOrder[o2.getType()]!!
+                sectionAnnotationOrder[o1.type]!!,
+                sectionAnnotationOrder[o2.type]!!
             )
         }
 
@@ -141,20 +141,17 @@ class DexAnnotator(
         try {
             // Need to annotate the debug info offset table first, to propagate the debug info identities
             if (dexFile is CDexBackedDexFile) {
-                moveTo(dexFile.baseDataOffset + (dexFile as CDexBackedDexFile).getDebugInfoOffsetsPos())
+                moveTo(dexFile.baseDataOffset + (dexFile as CDexBackedDexFile).debugInfoOffsetsPos)
                 CdexDebugOffsetTable.annotate(this, dexFile.buffer)
             }
 
             for (mapItem in mapItemsArray) {
                 try {
-                    val annotator = annotators[mapItem.getType()]
+                    val annotator = annotators[mapItem.type]
                     annotator!!.annotateSection(this)
                 } catch (ex: Exception) {
                     System.err.println(
-                        String.format(
-                            "There was an error while dumping the %s section",
-                            ItemType.getItemTypeName(mapItem.getType())
-                        )
+                        "There was an error while dumping the ${ItemType.getItemTypeName(mapItem.type)} section"
                     )
                     ex.printStackTrace(System.err)
                 }

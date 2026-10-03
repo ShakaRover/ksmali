@@ -43,7 +43,6 @@ open class BuilderInstruction10t(opcode: Opcode, target: Label) :
         get() = FORMAT
 
     companion object {
-        @JvmField
         val FORMAT: Format = Format.Format10t
     }
 }

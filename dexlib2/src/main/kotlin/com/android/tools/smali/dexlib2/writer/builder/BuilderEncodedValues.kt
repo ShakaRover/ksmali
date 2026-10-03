@@ -71,7 +71,6 @@ object BuilderEncodedValues {
             get() = elements
     }
 
-    @JvmStatic
     fun defaultValueForType(type: String): BuilderEncodedValue {
         return when (type[0]) {
             'Z' -> BuilderBooleanEncodedValue.FALSE_VALUE
@@ -90,10 +89,8 @@ object BuilderEncodedValues {
     class BuilderBooleanEncodedValue private constructor(override val value: Boolean) :
         BaseBooleanEncodedValue(), BuilderEncodedValue {
         companion object {
-            @JvmField
             val TRUE_VALUE = BuilderBooleanEncodedValue(true)
 
-            @JvmField
             val FALSE_VALUE = BuilderBooleanEncodedValue(false)
         }
     }
@@ -130,7 +127,6 @@ object BuilderEncodedValues {
 
     class BuilderNullEncodedValue private constructor() : BaseNullEncodedValue(), BuilderEncodedValue {
         companion object {
-            @JvmField
             val INSTANCE = BuilderNullEncodedValue()
         }
     }

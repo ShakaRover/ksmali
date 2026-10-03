@@ -38,7 +38,6 @@ object TypeListItem {
     const val SIZE_OFFSET = 0
     const val LIST_OFFSET = 4
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {
@@ -61,7 +60,6 @@ object TypeListItem {
         }
     }
 
-    @JvmStatic
     fun getReferenceAnnotation(dexFile: DexBackedDexFile, typeListOffset: Int): String {
         if (typeListOffset == 0) {
             return "type_list_item[NO_OFFSET]"
@@ -69,27 +67,24 @@ object TypeListItem {
 
         try {
             val typeList = asString(dexFile, typeListOffset)
-            return String.format("type_list_item[0x%x]: %s", typeListOffset, typeList)
+            return "type_list_item[0x%x]: %s".format(typeListOffset, typeList)
         } catch (ex: Exception) {
             ex.printStackTrace(System.err)
         }
-        return String.format("type_list_item[0x%x]", typeListOffset)
+        return "type_list_item[0x%x]".format(typeListOffset)
     }
 
-    @JvmStatic
     fun asString(dexFile: DexBackedDexFile, typeListOffset: Int): String {
         if (typeListOffset == 0) {
             return ""
         }
 
-        val sb = StringBuilder()
-
         val size = dexFile.dataBuffer.readSmallUint(typeListOffset)
-        for (i in 0 until size) {
-            val typeIndex = dexFile.dataBuffer.readUshort(typeListOffset + 4 + i * 2)
-            val type = dexFile.typeSection.get(typeIndex)
-            sb.append(type)
+        return buildString {
+            for (i in 0 until size) {
+                val typeIndex = dexFile.dataBuffer.readUshort(typeListOffset + 4 + i * 2)
+                append(dexFile.typeSection.get(typeIndex))
+            }
         }
-        return sb.toString()
     }
 }

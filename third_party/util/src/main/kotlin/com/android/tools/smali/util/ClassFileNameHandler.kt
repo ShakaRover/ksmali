@@ -341,7 +341,6 @@ class ClassFileNameHandler {
          *
          * The removed codePoints in the middle of the string will be replaced with a # character.
          */
-        @JvmStatic
         fun shortenPathComponent(pathComponent: String, bytesToRemove0: Int): String {
             // We replace the removed part with a #, so we need to remove 1 extra char
             var bytesToRemove = bytesToRemove0

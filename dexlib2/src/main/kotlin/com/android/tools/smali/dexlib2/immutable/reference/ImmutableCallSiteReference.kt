@@ -65,7 +65,6 @@ open class ImmutableCallSiteReference(
     )
 
     companion object {
-        @JvmStatic
         fun of(callSiteReference: CallSiteReference): ImmutableCallSiteReference {
             if (callSiteReference is ImmutableCallSiteReference) {
                 return callSiteReference

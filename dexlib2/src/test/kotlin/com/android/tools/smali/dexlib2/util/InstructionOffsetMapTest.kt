@@ -90,7 +90,7 @@ class InstructionOffsetMapTest {
                 Assert.assertEquals(instructionIndex.toLong(), instructionOffsetMap.getInstructionIndexAtCodeOffset(codeOffset, false).toLong())
                 try {
                     instructionOffsetMap.getInstructionIndexAtCodeOffset(codeOffset, true)
-                    Assert.fail(String.format("Exception exception didn't occur for code offset 0x%x", codeOffset))
+                    Assert.fail("Exception exception didn't occur for code offset 0x%x".format(codeOffset))
                 } catch (ex: ExceptionWithContext) {
                     // expected exception
                 }

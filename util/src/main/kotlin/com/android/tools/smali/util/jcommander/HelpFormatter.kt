@@ -36,7 +36,6 @@ import com.beust.jcommander.ParameterDescription
 import com.beust.jcommander.Parameters
 import com.google.common.base.Joiner
 import com.google.common.collect.Iterables
-import com.google.common.collect.Lists
 import java.io.IOException
 import java.io.StringWriter
 import java.util.Collections
@@ -63,7 +62,7 @@ class HelpFormatter {
     }
 
     private fun getSortedParameters(jc: JCommander): List<ParameterDescription> {
-        val parameters: MutableList<ParameterDescription> = Lists.newArrayList(jc.parameters)
+        val parameters: MutableList<ParameterDescription> = jc.parameters.toMutableList()
 
         val pattern = Pattern.compile("^-*(.*)$")
 
@@ -232,7 +231,7 @@ class HelpFormatter {
                 writer.indent(2)
 
                 val entryList: MutableList<Map.Entry<String, JCommander>> =
-                    Lists.newArrayList(leafJc.commands.entries)
+                    leafJc.commands.entries.toMutableList()
                 Collections.sort(entryList, Comparator<Map.Entry<String, JCommander>> { o1, o2 ->
                     o1.key.compareTo(o2.key)
                 })

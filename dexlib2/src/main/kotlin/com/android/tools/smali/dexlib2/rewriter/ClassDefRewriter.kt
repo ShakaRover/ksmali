@@ -38,7 +38,7 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.util.ChainedIterable
 
 open class ClassDefRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<ClassDef> {
     override fun rewrite(classDef: ClassDef): ClassDef {
         return RewrittenClassDef(classDef)

@@ -79,13 +79,12 @@ abstract class DebugInfo : Iterable<DebugItem> {
         override fun getSize(): Int = 0
 
         companion object {
-            @JvmField
             val INSTANCE = EmptyDebugInfo()
         }
     }
 
     private class DebugInfoImpl(
-        @JvmField val dexFile: DexBackedDexFile,
+        val dexFile: DexBackedDexFile,
         private val debugInfoOffset: Int,
         private val methodImpl: DexBackedMethodImplementation
     ) : DebugInfo() {
@@ -96,7 +95,7 @@ abstract class DebugInfo : Iterable<DebugItem> {
             // Debug information can have events for addresses past the instructions.
             // They have no relevance for the method in question and are excluded from the iterator.
             val lastInstructionAddress =
-                methodImpl.getInstructionsSize() -
+                methodImpl.instructionsSize -
                     IteratorUtils.getLast(methodImpl.instructions.iterator()).codeUnits
 
             //TODO: does dalvik allow references to invalid registers?
@@ -110,7 +109,7 @@ abstract class DebugInfo : Iterable<DebugItem> {
             // debug instructions
             val parameterIterator: Iterator<out MethodParameter> = ParameterIterator(
                 method.parameterTypes,
-                method.getParameterAnnotations(),
+                method.parameterAnnotations,
                 getParameterNames(reader)
             )
 
@@ -319,7 +318,6 @@ abstract class DebugInfo : Iterable<DebugItem> {
     }
 
     companion object {
-        @JvmStatic
         fun newOrEmpty(
             dexFile: DexBackedDexFile,
             debugInfoOffset: Int,

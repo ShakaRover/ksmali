@@ -47,7 +47,6 @@ open class BuilderInstruction3rmi(opcode: Opcode, startRegister: Int, registerCo
         get() = FORMAT
 
     companion object {
-        @JvmField
         val FORMAT: Format = Format.Format3rmi
     }
 }

@@ -32,7 +32,6 @@ package com.android.tools.smali.util
  */
 object Hex {
     /** Formats a `long` as an 8-byte unsigned hex value. */
-    @JvmStatic
     fun u8(v: Long): String {
         val result = CharArray(16)
         var v = v
@@ -44,7 +43,6 @@ object Hex {
     }
 
     /** Formats an `int` as a 4-byte unsigned hex value. */
-    @JvmStatic
     fun u4(v: Int): String {
         val result = CharArray(8)
         var v = v
@@ -56,7 +54,6 @@ object Hex {
     }
 
     /** Formats an `int` as a 3-byte unsigned hex value. */
-    @JvmStatic
     fun u3(v: Int): String {
         val result = CharArray(6)
         var v = v
@@ -68,7 +65,6 @@ object Hex {
     }
 
     /** Formats an `int` as a 2-byte unsigned hex value. */
-    @JvmStatic
     fun u2(v: Int): String {
         val result = CharArray(4)
         var v = v
@@ -83,7 +79,6 @@ object Hex {
      * Formats an `int` as either a 2-byte unsigned hex value (if the value is small enough) or a
      * 4-byte unsigned hex value (if not).
      */
-    @JvmStatic
     fun u2or4(v: Int): String {
         return if (v == v.toChar().code) {
             u2(v)
@@ -93,7 +88,6 @@ object Hex {
     }
 
     /** Formats an `int` as a 1-byte unsigned hex value. */
-    @JvmStatic
     fun u1(v: Int): String {
         val result = CharArray(2)
         var v = v
@@ -105,7 +99,6 @@ object Hex {
     }
 
     /** Formats an `int` as a 4-bit unsigned hex nibble. */
-    @JvmStatic
     fun uNibble(v: Int): String {
         val result = CharArray(1)
         result[0] = Character.forDigit(v and 0x0f, 16)
@@ -113,7 +106,6 @@ object Hex {
     }
 
     /** Formats a `long` as an 8-byte signed hex value. */
-    @JvmStatic
     fun s8(v: Long): String {
         val result = CharArray(17)
         var v = v
@@ -131,7 +123,6 @@ object Hex {
     }
 
     /** Formats an `int` as a 4-byte signed hex value. */
-    @JvmStatic
     fun s4(v: Int): String {
         val result = CharArray(9)
         var v = v
@@ -149,7 +140,6 @@ object Hex {
     }
 
     /** Formats an `int` as a 2-byte signed hex value. */
-    @JvmStatic
     fun s2(v: Int): String {
         val result = CharArray(5)
         var v = v
@@ -167,7 +157,6 @@ object Hex {
     }
 
     /** Formats an `int` as a 1-byte signed hex value. */
-    @JvmStatic
     fun s1(v: Int): String {
         val result = CharArray(3)
         var v = v
@@ -188,7 +177,6 @@ object Hex {
      * Formats a hex dump of a portion of a `byte[]`. The result is always newline-terminated,
      * unless the passed-in length was zero, in which case the result is always the empty string.
      */
-    @JvmStatic
     fun dump(
         arr: ByteArray,
         offset: Int,

@@ -42,7 +42,6 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import com.android.tools.smali.util.ExceptionWithContext
 
 object ImmutableReferenceFactory {
-    @JvmStatic
     fun of(reference: Reference): ImmutableReference {
         if (reference is StringReference) {
             return ImmutableStringReference.of(reference)
@@ -68,7 +67,6 @@ object ImmutableReferenceFactory {
         throw ExceptionWithContext("Invalid reference type")
     }
 
-    @JvmStatic
     fun of(referenceType: Int, reference: Reference): ImmutableReference {
         when (referenceType) {
             ReferenceType.STRING -> return ImmutableStringReference.of(reference as StringReference)

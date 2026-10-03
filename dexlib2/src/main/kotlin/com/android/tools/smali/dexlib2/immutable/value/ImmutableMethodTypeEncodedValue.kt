@@ -36,7 +36,6 @@ import com.android.tools.smali.dexlib2.immutable.reference.ImmutableMethodProtoR
 
 open class ImmutableMethodTypeEncodedValue(override val value: ImmutableMethodProtoReference) : BaseMethodTypeEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmStatic
         fun of(value: MethodTypeEncodedValue): ImmutableMethodTypeEncodedValue {
             if (value is ImmutableMethodTypeEncodedValue) {
                 return value

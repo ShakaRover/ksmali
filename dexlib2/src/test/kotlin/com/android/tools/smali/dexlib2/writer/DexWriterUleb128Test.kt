@@ -235,7 +235,7 @@ class DexWriterUleb128Test {
 
         Assert.assertEquals(startPosition + encodedLength, writer.position)
         for (i in 0 until encodedLength) {
-            Assert.assertEquals(String.format("Values not equal at index %d", i), encodedValue[i], writtenData[i])
+            Assert.assertEquals("Values not equal at index ${i}", encodedValue[i], writtenData[i])
         }
     }
 }

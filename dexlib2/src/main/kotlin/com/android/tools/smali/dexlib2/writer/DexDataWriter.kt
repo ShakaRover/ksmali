@@ -40,7 +40,6 @@ class DexDataWriter : BufferedOutputStream {
     private var tempBuf = ByteArray(8)
     private val zeroBuf = ByteArray(3)
 
-    @JvmOverloads
     constructor(output: OutputStream, filePosition: Int, bufferSize: Int = 256 * 1024) : super(output, bufferSize) {
         this.filePosition = filePosition
     }
@@ -246,7 +245,6 @@ class DexDataWriter : BufferedOutputStream {
         get() = filePosition
 
     companion object {
-        @JvmStatic
         @Throws(IOException::class)
         fun writeInt(out: OutputStream, value: Int) {
             out.write(value)
@@ -255,7 +253,6 @@ class DexDataWriter : BufferedOutputStream {
             out.write(value shr 24)
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun writeUleb128(out: OutputStream, value: Int) {
             var value = value
@@ -266,7 +263,6 @@ class DexDataWriter : BufferedOutputStream {
             out.write(value)
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun writeSleb128(out: OutputStream, value: Int) {
             var value = value

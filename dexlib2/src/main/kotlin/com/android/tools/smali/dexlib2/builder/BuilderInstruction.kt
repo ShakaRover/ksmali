@@ -39,7 +39,6 @@ import com.android.tools.smali.dexlib2.util.checkFormat
 abstract class BuilderInstruction(opcode: Opcode) : Instruction {
     override val opcode: Opcode = opcode
 
-    @JvmField
     var location: MethodLocation? = null
 
     init {
@@ -49,7 +48,7 @@ abstract class BuilderInstruction(opcode: Opcode) : Instruction {
     override val codeUnits: Int
         get() = format.size / 2
 
-    fun getLocation(): MethodLocation {
+    fun requireLocation(): MethodLocation {
         if (location == null) {
             throw IllegalStateException(
                 "Cannot get the location of an instruction that hasn't been added to a " +

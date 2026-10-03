@@ -40,7 +40,6 @@ open class ImmutableEpilogueBegin(
         get() = DebugItemType.EPILOGUE_BEGIN
 
     companion object {
-        @JvmStatic
         fun of(epilogueBegin: EpilogueBegin): ImmutableEpilogueBegin {
             if (epilogueBegin is ImmutableEpilogueBegin) {
                 return epilogueBegin

@@ -41,8 +41,10 @@ open class TypeRewriter : Rewriter<String> {
             val rewrittenType = rewriteUnwrappedType(unwrappedType)
             // instance equality, to avoid a value comparison in the common case of the type being unmodified
             if (unwrappedType !== rewrittenType) {
-                return StringBuilder(dimensions + rewrittenType.length)
-                    .append(value, 0, dimensions).append(rewrittenType).toString()
+                return buildString(dimensions + rewrittenType.length) {
+                    append(value, 0, dimensions)
+                    append(rewrittenType)
+                }
             }
             return value
         } else {

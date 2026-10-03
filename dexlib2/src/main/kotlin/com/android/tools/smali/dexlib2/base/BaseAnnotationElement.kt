@@ -53,7 +53,6 @@ abstract class BaseAnnotationElement : AnnotationElement {
     }
 
     companion object {
-        @JvmField
         val BY_NAME: Comparator<AnnotationElement> = Comparator { element1, element2 ->
             element1.name.compareTo(element2.name)
         }

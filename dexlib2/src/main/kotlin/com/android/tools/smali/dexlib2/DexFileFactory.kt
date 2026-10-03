@@ -55,7 +55,6 @@ import java.util.Collections
 
 object DexFileFactory {
 
-    @JvmStatic
     @Throws(IOException::class)
     fun loadDexFile(path: String, opcodes: Opcodes?): DexBackedDexFile {
         return loadDexFile(File(path), opcodes)
@@ -77,7 +76,6 @@ object DexFileFactory {
      * @throws UnsupportedFileTypeException If file is not a valid dex/zip/odex/oat file, or if the "classes.dex" entry
      * in a zip file is not a valid dex file
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun loadDexFile(file: File, opcodes: Opcodes?): DexBackedDexFile {
         if (!file.exists()) {
@@ -172,7 +170,6 @@ object DexFileFactory {
      * valid dex file
      * @throws MultipleMatchingDexEntriesException If multiple entries match the given dexEntry
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun loadDexEntry(
         file: File,
@@ -229,7 +226,6 @@ object DexFileFactory {
      * @throws DexFileNotFoundException If the given file does not exist
      * @throws UnsupportedFileTypeException If the given file is not a valid dex/zip/odex/oat file
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun loadDexContainer(file: File, opcodes: Opcodes?): MultiDexContainer<out DexBackedDexFile> {
         if (!file.exists()) {
@@ -284,7 +280,6 @@ object DexFileFactory {
      * @param path The path to write the dex file to
      * @param dexFile a DexFile to write
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun writeDexFile(path: String, dexFile: DexFile) {
         DexPool.writeTo(path, dexFile)
@@ -297,7 +292,7 @@ object DexFileFactory {
             super(cause, message, *formatArgs)
     }
 
-    class UnsupportedOatVersionException(@JvmField val oatFile: OatFile) :
+    class UnsupportedOatVersionException(val oatFile: OatFile) :
         ExceptionWithContext("Unsupported oat version: %d", oatFile.oatVersion)
 
     class MultipleMatchingDexEntriesException(message: String, vararg formatArgs: Any?) :
@@ -412,10 +407,7 @@ object DexFileFactory {
                 // This should be quite rare. This would only happen if an oat file has two entries that differ
                 // only by an initial path separator. e.g. "/blah/blah.dex" and "blah/blah.dex"
                 throw MultipleMatchingDexEntriesException(
-                    String.format(
-                        "Multiple entries in %s match %s: %s", filename, targetEntry,
-                        StringUtils.join(fullMatches, ", ")
-                    )
+                    "Multiple entries in ${filename} match ${targetEntry}: ${StringUtils.join(fullMatches, ", ")}"
                 )
             }
 
@@ -427,10 +419,7 @@ object DexFileFactory {
             }
             if (partialEntries.size > 1) {
                 throw MultipleMatchingDexEntriesException(
-                    String.format(
-                        "Multiple dex entries in %s match %s: %s", filename, targetEntry,
-                        StringUtils.join(partialMatches, ", ")
-                    )
+                    "Multiple dex entries in ${filename} match ${targetEntry}: ${StringUtils.join(partialMatches, ", ")}"
                 )
             }
             return partialEntries[0]
@@ -506,7 +495,6 @@ object DexFileFactory {
         }
 
         companion object {
-            @JvmStatic
             fun getNameWithoutExtension(file: String): String {
                 val fileName = File(file).name
                 val dotIndex = fileName.lastIndexOf('.')

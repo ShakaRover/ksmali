@@ -38,7 +38,6 @@ import com.android.tools.smali.dexlib2.dexbacked.value.DexBackedEncodedValue
 import com.android.tools.smali.dexlib2.util.AnnotatedBytes
 
 object EncodedValue {
-    @JvmStatic
     fun annotateEncodedValue(
         dexFile: DexBackedDexFile,
         out: AnnotatedBytes,
@@ -89,15 +88,11 @@ object EncodedValue {
                 )
             }
             else -> throw IllegalArgumentException(
-                String.format(
-                    "Invalid encoded value type 0x%x at offset 0x%x", valueType,
-                    reader.offset
-                )
+                "Invalid encoded value type 0x%x at offset 0x%x".format(valueType, reader.offset)
             )
         }
     }
 
-    @JvmStatic
     fun annotateEncodedAnnotation(
         dexFile: DexBackedDexFile,
         out: AnnotatedBytes,
@@ -127,7 +122,6 @@ object EncodedValue {
         }
     }
 
-    @JvmStatic
     fun annotateEncodedArray(
         dexFile: DexBackedDexFile,
         out: AnnotatedBytes,
@@ -148,7 +142,6 @@ object EncodedValue {
         }
     }
 
-    @JvmStatic
     fun asString(dexFile: DexBackedDexFile, reader: DexReader<out DexBuffer>): String {
         val valueArgType = reader.readUbyte()
 
@@ -158,31 +151,31 @@ object EncodedValue {
         return when (valueType) {
             ValueType.BYTE -> {
                 val intValue = reader.readByte()
-                String.format("0x%x", intValue)
+                "0x%x".format(intValue)
             }
             ValueType.SHORT -> {
                 val intValue = reader.readSizedInt(valueArg + 1)
-                String.format("0x%x", intValue)
+                "0x%x".format(intValue)
             }
             ValueType.CHAR -> {
                 val intValue = reader.readSizedSmallUint(valueArg + 1)
-                String.format("0x%x", intValue)
+                "0x%x".format(intValue)
             }
             ValueType.INT -> {
                 val intValue = reader.readSizedInt(valueArg + 1)
-                String.format("0x%x", intValue)
+                "0x%x".format(intValue)
             }
             ValueType.LONG -> {
                 val longValue = reader.readSizedLong(valueArg + 1)
-                String.format("0x%x", longValue)
+                "0x%x".format(longValue)
             }
             ValueType.FLOAT -> {
                 val floatValue = Float.fromBits(reader.readSizedRightExtendedInt(valueArg + 1))
-                String.format("%f", floatValue)
+                "%f".format(floatValue)
             }
             ValueType.DOUBLE -> {
                 val doubleValue = Double.fromBits(reader.readSizedRightExtendedLong(valueArg + 1))
-                String.format("%f", doubleValue)
+                "%f".format(doubleValue)
             }
             ValueType.METHOD_TYPE -> {
                 val protoIndex = reader.readSizedSmallUint(valueArg + 1)
@@ -217,10 +210,7 @@ object EncodedValue {
             ValueType.NULL -> "null"
             ValueType.BOOLEAN -> java.lang.Boolean.toString(valueArg == 1)
             else -> throw IllegalArgumentException(
-                String.format(
-                    "Invalid encoded value type 0x%x at offset 0x%x",
-                    valueType, reader.offset
-                )
+                "Invalid encoded value type 0x%x at offset 0x%x".format(valueType, reader.offset)
             )
         }
     }

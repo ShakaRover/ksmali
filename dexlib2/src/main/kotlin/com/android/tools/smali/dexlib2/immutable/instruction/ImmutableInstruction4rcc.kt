@@ -60,7 +60,6 @@ open class ImmutableInstruction4rcc(
         private
         val FORMAT: Format = Format.Format4rcc
 
-        @JvmStatic
         fun of(instruction: Instruction4rcc): ImmutableInstruction4rcc {
             if (instruction is ImmutableInstruction4rcc) {
                 return instruction

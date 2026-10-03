@@ -40,7 +40,6 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableDexFile
 import com.android.tools.smali.util.IteratorUtils
 import java.io.IOException
 import java.io.Serializable
-import java.util.Arrays
 import java.util.Collections
 import java.util.HashSet
 import java.util.function.Supplier
@@ -48,7 +47,7 @@ import java.util.function.Supplier
 open class ClassPath(
     providers: Iterable<out ClassProvider>,
     private val checkPackagePrivateAccess: Boolean,
-    @JvmField val oatVersion: Int
+    val oatVersion: Int
 ) {
     private val unknownClass: TypeProto = UnknownClassProto(this)
 
@@ -93,7 +92,7 @@ open class ClassPath(
      */
     @Throws(IOException::class)
     constructor(vararg classProviders: ClassProvider) :
-        this(Arrays.asList(*classProviders), false, NOT_ART)
+        this(listOf(*classProviders), false, NOT_ART)
 
     /**
      * Creates a new ClassPath instance that can load classes from the given providers
@@ -140,10 +139,8 @@ open class ClassPath(
     }
 
     companion object {
-        @JvmField
         val NOT_ART: Int = -1
 
-        @JvmField
         val NOT_SPECIFIED: Int = -2
 
         private fun getBasicClasses(): ClassProvider {
@@ -153,7 +150,7 @@ open class ClassPath(
                     Opcodes.getDefault(),
                     Collections.unmodifiableSet(
                         HashSet(
-                            Arrays.asList(
+                            listOf(
                                 ReflectionClassDef(Class::class.java),
                                 ReflectionClassDef(Cloneable::class.java),
                                 ReflectionClassDef(Object::class.java),

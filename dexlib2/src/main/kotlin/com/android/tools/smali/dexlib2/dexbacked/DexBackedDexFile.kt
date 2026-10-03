@@ -98,15 +98,12 @@ open class DexBackedDexFile internal constructor(
     init {
         if (offset < 0 || offset > buf.size) {
             throw DexUtil.InvalidFile(
-                String.format("Invalid offset %d for buffer of length %d", offset, buf.size)
+                "Invalid offset ${offset} for buffer of length ${buf.size}"
             )
         }
         if (header_offset < 0 || buf.size - offset < header_offset) {
             throw DexUtil.InvalidFile(
-                String.format(
-                    "Invalid header_offset %d for buffer of length %d at offset %d",
-                    header_offset, buf.size, offset
-                )
+                "Invalid header_offset ${header_offset} for buffer of length ${buf.size} at offset ${offset}"
             )
         }
 
@@ -124,28 +121,19 @@ open class DexBackedDexFile internal constructor(
         val requiredHeaderSize = if (dexVersion >= 41) 120 else 112
         if (buf.size - offset - header_offset < requiredHeaderSize) {
             throw DexUtil.InvalidFile(
-                String.format(
-                    "File is too short to contain a valid dex header (size: %d, required: %d)",
-                    buf.size - offset - header_offset, requiredHeaderSize
-                )
+                "File is too short to contain a valid dex header (size: ${buf.size - offset - header_offset}, required: ${requiredHeaderSize})"
             )
         }
 
         fileSize = buffer.readSmallUint(header_offset + HeaderItem.FILE_SIZE_OFFSET)
         if (fileSize < requiredHeaderSize) {
             throw DexUtil.InvalidFile(
-                String.format(
-                    "Invalid file_size %d (smaller than required header size %d)",
-                    fileSize, requiredHeaderSize
-                )
+                "Invalid file_size ${fileSize} (smaller than required header size ${requiredHeaderSize})"
             )
         }
         if (fileSize > buf.size - offset - header_offset) {
             throw DexUtil.InvalidFile(
-                String.format(
-                    "Invalid file_size %d (exceeds remaining buffer length %d)",
-                    fileSize, buf.size - offset - header_offset
-                )
+                "Invalid file_size ${fileSize} (exceeds remaining buffer length ${buf.size - offset - header_offset})"
             )
         }
         stringCount = buffer.readSmallUint(header_offset + HeaderItem.STRING_COUNT_OFFSET)
@@ -173,18 +161,12 @@ open class DexBackedDexFile internal constructor(
             )
             if (this.containerSize < header_offset + fileSize) {
                 throw DexUtil.InvalidFile(
-                    String.format(
-                        "DEX entry (header_offset: %d, file_size: %d) exceeds container_size %d",
-                        header_offset, fileSize, containerSize
-                    )
+                    "DEX entry (header_offset: ${header_offset}, file_size: ${fileSize}) exceeds container_size ${containerSize}"
                 )
             }
             if (this.containerSize > buf.size - offset) {
                 throw DexUtil.InvalidFile(
-                    String.format(
-                        "Invalid container_size %d (exceeds buffer length %d)",
-                        containerSize, buf.size - offset
-                    )
+                    "Invalid container_size ${containerSize} (exceeds buffer length ${buf.size - offset})"
                 )
             }
         } else if (CDexBackedDexFile.isCdex(buf, offset + header_offset)) {
@@ -197,16 +179,16 @@ open class DexBackedDexFile internal constructor(
             this.containerSize = this.fileSize
         }
         if (container_off != header_offset) {
-            throw DexUtil.InvalidFile(String.format("Unexpected container offset in header"))
+            throw DexUtil.InvalidFile("Unexpected container offset in header")
         }
 
         if (mapOffset < 0 || mapOffset > containerSize - 4) {
-            throw DexUtil.InvalidFile(String.format("Invalid mapOffset %d", mapOffset))
+            throw DexUtil.InvalidFile("Invalid mapOffset ${mapOffset}")
         }
 
         val dataOffset = baseDataOffset
         if (dataOffset > containerSize - 4 - mapOffset) {
-            throw DexUtil.InvalidFile(String.format("Invalid mapOffset %d", mapOffset))
+            throw DexUtil.InvalidFile("Invalid mapOffset ${mapOffset}")
         }
 
         // Eagerly read mapSize to validate map bounds
@@ -273,7 +255,6 @@ open class DexBackedDexFile internal constructor(
     }
 
     companion object {
-        @JvmStatic
         @Throws(IOException::class)
         fun fromInputStream(opcodes: Opcodes?, `is`: InputStream): DexBackedDexFile {
             DexUtil.verifyDexHeader(`is`)
@@ -337,7 +318,7 @@ open class DexBackedDexFile internal constructor(
             ReferenceType.METHOD_HANDLE -> methodHandleSection
             ReferenceType.CALL_SITE -> callSiteSection
             else -> throw IllegalArgumentException(
-                String.format("Invalid reference type: %d", referenceType)
+                "Invalid reference type: ${referenceType}"
             )
         }
     }
@@ -359,7 +340,7 @@ open class DexBackedDexFile internal constructor(
 
     fun getMapItemForSection(itemType: Int): MapItem? {
         for (mapItem in mapItems) {
-            if (mapItem.getType() == itemType) {
+            if (mapItem.type == itemType) {
                 return mapItem
             }
         }
@@ -399,7 +380,7 @@ open class DexBackedDexFile internal constructor(
             override fun getOffset(index: Int): Int {
                 if (index < 0 || index >= size) {
                     throw IndexOutOfBoundsException(
-                        String.format("Invalid string index %d, not in [0, %d)", index, size)
+                        "Invalid string index ${index}, not in [0, ${size})"
                     )
                 }
                 return stringStartOffset + index * StringIdItem.ITEM_SIZE
@@ -427,7 +408,7 @@ open class DexBackedDexFile internal constructor(
             override fun getOffset(index: Int): Int {
                 if (index < 0 || index >= size) {
                     throw IndexOutOfBoundsException(
-                        String.format("Invalid type index %d, not in [0, %d)", index, size)
+                        "Invalid type index ${index}, not in [0, ${size})"
                     )
                 }
                 return typeStartOffset + index * TypeIdItem.ITEM_SIZE
@@ -446,7 +427,7 @@ open class DexBackedDexFile internal constructor(
             override fun getOffset(index: Int): Int {
                 if (index < 0 || index >= size) {
                     throw IndexOutOfBoundsException(
-                        String.format("Invalid field index %d, not in [0, %d)", index, size)
+                        "Invalid field index ${index}, not in [0, ${size})"
                     )
                 }
 
@@ -466,7 +447,7 @@ open class DexBackedDexFile internal constructor(
             override fun getOffset(index: Int): Int {
                 if (index < 0 || index >= size) {
                     throw IndexOutOfBoundsException(
-                        String.format("Invalid method index %d, not in [0, %d)", index, size)
+                        "Invalid method index ${index}, not in [0, ${size})"
                     )
                 }
 
@@ -486,7 +467,7 @@ open class DexBackedDexFile internal constructor(
             override fun getOffset(index: Int): Int {
                 if (index < 0 || index >= size) {
                     throw IndexOutOfBoundsException(
-                        String.format("Invalid proto index %d, not in [0, %d)", index, size)
+                        "Invalid proto index ${index}, not in [0, ${size})"
                     )
                 }
 
@@ -509,7 +490,7 @@ open class DexBackedDexFile internal constructor(
             override fun getOffset(index: Int): Int {
                 if (index < 0 || index >= size) {
                     throw IndexOutOfBoundsException(
-                        String.format("Invalid class index %d, not in [0, %d)", index, size)
+                        "Invalid class index ${index}, not in [0, ${size})"
                     )
                 }
 
@@ -527,14 +508,14 @@ open class DexBackedDexFile internal constructor(
                 get() {
                     val mapItem = getMapItemForSection(ItemType.CALL_SITE_ID_ITEM)
                         ?: return 0
-                    return mapItem.getItemCount()
+                    return mapItem.itemCount
                 }
 
             override fun getOffset(index: Int): Int {
                 val mapItem = getMapItemForSection(ItemType.CALL_SITE_ID_ITEM)
                 if (index < 0 || index >= size) {
                     throw IndexOutOfBoundsException(
-                        String.format("Invalid callsite index %d, not in [0, %d)", index, size)
+                        "Invalid callsite index ${index}, not in [0, ${size})"
                     )
                 }
                 return mapItem!!.getOffset() + index * CallSiteIdItem.ITEM_SIZE
@@ -551,16 +532,14 @@ open class DexBackedDexFile internal constructor(
                 get() {
                     val mapItem = getMapItemForSection(ItemType.METHOD_HANDLE_ITEM)
                         ?: return 0
-                    return mapItem.getItemCount()
+                    return mapItem.itemCount
                 }
 
             override fun getOffset(index: Int): Int {
                 val mapItem = getMapItemForSection(ItemType.METHOD_HANDLE_ITEM)
                 if (index < 0 || index >= size) {
                     throw IndexOutOfBoundsException(
-                        String.format(
-                            "Invalid method handle index %d, not in [0, %d)", index, size
-                        )
+                        "Invalid method handle index ${index}, not in [0, ${size})"
                     )
                 }
                 return mapItem!!.getOffset() + index * MethodHandleItem.ITEM_SIZE

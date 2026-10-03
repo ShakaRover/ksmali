@@ -35,7 +35,6 @@ import com.android.tools.smali.dexlib2.iface.value.ByteEncodedValue
 
 open class ImmutableByteEncodedValue(override val value: Byte) : BaseByteEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmStatic
         fun of(value: ByteEncodedValue): ImmutableByteEncodedValue {
             if (value is ImmutableByteEncodedValue) {
                 return value

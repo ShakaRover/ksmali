@@ -228,7 +228,6 @@ class DexPool(opcodes: Opcodes) : DexWriter<CharSequence, StringReference, CharS
         }
     }
     companion object {
-        @JvmStatic
         @Throws(IOException::class)
         fun writeTo(dataStore: DexDataStore, input: DexFile) {
             val dexPool = DexPool(input.opcodes)
@@ -238,7 +237,6 @@ class DexPool(opcodes: Opcodes) : DexWriter<CharSequence, StringReference, CharS
             dexPool.writeTo(dataStore)
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun writeTo(path: String, input: DexFile) {
             val dexPool = DexPool(input.opcodes)

@@ -44,9 +44,9 @@ import com.android.tools.smali.dexlib2.iface.value.EncodedValue
 import java.util.EnumSet
 
 class DexBackedField(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     reader: DexReader<out DexBuffer>,
-    @JvmField val classDef: ClassDef,
+    val classDef: ClassDef,
     previousFieldIndex: Int,
     staticInitialValueIterator: EncodedArrayItemIterator?,
     annotationIterator: AnnotationIterator,
@@ -55,10 +55,8 @@ class DexBackedField(
     override val accessFlags: Int
     override val initialValue: EncodedValue?
 
-    @JvmField
     val annotationSetOffset: Int
 
-    @JvmField
     val fieldIndex: Int
     private val startOffset: Int
     private val initialValueOffset: Int
@@ -170,7 +168,6 @@ class DexBackedField(
          * @param reader The reader to skip
          * @param count The number of encoded_field structures to skip over
          */
-        @JvmStatic
         fun skipFields(reader: DexReader<out DexBuffer>, count: Int) {
             for (i in 0 until count) {
                 reader.skipUleb128()

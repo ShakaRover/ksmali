@@ -39,7 +39,6 @@ open class ImmutableFieldReference(
     override val type: String
 ) : BaseFieldReference(), ImmutableReference {
     companion object {
-        @JvmStatic
         fun of(fieldReference: FieldReference): ImmutableFieldReference {
             if (fieldReference is ImmutableFieldReference) {
                 return fieldReference

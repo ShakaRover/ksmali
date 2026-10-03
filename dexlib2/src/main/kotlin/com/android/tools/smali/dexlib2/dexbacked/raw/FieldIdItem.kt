@@ -41,7 +41,6 @@ object FieldIdItem {
     const val TYPE_OFFSET = 2
     const val NAME_OFFSET = 4
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {
@@ -61,7 +60,6 @@ object FieldIdItem {
         }
     }
 
-    @JvmStatic
     fun asString(dexFile: DexBackedDexFile, fieldIndex: Int): String {
         val fieldOffset = dexFile.fieldSection.getOffset(fieldIndex)
         val classIndex = dexFile.buffer.readUshort(fieldOffset + CLASS_OFFSET)
@@ -73,25 +71,23 @@ object FieldIdItem {
         val nameIndex = dexFile.buffer.readSmallUint(fieldOffset + NAME_OFFSET)
         val fieldName = dexFile.stringSection.get(nameIndex)
 
-        return String.format("%s->%s:%s", classType, fieldName, fieldType)
+        return "${classType}->${fieldName}:${fieldType}"
     }
 
-    @JvmStatic
     fun getReferenceAnnotation(dexFile: DexBackedDexFile, fieldIndex: Int): String {
         try {
             val fieldString = asString(dexFile, fieldIndex)
-            return String.format("field_id_item[%d]: %s", fieldIndex, fieldString)
+            return "field_id_item[${fieldIndex}]: ${fieldString}"
         } catch (ex: Exception) {
             ex.printStackTrace(System.err)
         }
-        return String.format("field_id_item[%d]", fieldIndex)
+        return "field_id_item[${fieldIndex}]"
     }
 
-    @JvmStatic
     fun getFields(dexFile: DexBackedDexFile): Array<String> {
         val mapItem = dexFile.getMapItemForSection(ItemType.FIELD_ID_ITEM) ?: return emptyArray()
 
-        val fieldCount = mapItem.getItemCount()
+        val fieldCount = mapItem.itemCount
         return Array(fieldCount) { i -> asString(dexFile, i) }
     }
 }

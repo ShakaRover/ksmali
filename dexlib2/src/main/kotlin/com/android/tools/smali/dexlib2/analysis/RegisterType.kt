@@ -36,8 +36,8 @@ import java.io.IOException
 import java.io.Writer
 
 class RegisterType private constructor(
-    @JvmField val category: Byte,
-    @JvmField val type: TypeProto?
+    val category: Byte,
+    val type: TypeProto?
 ) {
     init {
         assert(
@@ -154,7 +154,6 @@ class RegisterType private constructor(
         // incomming code path. There is no register type that can hold either an Integer or a Reference.
         const val CONFLICTED: Byte = 19
 
-        @JvmField
         val CATEGORY_NAMES: Array<String> = arrayOf(
             "Unknown",
             "Uninit",
@@ -204,58 +203,40 @@ class RegisterType private constructor(
             byteArrayOf(CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED, CONFLICTED),
         )
 
-        @JvmField
         val UNKNOWN_TYPE: RegisterType = RegisterType(UNKNOWN, null)
 
-        @JvmField
         val UNINIT_TYPE: RegisterType = RegisterType(UNINIT, null)
 
-        @JvmField
         val NULL_TYPE: RegisterType = RegisterType(NULL, null)
 
-        @JvmField
         val ONE_TYPE: RegisterType = RegisterType(ONE, null)
 
-        @JvmField
         val BOOLEAN_TYPE: RegisterType = RegisterType(BOOLEAN, null)
 
-        @JvmField
         val BYTE_TYPE: RegisterType = RegisterType(BYTE, null)
 
-        @JvmField
         val POS_BYTE_TYPE: RegisterType = RegisterType(POS_BYTE, null)
 
-        @JvmField
         val SHORT_TYPE: RegisterType = RegisterType(SHORT, null)
 
-        @JvmField
         val POS_SHORT_TYPE: RegisterType = RegisterType(POS_SHORT, null)
 
-        @JvmField
         val CHAR_TYPE: RegisterType = RegisterType(CHAR, null)
 
-        @JvmField
         val INTEGER_TYPE: RegisterType = RegisterType(INTEGER, null)
 
-        @JvmField
         val FLOAT_TYPE: RegisterType = RegisterType(FLOAT, null)
 
-        @JvmField
         val LONG_LO_TYPE: RegisterType = RegisterType(LONG_LO, null)
 
-        @JvmField
         val LONG_HI_TYPE: RegisterType = RegisterType(LONG_HI, null)
 
-        @JvmField
         val DOUBLE_LO_TYPE: RegisterType = RegisterType(DOUBLE_LO, null)
 
-        @JvmField
         val DOUBLE_HI_TYPE: RegisterType = RegisterType(DOUBLE_HI, null)
 
-        @JvmField
         val CONFLICTED_TYPE: RegisterType = RegisterType(CONFLICTED, null)
 
-        @JvmStatic
         fun getWideRegisterType(type: CharSequence, firstRegister: Boolean): RegisterType {
             when (type[0]) {
                 'J' -> {
@@ -278,7 +259,6 @@ class RegisterType private constructor(
             }
         }
 
-        @JvmStatic
         fun getRegisterType(classPath: ClassPath, type: CharSequence): RegisterType {
             when (type[0]) {
                 'Z' -> return BOOLEAN_TYPE
@@ -294,7 +274,6 @@ class RegisterType private constructor(
             }
         }
 
-        @JvmStatic
         fun getRegisterTypeForLiteral(literalValue: Int): RegisterType {
             if (literalValue < -32768) {
                 return INTEGER_TYPE
@@ -323,7 +302,6 @@ class RegisterType private constructor(
             return INTEGER_TYPE
         }
 
-        @JvmStatic
         fun getRegisterType(category: Byte, typeProto: TypeProto?): RegisterType {
             when (category) {
                 UNKNOWN -> return UNKNOWN_TYPE

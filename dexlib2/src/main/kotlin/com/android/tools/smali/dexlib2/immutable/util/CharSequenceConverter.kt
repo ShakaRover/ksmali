@@ -33,7 +33,6 @@ package com.android.tools.smali.dexlib2.immutable.util
 import com.android.tools.smali.util.ImmutableConverter
 
 object CharSequenceConverter {
-    @JvmStatic
     fun immutableStringList(iterable: Iterable<CharSequence>?): List<String> {
         return CONVERTER.toList(iterable)
     }

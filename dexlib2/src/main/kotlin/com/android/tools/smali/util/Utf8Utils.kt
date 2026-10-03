@@ -36,7 +36,6 @@ object Utf8Utils {
      * @param string non-null; the string to convert
      * @return non-null; the UTF-8 bytes for it
      */
-    @JvmStatic
     fun stringToUtf8Bytes(string: String): ByteArray {
         val len = string.length
         val bytes = ByteArray(len * 3) // Avoid having to reallocate.
@@ -79,7 +78,6 @@ object Utf8Utils {
      * @param length the length of the utf8 string to convert, not including any null-terminator
      * @return non-null; the converted string
      */
-    @JvmStatic
     fun utf8BytesToString(bytes: ByteArray, start: Int, length: Int): String {
         var chars = localBuffer.get()
         if (chars == null || chars.size < length) {
@@ -164,7 +162,6 @@ object Utf8Utils {
      * @param utf16Length the number of utf16 characters in the string to decode
      * @return non-null; the converted string
      */
-    @JvmStatic
     fun utf8BytesWithUtf16LengthToString(bytes: ByteArray, start: Int, utf16Length: Int): String {
         return utf8BytesWithUtf16LengthToString(bytes, start, utf16Length, null)
     }
@@ -178,7 +175,6 @@ object Utf8Utils {
      * @param readLength If non-null, the first element will contain the number of bytes read
      * @return non-null; the converted string
      */
-    @JvmStatic
     fun utf8BytesWithUtf16LengthToString(
         bytes: ByteArray,
         start: Int,

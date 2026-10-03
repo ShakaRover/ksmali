@@ -35,7 +35,7 @@ import com.android.tools.smali.dexlib2.iface.AnnotationElement
 import com.android.tools.smali.dexlib2.iface.value.EncodedValue
 
 open class AnnotationElementRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<AnnotationElement> {
     override fun rewrite(annotationElement: AnnotationElement): AnnotationElement {
         return RewrittenAnnotationElement(annotationElement)

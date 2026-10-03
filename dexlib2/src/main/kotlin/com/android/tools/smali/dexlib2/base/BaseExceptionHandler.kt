@@ -78,7 +78,6 @@ abstract class BaseExceptionHandler : ExceptionHandler {
     }
 
     companion object {
-        @JvmField
         val BY_EXCEPTION: Comparator<ExceptionHandler> = Comparator { o1, o2 ->
             val exceptionType1 = o1.exceptionType
             if (exceptionType1 == null) {

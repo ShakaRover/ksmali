@@ -122,12 +122,10 @@ class FileDeferredOutputStream : DeferredOutputStream {
     companion object {
         private const val DEFAULT_BUFFER_SIZE = 4 * 1024
 
-        @JvmStatic
         fun getFactory(containingDirectory: File?): DeferredOutputStreamFactory {
             return getFactory(containingDirectory, DEFAULT_BUFFER_SIZE)
         }
 
-        @JvmStatic
         fun getFactory(containingDirectory: File?, bufferSize: Int): DeferredOutputStreamFactory {
             return object : DeferredOutputStreamFactory {
                 @Throws(IOException::class)

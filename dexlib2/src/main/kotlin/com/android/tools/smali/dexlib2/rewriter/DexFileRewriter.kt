@@ -35,7 +35,7 @@ import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.DexFile
 
 open class DexFileRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<DexFile> {
     override fun rewrite(value: DexFile): DexFile {
         return RewrittenDexFile(value)

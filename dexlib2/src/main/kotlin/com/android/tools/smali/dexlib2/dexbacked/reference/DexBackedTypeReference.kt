@@ -36,8 +36,8 @@ import com.android.tools.smali.dexlib2.dexbacked.raw.TypeIdItem
 import com.android.tools.smali.dexlib2.iface.reference.Reference.InvalidReferenceException
 
 class DexBackedTypeReference(
-    @JvmField val dexFile: DexBackedDexFile,
-    @JvmField val typeIndex: Int
+    val dexFile: DexBackedDexFile,
+    val typeIndex: Int
 ) : BaseTypeReference() {
     override val type: String
         get() = dexFile.typeSection.get(typeIndex)

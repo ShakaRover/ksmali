@@ -48,7 +48,6 @@ open class BuilderArrayPayload(elementWidth: Int, arrayElements: List<Number>?) 
         get() = OPCODE.format
 
     companion object {
-        @JvmField
         val OPCODE: Opcode = Opcode.ARRAY_PAYLOAD
     }
 }

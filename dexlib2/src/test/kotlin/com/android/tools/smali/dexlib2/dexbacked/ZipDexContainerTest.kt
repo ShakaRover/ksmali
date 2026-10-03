@@ -56,7 +56,7 @@ class ZipDexContainerTest {
 
         val dataStore = MemoryDataStore()
         DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
-        val dexBytes = dataStore.getData()
+        val dexBytes = dataStore.data
 
         val crc32 = CRC32()
         crc32.update(dexBytes)
@@ -90,7 +90,7 @@ class ZipDexContainerTest {
 
         val dataStore = MemoryDataStore()
         DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
-        val dexBytes = dataStore.getData()
+        val dexBytes = dataStore.data
 
         val tempZip = File.createTempFile("test_order", ".apk")
         tempZip.deleteOnExit()
@@ -125,7 +125,7 @@ class ZipDexContainerTest {
 
         val dataStore = MemoryDataStore()
         DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
-        val dexBytes = dataStore.getData()
+        val dexBytes = dataStore.data
 
         val containerBytes = ByteArray(dexBytes.size * 2)
         System.arraycopy(dexBytes, 0, containerBytes, 0, dexBytes.size)
@@ -166,7 +166,7 @@ class ZipDexContainerTest {
 
         val dataStore = MemoryDataStore()
         DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
-        val dexBytes = dataStore.getData()
+        val dexBytes = dataStore.data
 
         val containerBytesWithGarbage = ByteArray(dexBytes.size * 2 + 50)
         System.arraycopy(dexBytes, 0, containerBytesWithGarbage, 0, dexBytes.size)
@@ -205,7 +205,7 @@ class ZipDexContainerTest {
 
         val dataStore = MemoryDataStore()
         DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
-        val dexBytes = dataStore.getData()
+        val dexBytes = dataStore.data
 
         val containerBytes = ByteArray(dexBytes.size)
         System.arraycopy(dexBytes, 0, containerBytes, 0, dexBytes.size)
@@ -234,7 +234,6 @@ class ZipDexContainerTest {
     }
 
     companion object {
-        @JvmStatic
         private fun writeInt(buf: ByteArray, offset: Int, value: Int) {
             buf[offset] = value.toByte()
             buf[offset + 1] = (value shr 8).toByte()

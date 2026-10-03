@@ -124,13 +124,11 @@ class UnmodifiableRangeMap<K : Comparable<K>, V> private constructor(
     companion object {
         private val EMPTY: UnmodifiableRangeMap<Int, Any> = UnmodifiableRangeMap(emptyList(), emptyList())
 
-        @JvmStatic
         fun <K : Comparable<K>, V> builder(): Builder<K, V> {
             return Builder()
         }
 
         @Suppress("UNCHECKED_CAST")
-        @JvmStatic
         fun <K : Comparable<K>, V> of(): UnmodifiableRangeMap<K, V> {
             return EMPTY as UnmodifiableRangeMap<K, V>
         }

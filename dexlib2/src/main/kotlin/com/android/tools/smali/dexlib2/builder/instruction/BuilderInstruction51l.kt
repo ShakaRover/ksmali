@@ -45,7 +45,6 @@ open class BuilderInstruction51l(opcode: Opcode, registerA: Int, override val wi
         get() = FORMAT
 
     companion object {
-        @JvmField
         val FORMAT: Format = Format.Format51l
     }
 }

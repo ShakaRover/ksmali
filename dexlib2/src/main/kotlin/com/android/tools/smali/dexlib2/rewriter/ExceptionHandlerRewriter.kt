@@ -34,7 +34,7 @@ import com.android.tools.smali.dexlib2.base.BaseExceptionHandler
 import com.android.tools.smali.dexlib2.iface.ExceptionHandler
 
 open class ExceptionHandlerRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<ExceptionHandler> {
     override fun rewrite(value: ExceptionHandler): ExceptionHandler {
         return RewrittenExceptionHandler(value)

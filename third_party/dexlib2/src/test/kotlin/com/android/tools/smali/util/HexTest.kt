@@ -34,8 +34,7 @@ import org.junit.rules.ExpectedException
 
 class HexTest {
 
-    @JvmField
-    @Rule
+    @get:Rule
     val thrown: ExpectedException = ExpectedException.none()
 
     @Test

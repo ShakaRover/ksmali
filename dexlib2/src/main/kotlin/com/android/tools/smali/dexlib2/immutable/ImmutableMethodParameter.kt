@@ -48,7 +48,6 @@ open class ImmutableMethodParameter(
         get() = null
 
     companion object {
-        @JvmStatic
         fun of(methodParameter: MethodParameter): ImmutableMethodParameter {
             if (methodParameter is ImmutableMethodParameter) {
                 return methodParameter
@@ -60,7 +59,6 @@ open class ImmutableMethodParameter(
             )
         }
 
-        @JvmStatic
         fun immutableListOf(list: Iterable<MethodParameter>?): List<ImmutableMethodParameter> {
             return CONVERTER.toList(list)
         }

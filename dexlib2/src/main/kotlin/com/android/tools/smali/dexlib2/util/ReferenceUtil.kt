@@ -28,7 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@file:JvmName("ReferenceUtil")
 
 package com.android.tools.smali.dexlib2.util
 
@@ -54,19 +53,19 @@ fun getMethodDescriptor(methodReference: MethodReference): String {
 
 @Deprecated("use DexFormatter instead")
 fun getMethodDescriptor(methodReference: MethodReference, useImplicitReference: Boolean): String {
-    val sb = StringBuilder()
-    if (!useImplicitReference) {
-        sb.append(methodReference.definingClass)
-        sb.append("->")
+    return buildString {
+        if (!useImplicitReference) {
+            append(methodReference.definingClass)
+            append("->")
+        }
+        append(methodReference.name)
+        append('(')
+        for (paramType in methodReference.parameterTypes) {
+            append(paramType)
+        }
+        append(')')
+        append(methodReference.returnType)
     }
-    sb.append(methodReference.name)
-    sb.append('(')
-    for (paramType in methodReference.parameterTypes) {
-        sb.append(paramType)
-    }
-    sb.append(')')
-    sb.append(methodReference.returnType)
-    return sb.toString()
 }
 
 @Deprecated("use DexFormatter instead")
@@ -121,24 +120,24 @@ fun getFieldDescriptor(fieldReference: FieldReference): String {
 
 @Deprecated("use DexFormatter instead")
 fun getFieldDescriptor(fieldReference: FieldReference, useImplicitReference: Boolean): String {
-    val sb = StringBuilder()
-    if (!useImplicitReference) {
-        sb.append(fieldReference.definingClass)
-        sb.append("->")
+    return buildString {
+        if (!useImplicitReference) {
+            append(fieldReference.definingClass)
+            append("->")
+        }
+        append(fieldReference.name)
+        append(':')
+        append(fieldReference.type)
     }
-    sb.append(fieldReference.name)
-    sb.append(':')
-    sb.append(fieldReference.type)
-    return sb.toString()
 }
 
 @Deprecated("use DexFormatter instead")
 fun getShortFieldDescriptor(fieldReference: FieldReference): String {
-    val sb = StringBuilder()
-    sb.append(fieldReference.name)
-    sb.append(':')
-    sb.append(fieldReference.type)
-    return sb.toString()
+    return buildString {
+        append(fieldReference.name)
+        append(':')
+        append(fieldReference.type)
+    }
 }
 
 @Deprecated("use DexFormatter instead")
@@ -228,7 +227,7 @@ fun getReferenceString(reference: Reference): String? {
 @Deprecated("use DexFormatter instead")
 fun getReferenceString(reference: Reference, containingClass: String?): String? {
     if (reference is StringReference) {
-        return String.format("\"%s\"", StringUtils.escapeString(reference.string))
+        return "\"${StringUtils.escapeString(reference.string)}\""
     }
     if (reference is TypeReference) {
         return reference.type

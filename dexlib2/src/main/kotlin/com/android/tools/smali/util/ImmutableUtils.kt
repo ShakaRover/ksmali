@@ -35,7 +35,6 @@ import java.util.SortedSet
 import java.util.TreeSet
 
 object ImmutableUtils {
-    @JvmStatic
     fun <T> nullToEmptyList(list: List<T>?): List<T> {
         if (list == null) {
             return emptyList()
@@ -43,7 +42,6 @@ object ImmutableUtils {
         return Collections.unmodifiableList(list)
     }
 
-    @JvmStatic
     fun <T> nullToEmptySet(set: Set<T>?): Set<T> {
         if (set == null) {
             return emptySet()
@@ -51,7 +49,6 @@ object ImmutableUtils {
         return Collections.unmodifiableSet(set)
     }
 
-    @JvmStatic
     fun <T> nullToEmptySortedSet(set: SortedSet<T>?): SortedSet<T> {
         if (set == null) {
             return Collections.unmodifiableSortedSet(TreeSet<T>())

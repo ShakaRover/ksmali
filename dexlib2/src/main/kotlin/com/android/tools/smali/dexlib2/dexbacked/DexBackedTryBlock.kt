@@ -35,7 +35,7 @@ import com.android.tools.smali.dexlib2.dexbacked.raw.CodeItem
 import com.android.tools.smali.dexlib2.dexbacked.util.VariableSizeList
 
 class DexBackedTryBlock(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     private val tryItemOffset: Int,
     private val handlersStartOffset: Int
 ) : BaseTryBlock<DexBackedExceptionHandler>() {

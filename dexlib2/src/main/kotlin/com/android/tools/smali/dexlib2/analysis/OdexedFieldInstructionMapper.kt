@@ -36,11 +36,11 @@ import java.util.HashMap
 
 open class OdexedFieldInstructionMapper(isArt: Boolean) {
     private class FieldOpcode(
-        @JvmField val type: Char,
-        @JvmField val isStatic: Boolean,
-        @JvmField val normalOpcode: Opcode,
-        @JvmField val quickOpcode: Opcode?,
-        @JvmField val volatileOpcode: Opcode?
+        val type: Char,
+        val isStatic: Boolean,
+        val normalOpcode: Opcode,
+        val quickOpcode: Opcode?,
+        val volatileOpcode: Opcode?
     ) {
         constructor(type: Char, normalOpcode: Opcode, quickOpcode: Opcode?, volatileOpcode: Opcode?) :
             this(type, false, normalOpcode, quickOpcode, volatileOpcode)
@@ -82,10 +82,7 @@ open class OdexedFieldInstructionMapper(isArt: Boolean) {
 
         if (!isCompatible(odexedOpcode, fieldOpcode.type)) {
             throw AnalysisException(
-                String.format(
-                    "Incorrect field type \"%s\" for %s", fieldType,
-                    odexedOpcode.mnemonic
-                )
+                "Incorrect field type \"${fieldType}\" for ${odexedOpcode.mnemonic}"
             )
         }
 
@@ -183,7 +180,7 @@ open class OdexedFieldInstructionMapper(isArt: Boolean) {
                 'Z', 'B', 'S', 'C', 'I', 'F' -> PRIMITIVE
                 'J', 'D' -> WIDE
                 'L', '[' -> REFERENCE
-                else -> throw RuntimeException(String.format("Unknown type %s: ", type))
+                else -> throw RuntimeException("Unknown type ${type}: ")
             }
         }
 
@@ -199,7 +196,7 @@ open class OdexedFieldInstructionMapper(isArt: Boolean) {
                 'D' -> 7
                 'L' -> 8
                 '[' -> 9
-                else -> throw RuntimeException(String.format("Unknown type %s: ", type))
+                else -> throw RuntimeException("Unknown type ${type}: ")
             }
         }
 

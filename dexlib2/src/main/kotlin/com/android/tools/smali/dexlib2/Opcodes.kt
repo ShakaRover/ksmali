@@ -42,7 +42,6 @@ class Opcodes private constructor(api: Int, artVersion: Int) {
     @JvmField
     val api: Int
 
-    @JvmField
     val artVersion: Int
 
     private val opcodesByValue: Array<Opcode?> = arrayOfNulls(256)
@@ -116,12 +115,10 @@ class Opcodes private constructor(api: Int, artVersion: Int) {
             return Opcodes(api, VersionMap.NO_VERSION)
         }
 
-        @JvmStatic
         fun forArtVersion(artVersion: Int): Opcodes {
             return Opcodes(VersionMap.NO_VERSION, artVersion)
         }
 
-        @JvmStatic
         fun forDexVersion(dexVersion: Int): Opcodes {
             val api = VersionMap.mapDexVersionToApi(dexVersion)
             if (api == VersionMap.NO_VERSION) {
@@ -133,7 +130,6 @@ class Opcodes private constructor(api: Int, artVersion: Int) {
         /**
          * @return a default Opcodes instance for when the exact Opcodes to use doesn't matter or isn't known
          */
-        @JvmStatic
         fun getDefault(): Opcodes {
             // The last pre-art api
             return forApi(20)

@@ -38,7 +38,7 @@ import com.android.tools.smali.dexlib2.dexbacked.reference.DexBackedMethodHandle
 import com.android.tools.smali.dexlib2.iface.reference.MethodHandleReference
 
 class DexBackedMethodHandleEncodedValue(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     reader: DexReader<out DexBuffer>,
     valueArg: Int
 ) : BaseMethodHandleEncodedValue() {

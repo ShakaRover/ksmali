@@ -62,7 +62,6 @@ open class ImmutableMethodImplementation(
     )
 
     companion object {
-        @JvmStatic
         fun of(methodImplementation: MethodImplementation?): ImmutableMethodImplementation? {
             if (methodImplementation == null) {
                 return null

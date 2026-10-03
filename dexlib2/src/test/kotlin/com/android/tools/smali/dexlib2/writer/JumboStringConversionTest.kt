@@ -66,7 +66,7 @@ class JumboStringConversionTest {
         for (i in 0 until 66000) {
             methodBuilder.addInstruction(
                 BuilderInstruction21c(Opcode.CONST_STRING, 0,
-                    dexBuilder.internStringReference(String.format("%08d", i)))
+                    dexBuilder.internStringReference("%08d".format(i)))
             )
         }
         methodBuilder.addInstruction(BuilderInstruction10x(Opcode.RETURN_VOID))
@@ -112,12 +112,12 @@ class JumboStringConversionTest {
 
         for (i in 0 until 65536) {
             Assert.assertEquals(Opcode.CONST_STRING, instructions[i].opcode)
-            Assert.assertEquals(String.format("%08d", i),
+            Assert.assertEquals("%08d".format(i),
                 (instructions[i] as ReferenceInstruction).reference.let { it as StringReference }.string)
         }
         for (i in 65536 until 66000) {
             Assert.assertEquals(Opcode.CONST_STRING_JUMBO, instructions[i].opcode)
-            Assert.assertEquals(String.format("%08d", i),
+            Assert.assertEquals("%08d".format(i),
                 (instructions[i] as ReferenceInstruction).reference.let { it as StringReference }.string)
         }
         Assert.assertEquals(Opcode.RETURN_VOID, instructions[66000].opcode)
@@ -130,7 +130,7 @@ class JumboStringConversionTest {
 
         val instructions = mutableListOf<Instruction>()
         for (i in 0 until 66000) {
-            val ref = dexBuilder.internStringReference(String.format("%08d", i))
+            val ref = dexBuilder.internStringReference("%08d".format(i))
 
             instructions.add(object : Instruction21c {
                 override val registerA: Int
@@ -206,12 +206,12 @@ class JumboStringConversionTest {
 
         for (i in 0 until 65536) {
             Assert.assertEquals(Opcode.CONST_STRING, actualInstructions[i].opcode)
-            Assert.assertEquals(String.format("%08d", i),
+            Assert.assertEquals("%08d".format(i),
                 (actualInstructions[i] as ReferenceInstruction).reference.let { it as StringReference }.string)
         }
         for (i in 65536 until 66000) {
             Assert.assertEquals(Opcode.CONST_STRING_JUMBO, actualInstructions[i].opcode)
-            Assert.assertEquals(String.format("%08d", i),
+            Assert.assertEquals("%08d".format(i),
                 (actualInstructions[i] as ReferenceInstruction).reference.let { it as StringReference }.string)
         }
         Assert.assertEquals(Opcode.RETURN_VOID, actualInstructions[66000].opcode)

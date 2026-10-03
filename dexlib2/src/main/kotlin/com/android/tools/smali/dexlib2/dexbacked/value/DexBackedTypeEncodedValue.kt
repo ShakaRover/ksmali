@@ -36,7 +36,7 @@ import com.android.tools.smali.dexlib2.dexbacked.DexBuffer
 import com.android.tools.smali.dexlib2.dexbacked.DexReader
 
 class DexBackedTypeEncodedValue(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     reader: DexReader<out DexBuffer>,
     valueArg: Int
 ) : BaseTypeEncodedValue() {

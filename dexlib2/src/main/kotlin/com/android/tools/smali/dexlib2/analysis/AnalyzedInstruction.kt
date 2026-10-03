@@ -53,33 +53,29 @@ import java.util.SortedSet
 import java.util.TreeSet
 
 open class AnalyzedInstruction(
-    @JvmField val methodAnalyzer: MethodAnalyzer,
-    @JvmField var instruction: Instruction,
-    @JvmField val instructionIndex: Int,
+    val methodAnalyzer: MethodAnalyzer,
+    var instruction: Instruction,
+    val instructionIndex: Int,
     registerCount: Int
 ) : Comparable<AnalyzedInstruction> {
     /**
      * Instructions that can pass on execution to this one during normal execution
      */
-    @JvmField
     val predecessors: TreeSet<AnalyzedInstruction> = TreeSet()
 
     /**
      * Instructions that can execution could pass on to next during normal execution
      */
-    @JvmField
     val successors: LinkedList<AnalyzedInstruction> = LinkedList()
 
     /**
      * This contains the register types *before* the instruction has executed
      */
-    @JvmField
     val preRegisterMap: Array<RegisterType>
 
     /**
      * This contains the register types *after* the instruction has executed
      */
-    @JvmField
     val postRegisterMap: Array<RegisterType>
 
     /**
@@ -91,7 +87,6 @@ open class AnalyzedInstruction(
      * When deodexing, we might need to deodex this instruction multiple times, when we merge in new register
      * information. When this happens, we need to restore the original (odexed) instruction, so we can deodex it again
      */
-    @JvmField
     val originalInstruction: Instruction
 
     init {
@@ -99,10 +94,6 @@ open class AnalyzedInstruction(
         val unknown = RegisterType.getRegisterType(RegisterType.UNKNOWN, null)
         this.postRegisterMap = Array(registerCount) { unknown }
         this.preRegisterMap = Array(registerCount) { unknown }
-    }
-
-    fun getInstructionIndex(): Int {
-        return instructionIndex
     }
 
     val predecessorCount: Int
@@ -143,14 +134,6 @@ open class AnalyzedInstruction(
 
     fun getSuccessors(): List<AnalyzedInstruction> {
         return Collections.unmodifiableList(successors)
-    }
-
-    fun getInstruction(): Instruction {
-        return instruction
-    }
-
-    fun getOriginalInstruction(): Instruction {
-        return originalInstruction
     }
 
     /**
@@ -649,8 +632,8 @@ open class AnalyzedInstruction(
     }
 
     private class PredecessorOverrideKey(
-        @JvmField val analyzedInstruction: AnalyzedInstruction,
-        @JvmField val registerNumber: Int
+        val analyzedInstruction: AnalyzedInstruction,
+        val registerNumber: Int
     ) {
         override fun equals(o: Any?): Boolean {
             if (this === o) return true

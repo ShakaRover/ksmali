@@ -86,7 +86,6 @@ abstract class ImmutableInstruction(opcode: Opcode) : Instruction {
         get() = format.size / 2
 
     companion object {
-        @JvmStatic
         fun of(instruction: Instruction): ImmutableInstruction {
             if (instruction is ImmutableInstruction) {
                 return instruction
@@ -142,7 +141,6 @@ abstract class ImmutableInstruction(opcode: Opcode) : Instruction {
             }
         }
 
-        @JvmStatic
         fun immutableListOf(list: Iterable<Instruction>?): List<ImmutableInstruction> {
             return CONVERTER.toList(list)
         }

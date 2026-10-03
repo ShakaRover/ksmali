@@ -44,7 +44,6 @@ class CollectionUtils private constructor() {
         }
 
         companion object {
-            @JvmField
             val INSTANCE: UsingToStringOrdering<Any> = UsingToStringOrdering()
         }
     }
@@ -56,13 +55,11 @@ class CollectionUtils private constructor() {
         }
 
         companion object {
-            @JvmField
             val INSTANCE: NaturalOrdering<Any> = NaturalOrdering()
         }
     }
 
     companion object {
-        @JvmStatic
         fun <T> listHashCode(iterable: Iterable<T>): Int {
             var hashCode = 1
             for (item in iterable) {
@@ -71,7 +68,6 @@ class CollectionUtils private constructor() {
             return hashCode
         }
 
-        @JvmStatic
         fun <T> lastIndexOf(iterable: Iterable<T>, predicate: Predicate<in T>): Int {
             var index = 0
             var lastMatchingIndex = -1
@@ -83,7 +79,6 @@ class CollectionUtils private constructor() {
             }
             return lastMatchingIndex
         }
-        @JvmStatic
         fun <T : Comparable<T>> compareAsList(list1: Collection<out T>, list2: Collection<out T>): Int {
             var res = list1.size.compareTo(list2.size)
             if (res != 0) return res
@@ -95,7 +90,6 @@ class CollectionUtils private constructor() {
             return 0
         }
 
-        @JvmStatic
         fun <T> compareAsIterable(
             comparator: Comparator<in T>,
             it1: Iterable<out T>,
@@ -116,7 +110,6 @@ class CollectionUtils private constructor() {
             return 0
         }
 
-        @JvmStatic
         fun <T : Comparable<T>> compareAsIterable(it1: Iterable<out T>, it2: Iterable<out T>): Int {
             val elements2 = it2.iterator()
             for (element1 in it1) {
@@ -133,7 +126,6 @@ class CollectionUtils private constructor() {
             return 0
         }
 
-        @JvmStatic
         fun <T> compareAsList(
             elementComparator: Comparator<in T>,
             list1: Collection<out T>,
@@ -149,13 +141,11 @@ class CollectionUtils private constructor() {
             return 0
         }
 
-        @JvmStatic
         fun <T> listComparator(elementComparator: Comparator<in T>): Comparator<Collection<out T>> {
             return Comparator { list1, list2 ->
                 compareAsList(elementComparator, list1, list2)
             }
         }
-        @JvmStatic
         fun <T> isNaturalSortedSet(it: Iterable<out T>): Boolean {
             if (it is SortedSet<*>) {
                 val comparator = it.comparator()
@@ -164,7 +154,6 @@ class CollectionUtils private constructor() {
             return false
         }
 
-        @JvmStatic
         fun <T> isSortedSet(elementComparator: Comparator<*>, it: Iterable<out T>): Boolean {
             if (it is SortedSet<*>) {
                 val comparator = it.comparator()
@@ -199,21 +188,18 @@ class CollectionUtils private constructor() {
 
             return Collections.unmodifiableSortedSet(ArraySortedSet.copyOf(elementComparator, collection))
         }
-        @JvmStatic
         fun <T> setComparator(elementComparator: Comparator<in T>): Comparator<Collection<out T>> {
             return Comparator { list1, list2 ->
                 compareAsSet(elementComparator, list1, list2)
             }
         }
 
-        @JvmStatic
         fun <T : Comparable<T>> compareAsSet(set1: Collection<out T>, set2: Collection<out T>): Int {
             val sortedSet1 = toNaturalSortedSet(set1)
             val sortedSet2 = toNaturalSortedSet(set2)
             return compareAsIterable(sortedSet1, sortedSet2)
         }
 
-        @JvmStatic
         fun <T> compareAsSet(
             elementComparator: Comparator<in T>,
             list1: Collection<out T>,
@@ -223,20 +209,17 @@ class CollectionUtils private constructor() {
             val set2 = toSortedSet(elementComparator, list2)
             return compareAsIterable(elementComparator, set1, set2)
         }
-        @JvmStatic
         fun <T> immutableSortedCopy(collection: Collection<T>, comparator: Comparator<in T>): MutableList<T> {
             val copy = ArrayList(collection)
             copy.sortWith(comparator)
             return Collections.unmodifiableList(copy)
         }
 
-        @JvmStatic
         fun <T> usingToStringOrdering(): Comparator<in T> {
             @Suppress("UNCHECKED_CAST")
             return UsingToStringOrdering.INSTANCE as Comparator<in T>
         }
 
-        @JvmStatic
         fun <T> naturalOrdering(): Comparator<in T> {
             @Suppress("UNCHECKED_CAST")
             return NaturalOrdering.INSTANCE as Comparator<in T>

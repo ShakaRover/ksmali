@@ -46,7 +46,6 @@ open class ImmutableRestartLocal(
         get() = DebugItemType.RESTART_LOCAL
 
     companion object {
-        @JvmStatic
         fun of(restartLocal: RestartLocal): ImmutableRestartLocal {
             if (restartLocal is ImmutableRestartLocal) {
                 return restartLocal

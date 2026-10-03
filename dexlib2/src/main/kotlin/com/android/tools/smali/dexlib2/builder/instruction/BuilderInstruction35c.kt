@@ -63,7 +63,6 @@ open class BuilderInstruction35c(
         get() = FORMAT
 
     companion object {
-        @JvmField
         val FORMAT: Format = Format.Format35c
     }
 }

@@ -71,7 +71,6 @@ class PoolMethod(private val method: Method) : BaseMethodReference(), Method {
         get() = method.implementation
 
     companion object {
-        @JvmField
         val TRANSFORM: Function<Method, PoolMethod> = Function { method -> PoolMethod(method) }
     }
 }

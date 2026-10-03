@@ -38,7 +38,6 @@ import com.android.tools.smali.dexlib2.util.TypeUtils
 import com.android.tools.smali.dexlib2.util.isPackagePrivate
 
 object AnalyzedMethodUtil {
-    @JvmStatic
     fun canAccess(
         type: TypeProto,
         virtualMethod: Method,

@@ -40,7 +40,6 @@ open class ImmutablePrologueEnd(
         get() = DebugItemType.PROLOGUE_END
 
     companion object {
-        @JvmStatic
         fun of(prologueEnd: PrologueEnd): ImmutablePrologueEnd {
             if (prologueEnd is ImmutablePrologueEnd) {
                 return prologueEnd

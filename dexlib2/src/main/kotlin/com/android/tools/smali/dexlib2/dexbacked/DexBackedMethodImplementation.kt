@@ -44,27 +44,25 @@ import com.android.tools.smali.util.ExceptionWithContext
 import java.util.Collections
 
 open class DexBackedMethodImplementation internal constructor(
-    @JvmField val dexFile: DexBackedDexFile,
-    @JvmField val method: DexBackedMethod,
+    val dexFile: DexBackedDexFile,
+    val method: DexBackedMethod,
     protected val codeOffset: Int
 ) : MethodImplementation {
     override val registerCount: Int
         get() = dexFile.dataBuffer.readUshort(codeOffset)
 
-    open fun getInstructionsSize(): Int {
-        return dexFile.dataBuffer.readSmallUint(codeOffset + CodeItem.INSTRUCTION_COUNT_OFFSET)
-    }
+    open val instructionsSize: Int
+        get() = dexFile.dataBuffer.readSmallUint(codeOffset + CodeItem.INSTRUCTION_COUNT_OFFSET)
 
-    protected open fun getInstructionsStartOffset(): Int {
-        return codeOffset + CodeItem.INSTRUCTION_START_OFFSET
-    }
+    protected open val instructionsStartOffset: Int
+        get() = codeOffset + CodeItem.INSTRUCTION_START_OFFSET
 
     override val instructions: Iterable<Instruction>
         get() {
             // instructionsSize is the number of 16-bit code units in the instruction list, not the number of instructions
-            val instructionsSize = getInstructionsSize()
+            val instructionsSize = this.instructionsSize
 
-            val instructionsStartOffset = getInstructionsStartOffset()
+            val instructionsStartOffset = this.instructionsStartOffset
             val endOffset = instructionsStartOffset + (instructionsSize * 2)
             return object : Iterable<Instruction> {
                 override fun iterator(): MutableIterator<Instruction> {
@@ -92,17 +90,15 @@ open class DexBackedMethodImplementation internal constructor(
             }
         }
 
-    protected open fun getTriesSize(): Int {
-        return dexFile.dataBuffer.readUshort(codeOffset + CodeItem.TRIES_SIZE_OFFSET)
-    }
+    protected open val triesSize: Int
+        get() = dexFile.dataBuffer.readUshort(codeOffset + CodeItem.TRIES_SIZE_OFFSET)
 
     override val tryBlocks: List<DexBackedTryBlock>
         get() {
-            val triesSize = getTriesSize()
             if (triesSize > 0) {
-                val instructionsSize = getInstructionsSize()
+                val instructionsSize = this.instructionsSize
                 val triesStartOffset = alignOffset(
-                    getInstructionsStartOffset() + (instructionsSize * 2), 4
+                    instructionsStartOffset + (instructionsSize * 2), 4
                 )
                 val handlersStartOffset =
                     triesStartOffset + triesSize * CodeItem.TryItem.ITEM_SIZE
@@ -123,22 +119,21 @@ open class DexBackedMethodImplementation internal constructor(
             return emptyList()
         }
 
-    open fun getDebugOffset(): Int {
-        return dexFile.dataBuffer.readInt(codeOffset + CodeItem.DEBUG_INFO_OFFSET)
-    }
+    open val debugOffset: Int
+        get() = dexFile.dataBuffer.readInt(codeOffset + CodeItem.DEBUG_INFO_OFFSET)
 
     private fun getDebugInfo(): DebugInfo {
-        val debugOffset = getDebugOffset()
+        val debugOffset = this.debugOffset
 
         if (debugOffset == -1 || debugOffset == 0) {
             return DebugInfo.newOrEmpty(dexFile, 0, this)
         }
         if (debugOffset < 0) {
-            System.err.println(String.format("%s: Invalid debug offset", method))
+            System.err.println("${method}: Invalid debug offset")
             return DebugInfo.newOrEmpty(dexFile, 0, this)
         }
         if ((debugOffset + dexFile.baseDataOffset) >= dexFile.buffer.buf.size) {
-            System.err.println(String.format("%s: Invalid debug offset", method))
+            System.err.println("${method}: Invalid debug offset")
             return DebugInfo.newOrEmpty(dexFile, 0, this)
         }
         return DebugInfo.newOrEmpty(dexFile, debugOffset, this)
@@ -163,10 +158,10 @@ open class DexBackedMethodImplementation internal constructor(
      */
     fun getSize(): Int {
         //set last offset just before bytecode instructions (after insns_size)
-        var lastOffset = getInstructionsStartOffset()
+        var lastOffset = instructionsStartOffset
 
         //set code_item ending offset to the end of instructions list (insns_size * ushort)
-        lastOffset += getInstructionsSize() * 2
+        lastOffset += instructionsSize * 2
 
         //read any exception handlers and move code_item offset to the end
         for (tryBlock in tryBlocks) {

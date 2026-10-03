@@ -89,7 +89,7 @@ class AccessorTest {
                     val accessedMember = sar.getAccessedMember(accessorMethod)
 
                     Assert.assertNotNull(
-                        String.format("Could not resolve accessor for %s_%s", type, operation),
+                        "Could not resolve accessor for ${type}_${operation}",
                         accessedMember
                     )
 
@@ -97,7 +97,7 @@ class AccessorTest {
                     Assert.assertEquals(operationType!!.toLong(), accessedMember!!.accessedMemberType.toLong())
 
                     Assert.assertEquals(
-                        String.format("%s_val", type),
+                        "${type}_val",
                         (accessedMember.accessedMember as FieldReference).name
                     )
                 }

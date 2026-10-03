@@ -110,8 +110,8 @@ class SyntheticAccessorResolver(
     }
 
     class AccessedMember(
-        @JvmField val accessedMemberType: Int,
-        @JvmField val accessedMember: Reference
+        val accessedMemberType: Int,
+        val accessedMember: Reference
     )
 
     private fun methodReferenceEquals(ref1: MethodReference, ref2: MethodReference): Boolean {
@@ -141,7 +141,6 @@ class SyntheticAccessorResolver(
         const val SHR_ASSIGNMENT = 16
         const val USHR_ASSIGNMENT = 17
 
-        @JvmStatic
         fun looksLikeSyntheticAccessor(methodName: String): Boolean {
             return methodName.startsWith("access\$")
         }

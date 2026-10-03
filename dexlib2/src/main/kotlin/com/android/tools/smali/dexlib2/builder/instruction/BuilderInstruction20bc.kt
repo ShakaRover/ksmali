@@ -50,7 +50,6 @@ open class BuilderInstruction20bc(opcode: Opcode, verificationError: Int, overri
         get() = FORMAT
 
     companion object {
-        @JvmField
         val FORMAT: Format = Format.Format20bc
     }
 }

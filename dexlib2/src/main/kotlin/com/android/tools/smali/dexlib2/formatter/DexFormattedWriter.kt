@@ -65,7 +65,7 @@ import java.io.Writer
 /**
  * This class handles formatting and writing various types of items in a dex file to a Writer.
  */
-open class DexFormattedWriter(@JvmField protected val writer: Writer) : Writer() {
+open class DexFormattedWriter(protected val writer: Writer) : Writer() {
 
     /**
      * Write the method descriptor for the given [MethodReference].
@@ -200,20 +200,20 @@ open class DexFormattedWriter(@JvmField protected val writer: Writer) : Writer()
 
                 if (i != type.length - 1) {
                     throw IllegalArgumentException(
-                        String.format("Invalid type string: %s", type)
+                        "Invalid type string: ${type}"
                     )
                 }
                 return
             } else {
                 throw IllegalArgumentException(
-                    String.format("Invalid type string: %s", type)
+                    "Invalid type string: ${type}"
                 )
             }
         }
 
         // Any valid type would have returned from within the loop.
         throw IllegalArgumentException(
-            String.format("Invalid type string: %s", type)
+            "Invalid type string: ${type}"
         )
     }
 
@@ -231,7 +231,7 @@ open class DexFormattedWriter(@JvmField protected val writer: Writer) : Writer()
             if (c == '/') {
                 if (i == startIndex) {
                     throw IllegalArgumentException(
-                        String.format("Invalid type string: %s", type)
+                        "Invalid type string: ${type}"
                     )
                 }
 
@@ -241,7 +241,7 @@ open class DexFormattedWriter(@JvmField protected val writer: Writer) : Writer()
             } else if (c == ';') {
                 if (i == startIndex) {
                     throw IllegalArgumentException(
-                        String.format("Invalid type string: %s", type)
+                        "Invalid type string: ${type}"
                     )
                 }
 
@@ -254,7 +254,7 @@ open class DexFormattedWriter(@JvmField protected val writer: Writer) : Writer()
 
         if (i != type.length - 1 || type[i] != ';') {
             throw IllegalArgumentException(
-                String.format("Invalid type string: %s", type)
+                "Invalid type string: ${type}"
             )
         }
     }
@@ -320,15 +320,15 @@ open class DexFormattedWriter(@JvmField protected val writer: Writer) : Writer()
             ValueType.BOOLEAN ->
                 writer.write(java.lang.Boolean.toString((encodedValue as BooleanEncodedValue).value))
             ValueType.BYTE ->
-                writer.write(String.format("0x%x", (encodedValue as ByteEncodedValue).value))
+                writer.write("0x%x".format((encodedValue as ByteEncodedValue).value))
             ValueType.CHAR ->
-                writer.write(String.format("0x%x", (encodedValue as CharEncodedValue).value.code))
+                writer.write("0x%x".format((encodedValue as CharEncodedValue).value.code))
             ValueType.SHORT ->
-                writer.write(String.format("0x%x", (encodedValue as ShortEncodedValue).value))
+                writer.write("0x%x".format((encodedValue as ShortEncodedValue).value))
             ValueType.INT ->
-                writer.write(String.format("0x%x", (encodedValue as IntEncodedValue).value))
+                writer.write("0x%x".format((encodedValue as IntEncodedValue).value))
             ValueType.LONG ->
-                writer.write(String.format("0x%x", (encodedValue as LongEncodedValue).value))
+                writer.write("0x%x".format((encodedValue as LongEncodedValue).value))
             ValueType.FLOAT ->
                 writer.write(java.lang.Float.toString((encodedValue as FloatEncodedValue).value))
             ValueType.DOUBLE ->
@@ -411,7 +411,7 @@ open class DexFormattedWriter(@JvmField protected val writer: Writer) : Writer()
             is MethodHandleReference -> writeMethodHandle(reference)
             is CallSiteReference -> writeCallSite(reference)
             else -> throw IllegalArgumentException(
-                String.format("Not a known reference type: %s", reference.javaClass)
+                "Not a known reference type: ${reference.javaClass}"
             )
         }
     }

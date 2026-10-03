@@ -46,7 +46,7 @@ import java.util.AbstractList
 import java.util.Arrays
 import java.util.function.Function
 
-class OatFile @JvmOverloads constructor(
+class OatFile constructor(
     buf: ByteArray,
     vdexProviderArg: VdexProvider? = null
 ) : DexBuffer(buf), MultiDexContainer<DexBackedDexFile> {
@@ -67,7 +67,7 @@ class OatFile @JvmOverloads constructor(
         } else if (buf[4] == 2.toByte()) {
             is64bit = true
         } else {
-            throw InvalidOatFileException(String.format("Invalid word-size value: %x", buf[5]))
+            throw InvalidOatFileException("Invalid word-size value: %x".format(buf[5]))
         }
 
         var localOatHeader: OatHeader? = null
@@ -171,7 +171,6 @@ class OatFile @JvmOverloads constructor(
     }
 
     private inner class OatHeader(offset: Int) {
-        @JvmField
         val headerOffset: Int = offset
 
         private val keyValueStoreOffset: Int
@@ -338,7 +337,7 @@ class OatFile @JvmOverloads constructor(
             }
         }
 
-    abstract inner class SectionHeader(@JvmField protected val headerOffset: Int) {
+    abstract inner class SectionHeader(protected val headerOffset: Int) {
         abstract val address: Long
         abstract val offset: Int
         abstract val size: Int
@@ -676,7 +675,6 @@ class OatFile @JvmOverloads constructor(
         const val SUPPORTED = 1
         const val UNKNOWN = 2
 
-        @JvmStatic
         private fun verifyMagic(buf: ByteArray) {
             for (i in ELF_MAGIC.indices) {
                 if (buf[i] != ELF_MAGIC[i]) {
@@ -685,13 +683,11 @@ class OatFile @JvmOverloads constructor(
             }
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun fromInputStream(`is`: InputStream): OatFile {
             return fromInputStream(`is`, null)
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun fromInputStream(`is`: InputStream, vdexProvider: VdexProvider?): OatFile {
             if (!`is`.markSupported()) {

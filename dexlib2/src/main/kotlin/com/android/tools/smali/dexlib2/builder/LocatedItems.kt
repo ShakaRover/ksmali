@@ -57,7 +57,7 @@ abstract class LocatedItems<T : ItemWithLocation> {
                     override fun remove() {
                         val current = currentItem
                         if (current != null) {
-                            current.setLocation(null)
+                            current.location = null
                         }
                         it.remove()
                     }
@@ -71,7 +71,7 @@ abstract class LocatedItems<T : ItemWithLocation> {
                 if (element.isPlaced) {
                     throw IllegalArgumentException(getAddLocatedItemError())
                 }
-                element.setLocation(newItemsLocation)
+                element.location = newItemsLocation
                 addItem(element)
                 return true
             }
@@ -94,7 +94,7 @@ abstract class LocatedItems<T : ItemWithLocation> {
         val currentItems = items
         if (currentItems != null) {
             for (item in currentItems) {
-                item.setLocation(nextLocation)
+                item.location = nextLocation
             }
             val mergedItems = currentItems
             val otherItems = otherLocatedItems.items

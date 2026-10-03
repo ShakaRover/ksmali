@@ -45,7 +45,6 @@ open class ImmutableMethodProtoReference(
         this(CharSequenceConverter.immutableStringList(parameters), returnType)
 
     companion object {
-        @JvmStatic
         fun of(methodProtoReference: MethodProtoReference): ImmutableMethodProtoReference {
             if (methodProtoReference is ImmutableMethodProtoReference) {
                 return methodProtoReference

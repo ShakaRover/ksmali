@@ -40,7 +40,6 @@ object AnnotationItem {
     const val VISIBILITY_OFFSET = 0
     const val ANNOTATION_OFFSET = 1
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {
@@ -67,17 +66,16 @@ object AnnotationItem {
         }
     }
 
-    @JvmStatic
     fun getReferenceAnnotation(dexFile: DexBackedDexFile, annotationItemOffset: Int): String {
         try {
             val reader: DexReader<out DexBuffer> = dexFile.dataBuffer.readerAt(annotationItemOffset)
             reader.readUbyte()
             val typeIndex = reader.readSmallUleb128()
             val annotationType = dexFile.typeSection.get(typeIndex)
-            return String.format("annotation_item[0x%x]: %s", annotationItemOffset, annotationType)
+            return "annotation_item[0x%x]: %s".format(annotationItemOffset, annotationType)
         } catch (ex: Exception) {
             ex.printStackTrace(System.err)
         }
-        return String.format("annotation_item[0x%x]", annotationItemOffset)
+        return "annotation_item[0x%x]".format(annotationItemOffset)
     }
 }

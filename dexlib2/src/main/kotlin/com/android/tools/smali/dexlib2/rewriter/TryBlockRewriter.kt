@@ -35,7 +35,7 @@ import com.android.tools.smali.dexlib2.iface.ExceptionHandler
 import com.android.tools.smali.dexlib2.iface.TryBlock
 
 open class TryBlockRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<TryBlock<out ExceptionHandler>> {
     override fun rewrite(tryBlock: TryBlock<out ExceptionHandler>): TryBlock<out ExceptionHandler> {
         return RewrittenTryBlock(tryBlock)

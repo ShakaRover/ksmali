@@ -52,7 +52,6 @@ open class BuilderSparseSwitchPayload(switchElements: List<SwitchLabelElement>?)
         get() = OPCODE.format
 
     companion object {
-        @JvmField
         val OPCODE: Opcode = Opcode.SPARSE_SWITCH_PAYLOAD
     }
 }

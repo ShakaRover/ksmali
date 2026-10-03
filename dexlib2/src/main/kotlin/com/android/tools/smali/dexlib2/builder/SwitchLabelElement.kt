@@ -31,4 +31,4 @@
 
 package com.android.tools.smali.dexlib2.builder
 
-open class SwitchLabelElement(@JvmField val key: Int, @JvmField val target: Label)
+open class SwitchLabelElement(val key: Int, val target: Label)

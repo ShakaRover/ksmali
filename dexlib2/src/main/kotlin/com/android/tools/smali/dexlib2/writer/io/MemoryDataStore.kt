@@ -35,7 +35,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.Arrays
 
-class MemoryDataStore @JvmOverloads constructor(initialCapacity: Int = 0) : DexDataStore {
+class MemoryDataStore constructor(initialCapacity: Int = 0) : DexDataStore {
     private var buf: ByteArray = ByteArray(initialCapacity)
     var size: Int = 0
         private set
@@ -43,9 +43,8 @@ class MemoryDataStore @JvmOverloads constructor(initialCapacity: Int = 0) : DexD
     val buffer: ByteArray
         get() = buf
 
-    fun getData(): ByteArray {
-        return Arrays.copyOf(buf, size)
-    }
+    val data: ByteArray
+        get() = Arrays.copyOf(buf, size)
 
     override fun outputAt(offset: Int): OutputStream {
         if (offset < 0) throw IllegalArgumentException()

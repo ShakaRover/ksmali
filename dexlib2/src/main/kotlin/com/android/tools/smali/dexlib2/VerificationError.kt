@@ -58,7 +58,6 @@ object VerificationError {
         verificationErrorNames["instantiation-error"] = INSTANTIATION_ERROR
     }
 
-    @JvmStatic
     fun getVerificationErrorName(verificationError: Int): String? {
         return when (verificationError) {
             GENERIC -> "generic-error"
@@ -81,7 +80,6 @@ object VerificationError {
         return ret
     }
 
-    @JvmStatic
     fun isValidVerificationError(verificationError: Int): Boolean {
         return verificationError > 0 && verificationError < 10
     }

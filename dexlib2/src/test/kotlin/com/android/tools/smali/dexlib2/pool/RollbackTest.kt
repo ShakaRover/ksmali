@@ -100,8 +100,8 @@ class RollbackTest {
         val mapItems1 = dexFile1.mapItems
         val mapItems2 = dexFile2.mapItems
         for (i in mapItems1.indices) {
-            Assert.assertEquals(mapItems1[i].getType(), mapItems2[i].getType())
-            Assert.assertEquals(mapItems1[i].getItemCount(), mapItems2[i].getItemCount())
+            Assert.assertEquals(mapItems1[i].type, mapItems2[i].type)
+            Assert.assertEquals(mapItems1[i].itemCount, mapItems2[i].itemCount)
         }
     }
 }

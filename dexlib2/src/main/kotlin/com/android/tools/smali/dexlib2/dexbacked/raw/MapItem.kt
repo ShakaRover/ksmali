@@ -38,17 +38,14 @@ class MapItem(
     private val dexFile: DexBackedDexFile,
     private val offset: Int
 ) {
-    fun getType(): Int {
-        return dexFile.dataBuffer.readUshort(offset + TYPE_OFFSET)
-    }
+    val type: Int
+        get() = dexFile.dataBuffer.readUshort(offset + TYPE_OFFSET)
 
-    fun getName(): String {
-        return ItemType.getItemTypeName(getType())
-    }
+    val name: String
+        get() = ItemType.getItemTypeName(type)
 
-    fun getItemCount(): Int {
-        return dexFile.dataBuffer.readSmallUint(offset + SIZE_OFFSET)
-    }
+    val itemCount: Int
+        get() = dexFile.dataBuffer.readSmallUint(offset + SIZE_OFFSET)
 
     fun getOffset(): Int {
         return dexFile.dataBuffer.readSmallUint(offset + OFFSET_OFFSET)
@@ -61,7 +58,6 @@ class MapItem(
         const val SIZE_OFFSET = 4
         const val OFFSET_OFFSET = 8
 
-        @JvmStatic
         fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
             return object : SectionAnnotator(annotator, mapItem) {
                 override fun getItemName(): String {

@@ -37,7 +37,6 @@ import com.android.tools.smali.dexlib2.util.AnnotatedBytes
 import com.android.tools.smali.util.StringUtils
 
 object StringDataItem {
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {

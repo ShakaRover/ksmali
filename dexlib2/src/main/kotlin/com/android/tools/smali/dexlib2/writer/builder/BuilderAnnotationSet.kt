@@ -14,7 +14,6 @@ class BuilderAnnotationSet(internal val annotations: Set<BuilderAnnotation>) : A
         get() = annotations.size
 
     companion object {
-        @JvmField
         val EMPTY = BuilderAnnotationSet(emptySet())
     }
 }

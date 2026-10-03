@@ -42,7 +42,6 @@ import com.android.tools.smali.dexlib2.immutable.value.ImmutableStringEncodedVal
 import java.util.ArrayList
 
 object CallSiteUtil {
-    @JvmStatic
     fun getEncodedCallSite(callSiteReference: CallSiteReference): ArrayEncodedValue {
         return object : BaseArrayEncodedValue() {
             override val value: List<@JvmWildcard EncodedValue>

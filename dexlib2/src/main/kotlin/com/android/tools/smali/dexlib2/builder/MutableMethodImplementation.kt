@@ -130,7 +130,6 @@ import java.util.Arrays
 import java.util.Collections
 
 open class MutableMethodImplementation : MethodImplementation {
-    @JvmField
     val instructionList: ArrayList<MethodLocation> = arrayListOf(MethodLocation(null, 0, 0))
 
     private val mutableTryBlocks = ArrayList<BuilderTryBlock>()
@@ -295,7 +294,7 @@ open class MutableMethodImplementation : MethodImplementation {
             addInstruction(instruction)
             return
         }
-        var codeAddress = instructionList[index].getCodeAddress()
+        var codeAddress = instructionList[index].codeAddress
         val newLoc = MethodLocation(instruction, codeAddress, index)
         instructionList.add(index, newLoc)
         instruction.location = newLoc
@@ -346,7 +345,7 @@ open class MutableMethodImplementation : MethodImplementation {
             val location = instructionList[i]
             location.codeAddress = codeAddress
 
-            val instruction = location.getInstruction()
+            val instruction = location.instruction
             if (instruction != null) {
                 codeAddress += instruction.codeUnits
             } else {
@@ -374,7 +373,7 @@ open class MutableMethodImplementation : MethodImplementation {
             location.index = i
             location.codeAddress = codeAddress
 
-            val instruction = location.getInstruction()
+            val instruction = location.instruction
             if (instruction != null) {
                 codeAddress += instruction.codeUnits
             } else {
@@ -444,13 +443,12 @@ open class MutableMethodImplementation : MethodImplementation {
                 when (instruction.opcode) {
                     Opcode.SPARSE_SWITCH, Opcode.PACKED_SWITCH -> {
                         val targetLocation =
-                            (instruction as BuilderOffsetInstruction).getTarget().getLocation()
+                            (instruction as BuilderOffsetInstruction).target.requireLocation()
                         var targetInstruction: BuilderInstruction? = targetLocation.instruction
                         if (targetInstruction == null) {
                             throw IllegalStateException(
-                                String.format(
-                                    "Switch instruction at address/index " +
-                                            "0x%x/%d points to the end of the method.",
+                                ("Switch instruction at address/index " +
+                                        "0x%x/%d points to the end of the method.").format(
                                     location.codeAddress, location.index
                                 )
                             )
@@ -461,9 +459,8 @@ open class MutableMethodImplementation : MethodImplementation {
                         }
                         if (targetInstruction == null || targetInstruction !is BuilderSwitchPayload) {
                             throw IllegalStateException(
-                                String.format(
-                                    "Switch instruction at address/index " +
-                                            "0x%x/%d does not refer to a payload instruction.",
+                                ("Switch instruction at address/index " +
+                                        "0x%x/%d does not refer to a payload instruction.").format(
                                     location.codeAddress, location.index
                                 )
                             )
@@ -474,9 +471,8 @@ open class MutableMethodImplementation : MethodImplementation {
                                     targetInstruction.opcode != Opcode.SPARSE_SWITCH_PAYLOAD)
                         ) {
                             throw IllegalStateException(
-                                String.format(
-                                    "Switch instruction at address/index " +
-                                            "0x%x/%d refers to the wrong type of payload instruction.",
+                                ("Switch instruction at address/index " +
+                                        "0x%x/%d refers to the wrong type of payload instruction.").format(
                                     location.codeAddress, location.index
                                 )
                             )
@@ -513,12 +509,12 @@ open class MutableMethodImplementation : MethodImplementation {
                                 if (offset < Short.MIN_VALUE || offset > Short.MAX_VALUE) {
                                     replacement = BuilderInstruction30t(
                                         Opcode.GOTO_32,
-                                        (instruction as BuilderOffsetInstruction).getTarget()
+                                        (instruction as BuilderOffsetInstruction).target
                                     )
                                 } else {
                                     replacement = BuilderInstruction20t(
                                         Opcode.GOTO_16,
-                                        (instruction as BuilderOffsetInstruction).getTarget()
+                                        (instruction as BuilderOffsetInstruction).target
                                     )
                                 }
                                 replaceInstruction(location.index, replacement)
@@ -530,7 +526,7 @@ open class MutableMethodImplementation : MethodImplementation {
                             if (offset < Short.MIN_VALUE || offset > Short.MAX_VALUE) {
                                 val replacement = BuilderInstruction30t(
                                     Opcode.GOTO_32,
-                                    (instruction as BuilderOffsetInstruction).getTarget()
+                                    (instruction as BuilderOffsetInstruction).target
                                 )
                                 replaceInstruction(location.index, replacement)
                                 madeChanges = true
@@ -629,7 +625,7 @@ open class MutableMethodImplementation : MethodImplementation {
 
     fun newLabelForAddress(codeAddress: Int): Label {
         if (codeAddress < 0 || codeAddress > instructionList[instructionList.size - 1].codeAddress) {
-            throw IndexOutOfBoundsException(String.format("codeAddress %d out of bounds", codeAddress))
+            throw IndexOutOfBoundsException("codeAddress ${codeAddress} out of bounds")
         }
         val referent = instructionList[mapCodeAddressToIndex(codeAddress)]
         return referent.addNewLabel()
@@ -638,7 +634,7 @@ open class MutableMethodImplementation : MethodImplementation {
     fun newLabelForIndex(instructionIndex: Int): Label {
         if (instructionIndex < 0 || instructionIndex >= instructionList.size) {
             throw IndexOutOfBoundsException(
-                String.format("instruction index %d out of bounds", instructionIndex)
+                "instruction index ${instructionIndex} out of bounds"
             )
         }
         val referent = instructionList[instructionIndex]
@@ -651,7 +647,6 @@ open class MutableMethodImplementation : MethodImplementation {
     }
 
     private class SwitchPayloadReferenceLabel : Label() {
-        @JvmField
         var switchLocation: MethodLocation? = null
     }
 
@@ -1067,7 +1062,7 @@ open class MutableMethodImplementation : MethodImplementation {
         codeAddressToIndex: IntArray,
         instruction: Instruction31t
     ): BuilderInstruction31t {
-        val codeAddress = location.getCodeAddress()
+        val codeAddress = location.codeAddress
         val label: Label
         if (instruction.opcode != Opcode.FILL_ARRAY_DATA) {
             // if it's a sparse switch or packed switch

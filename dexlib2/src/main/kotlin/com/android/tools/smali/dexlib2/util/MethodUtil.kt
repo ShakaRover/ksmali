@@ -41,10 +41,8 @@ import java.util.function.Predicate
 private val directMask = AccessFlags.STATIC.value or AccessFlags.PRIVATE.value or
         AccessFlags.CONSTRUCTOR.value
 
-@JvmField
 val METHOD_IS_DIRECT: Predicate<Method> = Predicate { input -> input != null && isDirect(input) }
 
-@JvmField
 val METHOD_IS_VIRTUAL: Predicate<Method> = Predicate { input -> input != null && !isDirect(input) }
 
 fun isDirect(method: Method): Boolean {
@@ -100,12 +98,12 @@ private fun getShortyType(type: CharSequence): Char {
 }
 
 fun getShorty(params: Collection<@JvmWildcard CharSequence>, returnType: String): String {
-    val sb = StringBuilder(params.size + 1)
-    sb.append(getShortyType(returnType))
-    for (typeRef in params) {
-        sb.append(getShortyType(typeRef))
+    return buildString {
+        append(getShortyType(returnType))
+        for (typeRef in params) {
+            append(getShortyType(typeRef))
+        }
     }
-    return sb.toString()
 }
 
 fun methodSignaturesMatch(a: MethodReference, b: MethodReference): Boolean {

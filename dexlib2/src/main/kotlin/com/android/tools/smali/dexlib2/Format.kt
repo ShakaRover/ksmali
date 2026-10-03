@@ -30,7 +30,7 @@
 
 package com.android.tools.smali.dexlib2
 
-enum class Format(@JvmField val size: Int, @JvmField val isPayloadFormat: Boolean) {
+enum class Format(val size: Int, val isPayloadFormat: Boolean) {
     Format10t(2),
     Format10x(2),
     Format11n(2),

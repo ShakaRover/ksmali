@@ -47,7 +47,6 @@ object TypeProtoUtils {
      *
      * @return An iterable containing the superclasses of this class.
      */
-    @JvmStatic
     fun getSuperclassChain(typeProto: TypeProto): Iterable<TypeProto> {
         return object : Iterable<TypeProto> {
             override fun iterator(): Iterator<TypeProto> {
@@ -70,7 +69,6 @@ object TypeProtoUtils {
         }
     }
 
-    @JvmStatic
     fun getSuperclassAsTypeProto(type: TypeProto): TypeProto? {
         try {
             val next = type.superclass
@@ -84,7 +82,6 @@ object TypeProtoUtils {
         }
     }
 
-    @JvmStatic
     fun extendsFrom(candidate: TypeProto, possibleSuper: String): Boolean {
         if (candidate.type == possibleSuper) {
             return true

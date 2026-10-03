@@ -40,7 +40,6 @@ open class ImmutableArrayEncodedValue(
     constructor(value: Collection<EncodedValue>) : this(ImmutableEncodedValueFactory.immutableListOf(value))
 
     companion object {
-        @JvmStatic
         fun of(arrayEncodedValue: ArrayEncodedValue): ImmutableArrayEncodedValue {
             if (arrayEncodedValue is ImmutableArrayEncodedValue) {
                 return arrayEncodedValue

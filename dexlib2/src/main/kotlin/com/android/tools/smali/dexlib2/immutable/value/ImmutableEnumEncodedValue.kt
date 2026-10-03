@@ -36,7 +36,6 @@ import com.android.tools.smali.dexlib2.immutable.reference.ImmutableFieldReferen
 
 open class ImmutableEnumEncodedValue(override val value: ImmutableFieldReference) : BaseEnumEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmStatic
         fun of(value: EnumEncodedValue): ImmutableEnumEncodedValue {
             if (value is ImmutableEnumEncodedValue) {
                 return value

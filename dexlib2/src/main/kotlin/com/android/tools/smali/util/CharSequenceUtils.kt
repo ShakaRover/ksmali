@@ -35,12 +35,10 @@ import java.util.function.Function
 object CharSequenceUtils {
     private val TO_STRING: Function<CharSequence, String> = Function { o -> o.toString() }
 
-    @JvmStatic
     fun listHashCode(list: List<CharSequence>): Int {
         return IteratorUtils.toList(TransformedIterable(list, TO_STRING)).hashCode()
     }
 
-    @JvmStatic
     fun listEquals(list1: List<CharSequence>, list2: List<CharSequence>): Boolean {
         return IteratorUtils.toList(TransformedIterable(list1, TO_STRING)) ==
             IteratorUtils.toList(TransformedIterable(list2, TO_STRING))

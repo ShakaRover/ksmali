@@ -87,7 +87,6 @@ class DexBackedOdexFile(
         private const val DEPENDENCY_COUNT_OFFSET = 12
         private const val DEPENDENCY_START_OFFSET = 16
 
-        @JvmStatic
         @Throws(IOException::class)
         fun fromInputStream(opcodes: Opcodes, `is`: InputStream): DexBackedOdexFile {
             DexUtil.verifyOdexHeader(`is`)

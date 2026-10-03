@@ -28,7 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@file:JvmName("Preconditions")
 
 package com.android.tools.smali.dexlib2.util
 
@@ -49,7 +48,7 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 fun checkFormat(opcode: Opcode, expectedFormat: Format) {
     if (opcode.format != expectedFormat) {
         throw IllegalArgumentException(
-            String.format("Invalid opcode %s for %s", opcode.mnemonic, expectedFormat.name)
+            "Invalid opcode ${opcode.mnemonic} for ${expectedFormat.name}"
         )
     }
 }
@@ -57,7 +56,7 @@ fun checkFormat(opcode: Opcode, expectedFormat: Format) {
 fun checkNibbleRegister(register: Int): Int {
     if ((register and 0xFFFFFFF0.toInt()) != 0) {
         throw IllegalArgumentException(
-            String.format("Invalid register: v%d. Must be between v0 and v15, inclusive.", register)
+            "Invalid register: v${register}. Must be between v0 and v15, inclusive."
         )
     }
     return register
@@ -66,7 +65,7 @@ fun checkNibbleRegister(register: Int): Int {
 fun checkByteRegister(register: Int): Int {
     if ((register and 0xFFFFFF00.toInt()) != 0) {
         throw IllegalArgumentException(
-            String.format("Invalid register: v%d. Must be between v0 and v255, inclusive.", register)
+            "Invalid register: v${register}. Must be between v0 and v255, inclusive."
         )
     }
     return register
@@ -75,7 +74,7 @@ fun checkByteRegister(register: Int): Int {
 fun checkShortRegister(register: Int): Int {
     if ((register and 0xFFFF0000.toInt()) != 0) {
         throw IllegalArgumentException(
-            String.format("Invalid register: v%d. Must be between v0 and v65535, inclusive.", register)
+            "Invalid register: v${register}. Must be between v0 and v65535, inclusive."
         )
     }
     return register
@@ -84,7 +83,7 @@ fun checkShortRegister(register: Int): Int {
 fun checkNibbleLiteral(literal: Int): Int {
     if (literal < -8 || literal > 7) {
         throw IllegalArgumentException(
-            String.format("Invalid literal value: %d. Must be between -8 and 7, inclusive.", literal)
+            "Invalid literal value: ${literal}. Must be between -8 and 7, inclusive."
         )
     }
     return literal
@@ -93,7 +92,7 @@ fun checkNibbleLiteral(literal: Int): Int {
 fun checkByteLiteral(literal: Int): Int {
     if (literal < -128 || literal > 127) {
         throw IllegalArgumentException(
-            String.format("Invalid literal value: %d. Must be between -128 and 127, inclusive.", literal)
+            "Invalid literal value: ${literal}. Must be between -128 and 127, inclusive."
         )
     }
     return literal
@@ -102,7 +101,7 @@ fun checkByteLiteral(literal: Int): Int {
 fun checkShortLiteral(literal: Int): Int {
     if (literal < -32768 || literal > 32767) {
         throw IllegalArgumentException(
-            String.format("Invalid literal value: %d. Must be between -32768 and 32767, inclusive.", literal)
+            "Invalid literal value: ${literal}. Must be between -32768 and 32767, inclusive."
         )
     }
     return literal
@@ -111,7 +110,7 @@ fun checkShortLiteral(literal: Int): Int {
 fun checkIntegerHatLiteral(literal: Int): Int {
     if ((literal and 0xFFFF) != 0) {
         throw IllegalArgumentException(
-            String.format("Invalid literal value: %d. Low 16 bits must be zeroed out.", literal)
+            "Invalid literal value: ${literal}. Low 16 bits must be zeroed out."
         )
     }
     return literal
@@ -120,7 +119,7 @@ fun checkIntegerHatLiteral(literal: Int): Int {
 fun checkLongHatLiteral(literal: Long): Long {
     if ((literal and 0xFFFFFFFFFFFFL) != 0L) {
         throw IllegalArgumentException(
-            String.format("Invalid literal value: %d. Low 48 bits must be zeroed out.", literal)
+            "Invalid literal value: ${literal}. Low 48 bits must be zeroed out."
         )
     }
     return literal
@@ -129,7 +128,7 @@ fun checkLongHatLiteral(literal: Long): Long {
 fun checkByteCodeOffset(offset: Int): Int {
     if (offset < -128 || offset > 127) {
         throw IllegalArgumentException(
-            String.format("Invalid code offset: %d. Must be between -128 and 127, inclusive.", offset)
+            "Invalid code offset: ${offset}. Must be between -128 and 127, inclusive."
         )
     }
     return offset
@@ -138,7 +137,7 @@ fun checkByteCodeOffset(offset: Int): Int {
 fun checkShortCodeOffset(offset: Int): Int {
     if (offset < -32768 || offset > 32767) {
         throw IllegalArgumentException(
-            String.format("Invalid code offset: %d. Must be between -32768 and 32767, inclusive.", offset)
+            "Invalid code offset: ${offset}. Must be between -32768 and 32767, inclusive."
         )
     }
     return offset
@@ -147,7 +146,7 @@ fun checkShortCodeOffset(offset: Int): Int {
 fun check35cAnd45ccRegisterCount(registerCount: Int): Int {
     if (registerCount < 0 || registerCount > 5) {
         throw IllegalArgumentException(
-            String.format("Invalid register count: %d. Must be between 0 and 5, inclusive.", registerCount)
+            "Invalid register count: ${registerCount}. Must be between 0 and 5, inclusive."
         )
     }
     return registerCount
@@ -156,7 +155,7 @@ fun check35cAnd45ccRegisterCount(registerCount: Int): Int {
 fun checkRegisterRangeCount(registerCount: Int): Int {
     if ((registerCount and 0xFFFFFF00.toInt()) != 0) {
         throw IllegalArgumentException(
-            String.format("Invalid register count: %d. Must be between 0 and 255, inclusive.", registerCount)
+            "Invalid register count: ${registerCount}. Must be between 0 and 255, inclusive."
         )
     }
     return registerCount
@@ -166,17 +165,11 @@ fun checkValueArg(valueArg: Int, maxValue: Int) {
     if (valueArg > maxValue) {
         if (maxValue == 0) {
             throw IllegalArgumentException(
-                String.format(
-                    "Invalid value_arg value %d for an encoded_value. Expecting 0",
-                    valueArg
-                )
+                "Invalid value_arg value ${valueArg} for an encoded_value. Expecting 0"
             )
         }
         throw IllegalArgumentException(
-            String.format(
-                "Invalid value_arg value %d for an encoded_value. Expecting 0..%d, inclusive",
-                valueArg, maxValue
-            )
+            "Invalid value_arg value ${valueArg} for an encoded_value. Expecting 0..${maxValue}, inclusive"
         )
     }
 }
@@ -184,10 +177,7 @@ fun checkValueArg(valueArg: Int, maxValue: Int) {
 fun checkFieldOffset(fieldOffset: Int): Int {
     if (fieldOffset < 0 || fieldOffset > 65535) {
         throw IllegalArgumentException(
-            String.format(
-                "Invalid field offset: 0x%x. Must be between 0x0000 and 0xFFFF inclusive",
-                fieldOffset
-            )
+            "Invalid field offset: 0x%x. Must be between 0x0000 and 0xFFFF inclusive".format(fieldOffset)
         )
     }
     return fieldOffset
@@ -196,7 +186,7 @@ fun checkFieldOffset(fieldOffset: Int): Int {
 fun checkVtableIndex(vtableIndex: Int): Int {
     if (vtableIndex < 0 || vtableIndex > 65535) {
         throw IllegalArgumentException(
-            String.format("Invalid vtable index: %d. Must be between 0 and 65535, inclusive", vtableIndex)
+            "Invalid vtable index: ${vtableIndex}. Must be between 0 and 65535, inclusive"
         )
     }
     return vtableIndex
@@ -205,7 +195,7 @@ fun checkVtableIndex(vtableIndex: Int): Int {
 fun checkInlineIndex(inlineIndex: Int): Int {
     if (inlineIndex < 0 || inlineIndex > 65535) {
         throw IllegalArgumentException(
-            String.format("Invalid inline index: %d. Must be between 0 and 65535, inclusive", inlineIndex)
+            "Invalid inline index: ${inlineIndex}. Must be between 0 and 65535, inclusive"
         )
     }
     return inlineIndex
@@ -214,10 +204,7 @@ fun checkInlineIndex(inlineIndex: Int): Int {
 fun checkVerificationError(verificationError: Int): Int {
     if (!VerificationError.isValidVerificationError(verificationError)) {
         throw IllegalArgumentException(
-            String.format(
-                "Invalid verification error value: %d. Must be between 1 and 9, inclusive",
-                verificationError
-            )
+            "Invalid verification error value: ${verificationError}. Must be between 1 and 9, inclusive"
         )
     }
     return verificationError
@@ -240,7 +227,7 @@ fun <C : Collection<@JvmWildcard SwitchElement>> checkSequentialOrderedKeys(elem
 fun checkArrayPayloadElementWidth(elementWidth: Int): Int {
     when (elementWidth) {
         1, 2, 4, 8 -> return elementWidth
-        else -> throw IllegalArgumentException(String.format("Not a valid element width: %d", elementWidth))
+        else -> throw IllegalArgumentException("Not a valid element width: ${elementWidth}")
     }
 }
 
@@ -266,10 +253,7 @@ fun <L : List<@JvmWildcard Number>> checkArrayPayloadElements(elementWidth: Int,
     for (element in elements) {
         if (element.toLong() < minValue || element.toLong() > maxValue) {
             throw IllegalArgumentException(
-                String.format(
-                    "%d does not fit into a %d-byte signed integer",
-                    element.toLong(), elementWidth
-                )
+                "${element.toLong()} does not fit into a ${elementWidth}-byte signed integer"
             )
         }
     }
@@ -308,7 +292,7 @@ fun <T : Reference> checkReference(referenceType: Int, reference: T): T {
                 throw IllegalArgumentException("Invalid reference type, expecting a call site reference")
             }
         else ->
-            throw IllegalArgumentException(String.format("Not a valid reference type: %d", referenceType))
+            throw IllegalArgumentException("Not a valid reference type: ${referenceType}")
     }
     return reference
 }

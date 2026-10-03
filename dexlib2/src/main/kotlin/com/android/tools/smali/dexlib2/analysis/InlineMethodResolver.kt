@@ -159,14 +159,13 @@ abstract class InlineMethodResolver protected constructor() {
         const val VIRTUAL = 0x1 // AccessFlags.PUBLIC.value;
         const val DIRECT = 0x2 // AccessFlags.PRIVATE.value;
 
-        @JvmStatic
         fun createInlineMethodResolver(odexVersion: Int): InlineMethodResolver {
             if (odexVersion == 35) {
                 return InlineMethodResolver_version35()
             } else if (odexVersion == 36) {
                 return InlineMethodResolver_version36()
             } else {
-                throw RuntimeException(String.format("odex version %d is not supported yet", odexVersion))
+                throw RuntimeException("odex version ${odexVersion} is not supported yet")
             }
         }
 

@@ -35,23 +35,19 @@ import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 object TypeUtils {
-    @JvmStatic
     fun isWideType(type: String): Boolean {
         val c = type[0]
         return c == 'J' || c == 'D'
     }
 
-    @JvmStatic
     fun isWideType(type: TypeReference): Boolean {
         return isWideType(type.type)
     }
 
-    @JvmStatic
     fun isPrimitiveType(type: String): Boolean {
         return type.length == 1
     }
 
-    @JvmStatic
     fun getPackage(type: String): String {
         val lastSlash = type.lastIndexOf('/')
         if (lastSlash < 0) {
@@ -60,7 +56,6 @@ object TypeUtils {
         return type.substring(1, lastSlash)
     }
 
-    @JvmStatic
     fun canAccessClass(accessorType: String, accesseeClassDef: ClassDef): Boolean {
         if (AccessFlags.PUBLIC.isSet(accesseeClassDef.accessFlags)) {
             return true

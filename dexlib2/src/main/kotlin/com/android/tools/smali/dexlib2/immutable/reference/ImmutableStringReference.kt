@@ -37,7 +37,6 @@ open class ImmutableStringReference(
     override val string: String
 ) : BaseStringReference(), ImmutableReference {
     companion object {
-        @JvmStatic
         fun of(stringReference: StringReference): ImmutableStringReference {
             if (stringReference is ImmutableStringReference) {
                 return stringReference

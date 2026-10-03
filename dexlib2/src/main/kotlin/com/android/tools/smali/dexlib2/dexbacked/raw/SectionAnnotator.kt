@@ -37,34 +37,30 @@ import com.android.tools.smali.dexlib2.util.alignOffset
 import java.util.HashMap
 
 abstract class SectionAnnotator(
-    @JvmField val annotator: DexAnnotator,
+    val annotator: DexAnnotator,
     mapItem: MapItem
 ) {
-    @JvmField
     val dexFile: DexBackedDexFile
 
-    @JvmField
     val itemType: Int
 
-    @JvmField
     val sectionOffset: Int
 
-    @JvmField
     val itemCount: Int
 
     protected val itemIdentities: MutableMap<Int, String> = HashMap()
 
     init {
         this.dexFile = annotator.dexFile
-        this.itemType = mapItem.getType()
+        this.itemType = mapItem.type
 
-        if (mapItem.getType() >= ItemType.MAP_LIST) {
+        if (mapItem.type >= ItemType.MAP_LIST) {
             this.sectionOffset = mapItem.getOffset() + dexFile.baseDataOffset
         } else {
             this.sectionOffset = mapItem.getOffset()
         }
 
-        this.itemCount = mapItem.getItemCount()
+        this.itemCount = mapItem.itemCount
     }
 
     abstract fun getItemName(): String

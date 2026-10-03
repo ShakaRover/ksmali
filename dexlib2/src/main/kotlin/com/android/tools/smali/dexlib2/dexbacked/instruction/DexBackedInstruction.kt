@@ -39,9 +39,9 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.util.ExceptionWithContext
 
 abstract class DexBackedInstruction(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     opcode: Opcode,
-    @JvmField val instructionStart: Int
+    val instructionStart: Int
 ) : Instruction {
     override val opcode: Opcode = opcode
 
@@ -49,7 +49,6 @@ abstract class DexBackedInstruction(
         get() = opcode.format.size / 2
 
     companion object {
-        @JvmStatic
         fun readFrom(dexFile: DexBackedDexFile, reader: DexReader<out DexBuffer>): Instruction {
             var opcodeValue = reader.peekUbyte()
 

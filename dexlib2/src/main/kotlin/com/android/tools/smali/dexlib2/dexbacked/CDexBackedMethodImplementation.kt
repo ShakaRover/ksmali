@@ -38,30 +38,31 @@ class CDexBackedMethodImplementation(
     codeOffset: Int
 ) : DexBackedMethodImplementation(dexFile, method, codeOffset) {
 
-    fun getInsCount(): Int {
-        var insCount = (dexFile.dataBuffer.readUshort(codeOffset) shr
-            CodeItem.CDEX_INS_COUNT_SHIFT) and 0xf
+    val insCount: Int
+        get() {
+            var insCount = (dexFile.dataBuffer.readUshort(codeOffset) shr
+                CodeItem.CDEX_INS_COUNT_SHIFT) and 0xf
 
-        if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_INS_COUNT) != 0) {
-            var preheaderCount = 1
+            if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_INS_COUNT) != 0) {
+                var preheaderCount = 1
 
-            if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_INSTRUCTIONS_SIZE) != 0) {
-                preheaderCount += 2
+                if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_INSTRUCTIONS_SIZE) != 0) {
+                    preheaderCount += 2
+                }
+                if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_REGISTER_COUNT) != 0) {
+                    preheaderCount++
+                }
+                insCount += dexFile.dataBuffer.readUshort(codeOffset - 2 * preheaderCount)
             }
-            if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_REGISTER_COUNT) != 0) {
-                preheaderCount++
-            }
-            insCount += dexFile.dataBuffer.readUshort(codeOffset - 2 * preheaderCount)
+            return insCount
         }
-        return insCount
-    }
 
     override val registerCount: Int
         get() {
             var registerCount = (dexFile.dataBuffer.readUshort(codeOffset) shr
                 CodeItem.CDEX_REGISTER_COUNT_SHIFT) and 0xf
 
-            registerCount += getInsCount()
+            registerCount += insCount
             if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_REGISTER_COUNT) != 0) {
                 var preheaderCount = 1
                 if ((preheaderFlags and
@@ -74,51 +75,53 @@ class CDexBackedMethodImplementation(
             return registerCount
         }
 
-    override fun getInstructionsSize(): Int {
-        var instructionsSize = dexFile.dataBuffer.readUshort(
-            codeOffset + CodeItem.CDEX_INSTRUCTIONS_SIZE_AND_PREHEADER_FLAGS_OFFSET
-        ) shr CodeItem.CDEX_INSTRUCTIONS_SIZE_SHIFT
+    override val instructionsSize: Int
+        get() {
+            var instructionsSize = dexFile.dataBuffer.readUshort(
+                codeOffset + CodeItem.CDEX_INSTRUCTIONS_SIZE_AND_PREHEADER_FLAGS_OFFSET
+            ) shr CodeItem.CDEX_INSTRUCTIONS_SIZE_SHIFT
 
-        if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_INSTRUCTIONS_SIZE) != 0) {
-            instructionsSize += dexFile.dataBuffer.readUshort(codeOffset - 2)
-            instructionsSize += dexFile.dataBuffer.readUshort(codeOffset - 4) shl 16
+            if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_INSTRUCTIONS_SIZE) != 0) {
+                instructionsSize += dexFile.dataBuffer.readUshort(codeOffset - 2)
+                instructionsSize += dexFile.dataBuffer.readUshort(codeOffset - 4) shl 16
+            }
+            return instructionsSize
         }
-        return instructionsSize
-    }
 
-    override fun getInstructionsStartOffset(): Int {
-        return codeOffset + 4
-    }
+    override val instructionsStartOffset: Int
+        get() = codeOffset + 4
 
     private val preheaderFlags: Int
         get() = dexFile.dataBuffer.readUshort(
             codeOffset + CodeItem.CDEX_INSTRUCTIONS_SIZE_AND_PREHEADER_FLAGS_OFFSET
         ) and CodeItem.CDEX_PREHEADER_FLAGS_MASK
 
-    override fun getTriesSize(): Int {
-        var triesCount = (dexFile.dataBuffer.readUshort(codeOffset) shr
-            CodeItem.CDEX_TRIES_SIZE_SHIFT) and 0xf
-        if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_TRIES_COUNT) != 0) {
-            var preheaderCount = Integer.bitCount(preheaderFlags)
-            if ((preheaderFlags and
-                    CodeItem.CDEX_PREHEADER_FLAG_INSTRUCTIONS_SIZE) != 0
-            ) {
-                // The instructions size preheader is 2 shorts
-                preheaderCount++
+    override val triesSize: Int
+        get() {
+            var triesCount = (dexFile.dataBuffer.readUshort(codeOffset) shr
+                CodeItem.CDEX_TRIES_SIZE_SHIFT) and 0xf
+            if ((preheaderFlags and CodeItem.CDEX_PREHEADER_FLAG_TRIES_COUNT) != 0) {
+                var preheaderCount = Integer.bitCount(preheaderFlags)
+                if ((preheaderFlags and
+                        CodeItem.CDEX_PREHEADER_FLAG_INSTRUCTIONS_SIZE) != 0
+                ) {
+                    // The instructions size preheader is 2 shorts
+                    preheaderCount++
+                }
+                triesCount += dexFile.dataBuffer.readUshort(codeOffset - 2 * preheaderCount)
             }
-            triesCount += dexFile.dataBuffer.readUshort(codeOffset - 2 * preheaderCount)
+            return triesCount
         }
-        return triesCount
-    }
 
-    override fun getDebugOffset(): Int {
+    override val debugOffset: Int
+        get() {
         val cdexFile = dexFile as CDexBackedDexFile
 
         val debugTableItemOffset = (method.methodIndex / 16) * 4
         val bitIndex = method.methodIndex % 16
 
-        val debugInfoOffsetsPos = cdexFile.getDebugInfoOffsetsPos()
-        val debugTableOffset = debugInfoOffsetsPos + cdexFile.getDebugInfoOffsetsTableOffset()
+        val debugInfoOffsetsPos = cdexFile.debugInfoOffsetsPos
+        val debugTableOffset = debugInfoOffsetsPos + cdexFile.debugInfoOffsetsTableOffset
 
         val debugOffsetsOffset =
             cdexFile.dataBuffer.readSmallUint(debugTableOffset + debugTableItemOffset)
@@ -134,7 +137,7 @@ class CDexBackedMethodImplementation(
         }
 
         val offsetCount = Integer.bitCount(bitMask and (0xFFFF shr (16 - bitIndex)))
-        var baseDebugOffset = cdexFile.getDebugInfoBase()
+        var baseDebugOffset = cdexFile.debugInfoBase
         for (i in 0 until offsetCount) {
             baseDebugOffset += reader.readBigUleb128()
         }

@@ -37,7 +37,6 @@ import com.android.tools.smali.dexlib2.util.AnnotatedBytes
 object TypeIdItem {
     const val ITEM_SIZE = 4
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {
@@ -51,18 +50,16 @@ object TypeIdItem {
         }
     }
 
-    @JvmStatic
     fun getReferenceAnnotation(dexFile: DexBackedDexFile, typeIndex: Int): String {
         try {
             val typeString = dexFile.typeSection.get(typeIndex)
-            return String.format("type_id_item[%d]: %s", typeIndex, typeString)
+            return "type_id_item[${typeIndex}]: ${typeString}"
         } catch (ex: Exception) {
             ex.printStackTrace(System.err)
         }
-        return String.format("type_id_item[%d]", typeIndex)
+        return "type_id_item[${typeIndex}]"
     }
 
-    @JvmStatic
     fun getOptionalReferenceAnnotation(dexFile: DexBackedDexFile, typeIndex: Int): String {
         if (typeIndex == -1) {
             return "type_id_item[NO_INDEX]"

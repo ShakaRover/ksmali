@@ -59,7 +59,6 @@ open class BuilderPackedSwitchPayload(startKey: Int, switchElements: List<Label>
         get() = OPCODE.format
 
     companion object {
-        @JvmField
         val OPCODE: Opcode = Opcode.PACKED_SWITCH_PAYLOAD
     }
 }

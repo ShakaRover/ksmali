@@ -38,7 +38,6 @@ open class ImmutableSwitchElement(
     override val offset: Int
 ) : SwitchElement {
     companion object {
-        @JvmStatic
         fun of(switchElement: SwitchElement): ImmutableSwitchElement {
             if (switchElement is ImmutableSwitchElement) {
                 return switchElement
@@ -46,7 +45,6 @@ open class ImmutableSwitchElement(
             return ImmutableSwitchElement(switchElement.key, switchElement.offset)
         }
 
-        @JvmStatic
         fun immutableListOf(list: List<SwitchElement>?): List<ImmutableSwitchElement> {
             return CONVERTER.toList(list)
         }

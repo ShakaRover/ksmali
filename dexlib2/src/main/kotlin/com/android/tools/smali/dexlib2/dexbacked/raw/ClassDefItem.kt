@@ -48,7 +48,6 @@ object ClassDefItem {
     const val CLASS_DATA_OFFSET = 24
     const val STATIC_VALUES_OFFSET = 28
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             private var classDataAnnotator: SectionAnnotator? = null
@@ -125,18 +124,16 @@ object ClassDefItem {
         }
     }
 
-    @JvmStatic
     fun asString(dexFile: DexBackedDexFile, classIndex: Int): String {
         val offset = dexFile.classSection.getOffset(classIndex)
         val typeIndex = dexFile.buffer.readSmallUint(offset + CLASS_OFFSET)
         return dexFile.typeSection.get(typeIndex)
     }
 
-    @JvmStatic
     fun getClasses(dexFile: DexBackedDexFile): Array<String> {
         val mapItem = dexFile.getMapItemForSection(ItemType.CLASS_DEF_ITEM) ?: return emptyArray()
 
-        val classCount = mapItem.getItemCount()
+        val classCount = mapItem.itemCount
         return Array(classCount) { i -> asString(dexFile, i) }
     }
 }

@@ -46,7 +46,6 @@ open class ImmutableEndLocal(
         get() = DebugItemType.END_LOCAL
 
     companion object {
-        @JvmStatic
         fun of(endLocal: EndLocal): ImmutableEndLocal {
             if (endLocal is ImmutableEndLocal) {
                 return endLocal

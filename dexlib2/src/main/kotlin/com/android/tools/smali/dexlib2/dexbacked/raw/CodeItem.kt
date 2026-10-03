@@ -74,40 +74,28 @@ object CodeItem {
     const val INSTRUCTION_COUNT_OFFSET = 12
     const val INSTRUCTION_START_OFFSET = 16
 
-    @JvmField
     var CDEX_TRIES_SIZE_SHIFT = 0
 
-    @JvmField
     var CDEX_OUTS_COUNT_SHIFT = 4
 
-    @JvmField
     var CDEX_INS_COUNT_SHIFT = 8
 
-    @JvmField
     var CDEX_REGISTER_COUNT_SHIFT = 12
 
-    @JvmField
     var CDEX_INSTRUCTIONS_SIZE_AND_PREHEADER_FLAGS_OFFSET = 2
 
-    @JvmField
     var CDEX_INSTRUCTIONS_SIZE_SHIFT = 5
 
-    @JvmField
     var CDEX_PREHEADER_FLAGS_MASK = 0x1f
 
-    @JvmField
     var CDEX_PREHEADER_FLAG_REGISTER_COUNT = 1 shl 0
 
-    @JvmField
     var CDEX_PREHEADER_FLAG_INS_COUNT = 1 shl 1
 
-    @JvmField
     var CDEX_PREHEADER_FLAG_OUTS_COUNT = 1 shl 2
 
-    @JvmField
     var CDEX_PREHEADER_FLAG_TRIES_COUNT = 1 shl 3
 
-    @JvmField
     var CDEX_PREHEADER_FLAG_INSTRUCTIONS_SIZE = 1 shl 4
 
     object TryItem {
@@ -118,7 +106,6 @@ object CodeItem {
         const val HANDLER_OFFSET = 6
     }
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return if (annotator.dexFile is CDexBackedDexFile) {
             makeAnnotatorForCDex(annotator, mapItem)
@@ -290,8 +277,8 @@ object CodeItem {
         }
 
         protected inner class PreInstructionInfo(
-            @JvmField var triesCount: Int,
-            @JvmField var instructionSize: Int
+            var triesCount: Int,
+            var instructionSize: Int
         )
 
         protected open fun annotatePreInstructionFields(
@@ -481,7 +468,7 @@ object CodeItem {
         }
 
         private fun formatRegister(registerNum: Int): String {
-            return String.format("v%d", registerNum)
+            return "v${registerNum}"
         }
 
         private fun annotateInstruction10x(out: AnnotatedBytes, instruction: Instruction) {
@@ -518,10 +505,7 @@ object CodeItem {
             }
 
             out.annotate(
-                6, String.format(
-                    "%s {%s}, %s",
-                    instruction.opcode.mnemonic, StringUtils.join(args, ", "), instruction.reference
-                )
+                6, "${instruction.opcode.mnemonic} {${StringUtils.join(args, ", ")}}, ${instruction.reference}"
             )
         }
 
@@ -532,12 +516,7 @@ object CodeItem {
             val startRegister = instruction.startRegister
             val endRegister = startRegister + instruction.registerCount - 1
             out.annotate(
-                6, String.format(
-                    "%s {%s .. %s}, %s",
-                    instruction.opcode.mnemonic, formatRegister(startRegister),
-                    formatRegister(endRegister),
-                    instruction.reference
-                )
+                6, "${instruction.opcode.mnemonic} {${formatRegister(startRegister)} .. ${formatRegister(endRegister)}}, ${instruction.reference}"
             )
         }
 
@@ -580,30 +559,30 @@ object CodeItem {
             } else if (instruction is OffsetInstruction) {
                 val offset = instruction.codeOffset
                 val sign = if (offset >= 0) "+" else "-"
-                args.add(String.format("%s0x%x", sign, Math.abs(offset)))
+                args.add("%s0x%x".format(sign, Math.abs(offset)))
             } else if (instruction is NarrowLiteralInstruction) {
                 val value = instruction.narrowLiteral
                 if (NumberUtils.isLikelyFloat(value)) {
-                    args.add(String.format("%d # %f", value, Float.fromBits(value)))
+                    args.add("%d # %f".format(value, Float.fromBits(value)))
                 } else {
-                    args.add(String.format("%d", value))
+                    args.add("${value}")
                 }
             } else if (instruction is WideLiteralInstruction) {
                 val value = instruction.wideLiteral
                 if (NumberUtils.isLikelyDouble(value)) {
-                    args.add(String.format("%d # %f", value, Double.fromBits(value)))
+                    args.add("%d # %f".format(value, Double.fromBits(value)))
                 } else {
-                    args.add(String.format("%d", value))
+                    args.add("${value}")
                 }
             } else if (instruction is FieldOffsetInstruction) {
                 val fieldOffset = instruction.fieldOffset
-                args.add(String.format("field@0x%x", fieldOffset))
+                args.add("field@0x%x".format(fieldOffset))
             } else if (instruction is VtableIndexInstruction) {
                 val vtableIndex = instruction.vtableIndex
-                args.add(String.format("vtable@%d", vtableIndex))
+                args.add("vtable@${vtableIndex}")
             } else if (instruction is InlineIndexInstruction) {
                 val inlineIndex = instruction.inlineIndex
-                args.add(String.format("inline@%d", inlineIndex))
+                args.add("inline@${inlineIndex}")
             }
 
             out.annotate(

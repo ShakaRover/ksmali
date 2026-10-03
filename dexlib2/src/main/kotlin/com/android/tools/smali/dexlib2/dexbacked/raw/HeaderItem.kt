@@ -39,69 +39,53 @@ import com.android.tools.smali.dexlib2.util.AnnotatedBytes
 import com.android.tools.smali.util.StringUtils
 
 class HeaderItem(private var dexFile: DexBackedDexFile) {
-    fun getChecksum(): Int {
-        return dexFile.buffer.readSmallUint(CHECKSUM_OFFSET)
-    }
+    val checksum: Int
+        get() = dexFile.buffer.readSmallUint(CHECKSUM_OFFSET)
 
-    fun getSignature(): ByteArray {
-        return dexFile.buffer.readByteRange(SIGNATURE_OFFSET, SIGNATURE_SIZE)
-    }
+    val signature: ByteArray
+        get() = dexFile.buffer.readByteRange(SIGNATURE_OFFSET, SIGNATURE_SIZE)
 
-    fun getMapOffset(): Int {
-        return dexFile.buffer.readSmallUint(MAP_OFFSET)
-    }
+    val mapOffset: Int
+        get() = dexFile.buffer.readSmallUint(MAP_OFFSET)
 
-    fun getHeaderSize(): Int {
-        return dexFile.buffer.readSmallUint(HEADER_SIZE_OFFSET)
-    }
+    val headerSize: Int
+        get() = dexFile.buffer.readSmallUint(HEADER_SIZE_OFFSET)
 
-    fun getStringCount(): Int {
-        return dexFile.buffer.readSmallUint(STRING_COUNT_OFFSET)
-    }
+    val stringCount: Int
+        get() = dexFile.buffer.readSmallUint(STRING_COUNT_OFFSET)
 
-    fun getStringOffset(): Int {
-        return dexFile.buffer.readSmallUint(STRING_START_OFFSET)
-    }
+    val stringOffset: Int
+        get() = dexFile.buffer.readSmallUint(STRING_START_OFFSET)
 
-    fun getTypeCount(): Int {
-        return dexFile.buffer.readSmallUint(TYPE_COUNT_OFFSET)
-    }
+    val typeCount: Int
+        get() = dexFile.buffer.readSmallUint(TYPE_COUNT_OFFSET)
 
-    fun getTypeOffset(): Int {
-        return dexFile.buffer.readSmallUint(TYPE_START_OFFSET)
-    }
+    val typeOffset: Int
+        get() = dexFile.buffer.readSmallUint(TYPE_START_OFFSET)
 
-    fun getProtoCount(): Int {
-        return dexFile.buffer.readSmallUint(PROTO_COUNT_OFFSET)
-    }
+    val protoCount: Int
+        get() = dexFile.buffer.readSmallUint(PROTO_COUNT_OFFSET)
 
-    fun getProtoOffset(): Int {
-        return dexFile.buffer.readSmallUint(PROTO_START_OFFSET)
-    }
+    val protoOffset: Int
+        get() = dexFile.buffer.readSmallUint(PROTO_START_OFFSET)
 
-    fun getFieldCount(): Int {
-        return dexFile.buffer.readSmallUint(FIELD_COUNT_OFFSET)
-    }
+    val fieldCount: Int
+        get() = dexFile.buffer.readSmallUint(FIELD_COUNT_OFFSET)
 
-    fun getFieldOffset(): Int {
-        return dexFile.buffer.readSmallUint(FIELD_START_OFFSET)
-    }
+    val fieldOffset: Int
+        get() = dexFile.buffer.readSmallUint(FIELD_START_OFFSET)
 
-    fun getMethodCount(): Int {
-        return dexFile.buffer.readSmallUint(METHOD_COUNT_OFFSET)
-    }
+    val methodCount: Int
+        get() = dexFile.buffer.readSmallUint(METHOD_COUNT_OFFSET)
 
-    fun getMethodOffset(): Int {
-        return dexFile.buffer.readSmallUint(METHOD_START_OFFSET)
-    }
+    val methodOffset: Int
+        get() = dexFile.buffer.readSmallUint(METHOD_START_OFFSET)
 
-    fun getClassCount(): Int {
-        return dexFile.buffer.readSmallUint(CLASS_COUNT_OFFSET)
-    }
+    val classCount: Int
+        get() = dexFile.buffer.readSmallUint(CLASS_COUNT_OFFSET)
 
-    fun getClassOffset(): Int {
-        return dexFile.buffer.readSmallUint(CLASS_START_OFFSET)
-    }
+    val classOffset: Int
+        get() = dexFile.buffer.readSmallUint(CLASS_START_OFFSET)
 
     companion object {
         const val ITEM_SIZE = 0x70
@@ -153,7 +137,6 @@ class HeaderItem(private var dexFile: DexBackedDexFile) {
         const val CONTAINER_SIZE_OFFSET = 112
         const val HEADER_OFFSET_OFFSET = 116
 
-        @JvmStatic
         fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
             return object : SectionAnnotator(annotator, mapItem) {
                 override fun getItemName(): String {
@@ -168,15 +151,16 @@ class HeaderItem(private var dexFile: DexBackedDexFile) {
                     val startOffset = out.cursor
                     val headerSize: Int
 
-                    val magicBuilder = StringBuilder()
-                    for (i in 0 until 8) {
-                        magicBuilder.append(
-                            dexFile.buffer.readUbyte(startOffset + i).toChar()
-                        )
+                    val magic = buildString {
+                        for (i in 0 until 8) {
+                            append(
+                                dexFile.buffer.readUbyte(startOffset + i).toChar()
+                            )
+                        }
                     }
 
                     out.annotate(
-                        8, "magic: %s", StringUtils.escapeString(magicBuilder.toString())
+                        8, "magic: %s", StringUtils.escapeString(magic)
                     )
                     out.annotate(4, "checksum")
                     out.annotate(20, "signature")
@@ -241,12 +225,10 @@ class HeaderItem(private var dexFile: DexBackedDexFile) {
          * Get the highest magic number supported by Android for this api level.
          * @return The dex file magic number
          */
-        @JvmStatic
         fun getMagicForApi(api: Int): ByteArray {
             return getMagicForDexVersion(VersionMap.mapApiToDexVersion(api))
         }
 
-        @JvmStatic
         fun getMagicForDexVersion(dexVersion: Int): ByteArray {
             val magic = MAGIC_VALUE.clone()
 
@@ -271,7 +253,6 @@ class HeaderItem(private var dexFile: DexBackedDexFile) {
          * @param offset The offset within the buffer to the beginning of the dex header
          * @return True if the magic value is valid
          */
-        @JvmStatic
         fun verifyMagic(buf: ByteArray, offset: Int): Boolean {
             if (offset < 0 || offset > buf.size || buf.size - offset < MAGIC_SIZE) {
                 return false
@@ -303,7 +284,6 @@ class HeaderItem(private var dexFile: DexBackedDexFile) {
          * @param offset The offset within the buffer to the beginning of the dex header
          * @return The dex version if the header is valid or -1 if the header is invalid
          */
-        @JvmStatic
         fun getVersion(buf: ByteArray, offset: Int): Int {
             if (offset < 0 || offset > buf.size || buf.size - offset < MAGIC_SIZE) {
                 throw DexBackedDexFile.NotADexFile("File is too short")
@@ -323,12 +303,10 @@ class HeaderItem(private var dexFile: DexBackedDexFile) {
             return version
         }
 
-        @JvmStatic
         fun isSupportedDexVersion(version: Int): Boolean {
             return VersionMap.mapDexVersionToApi(version) != VersionMap.NO_VERSION
         }
 
-        @JvmStatic
         fun getEndian(buf: ByteArray, offset: Int): Int {
             val bdb = DexBuffer(buf)
             return bdb.readInt(offset + ENDIAN_TAG_OFFSET)

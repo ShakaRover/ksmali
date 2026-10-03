@@ -233,16 +233,16 @@ open class MethodAnalyzer(
                         this.analysisExceptionValue = ex
                         val codeAddress = getInstructionAddress(instructionToAnalyze)
                         ex.codeAddress = codeAddress
-                        ex.addContext(String.format("opcode: %s", instructionToAnalyze.instruction.opcode.mnemonic))
-                        ex.addContext(String.format("code address: %d", codeAddress))
-                        ex.addContext(String.format("method: %s", method))
+                        ex.addContext("opcode: ${instructionToAnalyze.instruction.opcode.mnemonic}")
+                        ex.addContext("code address: ${codeAddress}")
+                        ex.addContext("method: ${method}")
                         break
                     }
 
-                    analyzedState.set(instructionToAnalyze.getInstructionIndex())
+                    analyzedState.set(instructionToAnalyze.instructionIndex)
 
                     for (successor in instructionToAnalyze.successors) {
-                        instructionsToAnalyze.set(successor.getInstructionIndex())
+                        instructionsToAnalyze.set(successor.instructionIndex)
                     }
                     i = instructionsToAnalyze.nextSetBit(i + 1)
                 }
@@ -271,7 +271,7 @@ open class MethodAnalyzer(
         for (i in 0 until analyzedInstructionsByAddress.size()) {
             val analyzedInstruction = analyzedInstructionsByAddress.valueAt(i)
 
-            val instruction = analyzedInstruction.getInstruction()
+            val instruction = analyzedInstruction.instruction
 
             if (instruction.opcode.odexOnly()) {
                 val objectRegisterNumber: Int = when (instruction.opcode.format) {
@@ -627,7 +627,7 @@ open class MethodAnalyzer(
         }
 
         predecessor.addSuccessor(successor)
-        instructionsToProcess.set(successor.getInstructionIndex())
+        instructionsToProcess.set(successor.instructionIndex)
 
 
         //if the successor can throw an instruction, then we need to add the exception handlers as additional
@@ -1214,7 +1214,6 @@ open class MethodAnalyzer(
             RegisterType.BOOLEAN.toInt()
         )
 
-        @JvmStatic
         fun isNotWideningConversion(originalType: RegisterType, newType: RegisterType): Boolean {
             if (originalType.type == null || newType.type == null) {
                 return true
@@ -1233,7 +1232,6 @@ open class MethodAnalyzer(
             return true
         }
 
-        @JvmStatic
         fun canPropagateTypeAfterInstanceOf(
             analyzedInstanceOfInstruction: AnalyzedInstruction,
             analyzedIfInstruction: AnalyzedInstruction,
@@ -1246,13 +1244,13 @@ open class MethodAnalyzer(
             val ifInstruction = analyzedIfInstruction.instruction
             if ((ifInstruction as Instruction21t).registerA == analyzedInstanceOfInstruction.getDestinationRegister()) {
                 val reference: Reference =
-                    (analyzedInstanceOfInstruction.getInstruction() as Instruction22c).reference
+                    (analyzedInstanceOfInstruction.instruction as Instruction22c).reference
                 val registerType = RegisterType.getRegisterType(classPath, reference as TypeReference)
 
                 try {
                     if (registerType.type != null && !registerType.type!!.isInterface()) {
                         val objectRegister =
-                            (analyzedInstanceOfInstruction.getInstruction() as TwoRegisterInstruction).registerB
+                            (analyzedInstanceOfInstruction.instruction as TwoRegisterInstruction).registerB
 
                         val originalType = analyzedIfInstruction.getPreInstructionRegisterType(objectRegister)
 
@@ -1290,10 +1288,7 @@ open class MethodAnalyzer(
         private fun checkRegister(registerType: RegisterType, registerNumber: Int, validCategories: BitSet) {
             if (!validCategories.get(registerType.category.toInt())) {
                 throw AnalysisException(
-                    String.format(
-                        "Invalid register type %s for register v%d.",
-                        registerType.toString(), registerNumber
-                    )
+                    "Invalid register type ${registerType.toString()} for register v${registerNumber}."
                 )
             }
         }
@@ -1301,10 +1296,7 @@ open class MethodAnalyzer(
         private fun checkWidePair(registerNumber: Int, analyzedInstruction: AnalyzedInstruction) {
             if (registerNumber + 1 >= analyzedInstruction.postRegisterMap.size) {
                 throw AnalysisException(
-                    String.format(
-                        "v%d cannot be used as the first register in a wide register" +
-                                "pair because it is the last register.", registerNumber
-                    )
+                    "v${registerNumber} cannot be used as the first register in a wide registerpair because it is the last register."
                 )
             }
         }
@@ -1426,7 +1418,7 @@ open class MethodAnalyzer(
      */
     private fun analyzeIfEqzNez(analyzedInstruction: AnalyzedInstruction) {
         if (classPath.isArt()) {
-            val instructionIndex = analyzedInstruction.getInstructionIndex()
+            val instructionIndex = analyzedInstruction.instructionIndex
             if (instructionIndex > 0) {
                 if (analyzedInstruction.predecessorCount != 1) {
                     return
@@ -1435,7 +1427,7 @@ open class MethodAnalyzer(
                 if (prevAnalyzedInstruction.instruction.opcode == Opcode.INSTANCE_OF) {
 
                     val fallthroughInstruction = analyzedInstructionsByAddress.valueAt(
-                        analyzedInstruction.getInstructionIndex() + 1
+                        analyzedInstruction.instructionIndex + 1
                     )
 
                     val nextAddress = getInstructionAddress(analyzedInstruction) +
@@ -1544,14 +1536,14 @@ open class MethodAnalyzer(
             }
             val arrayProto = arrayRegisterType.type as ArrayProto
 
-            if (arrayProto.getDimensions() != 1) {
+            if (arrayProto.dimensions != 1) {
                 throw AnalysisException(
                     "aget-wide used with multi-dimensional array: %s",
                     arrayRegisterType.toString()
                 )
             }
 
-            val arrayBaseType = arrayProto.getElementType()[0]
+            val arrayBaseType = arrayProto.elementType[0]
             if (arrayBaseType == 'J') {
                 setDestinationRegisterTypeAndPropagateChanges(analyzedInstruction, RegisterType.LONG_LO_TYPE)
             } else if (arrayBaseType == 'D') {

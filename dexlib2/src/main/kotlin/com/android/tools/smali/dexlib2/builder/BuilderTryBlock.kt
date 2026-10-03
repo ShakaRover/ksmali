@@ -36,15 +36,12 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 open class BuilderTryBlock : BaseTryBlock<BuilderExceptionHandler> {
     // We only ever have one exception handler per try block. They are later merged as needed in TryListBuilder
-    @JvmField
     val exceptionHandler: BuilderExceptionHandler
 
-    @JvmField
     val start: Label
 
     // The end location is exclusive, it should point to the codeAddress of the instruction immediately after the last
     // covered instruction.
-    @JvmField
     val end: Label
 
     constructor(start: Label, end: Label, exceptionType: String?, handler: Label) : super() {

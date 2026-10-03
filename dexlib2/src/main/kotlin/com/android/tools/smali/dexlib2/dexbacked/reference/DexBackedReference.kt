@@ -37,7 +37,6 @@ import com.android.tools.smali.util.ExceptionWithContext
 
 abstract class DexBackedReference {
     companion object {
-        @JvmStatic
         fun makeReference(
             dexFile: DexBackedDexFile,
             referenceType: Int,

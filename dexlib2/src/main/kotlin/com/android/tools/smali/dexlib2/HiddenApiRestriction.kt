@@ -88,7 +88,6 @@ enum class HiddenApiRestriction(
             }
         }
 
-        @JvmStatic
         fun getAllFlags(value: Int): Set<HiddenApiRestriction> {
             val normalRestriction = hiddenApiFlags[value and HIDDENAPI_FLAG_MASK]
             val restrictionSet = HashSet<HiddenApiRestriction>()
@@ -107,7 +106,6 @@ enum class HiddenApiRestriction(
             return Collections.unmodifiableSet(restrictionSet)
         }
 
-        @JvmStatic
         fun formatHiddenRestrictions(value: Int): String {
             val joiner = StringJoiner("|")
             for (hiddenApiRestriction in getAllFlags(value)) {
@@ -116,7 +114,6 @@ enum class HiddenApiRestriction(
             return joiner.toString()
         }
 
-        @JvmStatic
         fun combineFlags(flags: Iterable<HiddenApiRestriction>): Int {
             var gotHiddenApiFlag = false
 

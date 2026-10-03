@@ -67,7 +67,6 @@ open class BuilderInstruction45cc(
         get() = FORMAT
 
     companion object {
-        @JvmField
         val FORMAT: Format = Format.Format45cc
     }
 }

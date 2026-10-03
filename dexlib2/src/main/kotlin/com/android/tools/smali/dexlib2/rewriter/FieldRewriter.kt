@@ -37,7 +37,7 @@ import com.android.tools.smali.dexlib2.iface.Field
 import com.android.tools.smali.dexlib2.iface.value.EncodedValue
 
 open class FieldRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<Field> {
     override fun rewrite(field: Field): Field {
         return RewrittenField(field)

@@ -79,7 +79,6 @@ enum class AccessFlags(
             }
         }
 
-        @JvmStatic
         fun getAccessFlagsForClass(accessFlagValue: Int): Array<AccessFlags> {
             var size = 0
             for (accessFlag in allFlags) {
@@ -99,28 +98,13 @@ enum class AccessFlags(
         }
 
         private fun formatAccessFlags(accessFlags: Array<AccessFlags>): String {
-            var size = 0
-            for (accessFlag in accessFlags) {
-                size += accessFlag.toString().length + 1
-            }
-
-            val sb = StringBuilder(size)
-            for (accessFlag in accessFlags) {
-                sb.append(accessFlag.toString())
-                sb.append(" ")
-            }
-            if (accessFlags.isNotEmpty()) {
-                sb.delete(sb.length - 1, sb.length)
-            }
-            return sb.toString()
+            return accessFlags.joinToString(" ") { it.toString() }
         }
 
-        @JvmStatic
         fun formatAccessFlagsForClass(accessFlagValue: Int): String {
             return formatAccessFlags(getAccessFlagsForClass(accessFlagValue))
         }
 
-        @JvmStatic
         fun getAccessFlagsForMethod(accessFlagValue: Int): Array<AccessFlags> {
             var size = 0
             for (accessFlag in allFlags) {
@@ -139,12 +123,10 @@ enum class AccessFlags(
             return accessFlags.requireNoNulls()
         }
 
-        @JvmStatic
         fun formatAccessFlagsForMethod(accessFlagValue: Int): String {
             return formatAccessFlags(getAccessFlagsForMethod(accessFlagValue))
         }
 
-        @JvmStatic
         fun getAccessFlagsForField(accessFlagValue: Int): Array<AccessFlags> {
             var size = 0
             for (accessFlag in allFlags) {
@@ -163,7 +145,6 @@ enum class AccessFlags(
             return accessFlags.requireNoNulls()
         }
 
-        @JvmStatic
         fun formatAccessFlagsForField(accessFlagValue: Int): String {
             return formatAccessFlags(getAccessFlagsForField(accessFlagValue))
         }

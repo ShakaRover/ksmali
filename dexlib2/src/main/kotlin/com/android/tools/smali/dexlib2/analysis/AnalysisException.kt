@@ -34,7 +34,6 @@ package com.android.tools.smali.dexlib2.analysis
 import com.android.tools.smali.util.ExceptionWithContext
 
 open class AnalysisException : ExceptionWithContext {
-    @JvmField
     var codeAddress: Int = 0
 
     constructor(cause: Throwable) : super(cause)

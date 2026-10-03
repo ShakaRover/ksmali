@@ -42,7 +42,6 @@ class DexBackedArrayPayload(
 ) : DexBackedInstruction(dexFile, OPCODE, instructionStart), ArrayPayload {
     override val elementWidth: Int
 
-    @JvmField
     val elementCount: Int
 
     init {
@@ -103,7 +102,6 @@ class DexBackedArrayPayload(
         get() = 4 + (elementWidth * elementCount + 1) / 2
 
     companion object {
-        @JvmField
         val OPCODE: Opcode = Opcode.ARRAY_PAYLOAD
 
         private const val ELEMENT_WIDTH_OFFSET = 2

@@ -48,10 +48,8 @@ open class ImmutableSparseSwitchPayload(
         get() = OPCODE.format
 
     companion object {
-        @JvmField
         val OPCODE: Opcode = Opcode.SPARSE_SWITCH_PAYLOAD
 
-        @JvmStatic
         fun of(instruction: SparseSwitchPayload): ImmutableSparseSwitchPayload {
             if (instruction is ImmutableSparseSwitchPayload) {
                 return instruction

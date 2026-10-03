@@ -35,7 +35,6 @@ import com.android.tools.smali.dexlib2.iface.value.IntEncodedValue
 
 open class ImmutableIntEncodedValue(override val value: Int) : BaseIntEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmStatic
         fun of(value: IntEncodedValue): ImmutableIntEncodedValue {
             if (value is ImmutableIntEncodedValue) {
                 return value

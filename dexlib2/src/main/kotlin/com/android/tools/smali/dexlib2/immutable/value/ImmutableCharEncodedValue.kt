@@ -35,7 +35,6 @@ import com.android.tools.smali.dexlib2.iface.value.CharEncodedValue
 
 open class ImmutableCharEncodedValue(override val value: Char) : BaseCharEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmStatic
         fun of(value: CharEncodedValue): ImmutableCharEncodedValue {
             if (value is ImmutableCharEncodedValue) {
                 return value

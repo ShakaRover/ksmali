@@ -244,7 +244,7 @@ class DexWriterSleb128Test {
                 encoded = (encoded.toInt() and 0x0F).toByte()
                 written = (written.toInt() and 0x0F).toByte()
             }
-            Assert.assertEquals(String.format("Values not equal at index %d", i), encoded, written)
+            Assert.assertEquals("Values not equal at index ${i}", encoded, written)
         }
     }
 }

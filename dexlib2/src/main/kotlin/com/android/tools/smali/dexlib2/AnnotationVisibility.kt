@@ -39,7 +39,6 @@ object AnnotationVisibility {
 
     private val NAMES = arrayOf("build", "runtime", "system")
 
-    @JvmStatic
     fun getVisibility(visibility: Int): String {
         if (visibility < 0 || visibility >= NAMES.size) {
             throw ExceptionWithContext("Invalid annotation visibility %d", visibility)

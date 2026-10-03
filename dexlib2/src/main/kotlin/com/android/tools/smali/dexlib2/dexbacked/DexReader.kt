@@ -34,7 +34,7 @@ import com.android.tools.smali.util.ExceptionWithContext
 import com.android.tools.smali.util.Utf8Utils
 
 class DexReader<T : DexBuffer>(
-    @JvmField val dexBuf: T,
+    val dexBuf: T,
     offset: Int
 ) {
     var offset: Int = offset

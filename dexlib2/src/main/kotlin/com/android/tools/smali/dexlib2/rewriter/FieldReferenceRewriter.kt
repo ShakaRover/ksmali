@@ -34,7 +34,7 @@ import com.android.tools.smali.dexlib2.base.reference.BaseFieldReference
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 
 open class FieldReferenceRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<FieldReference> {
     override fun rewrite(fieldReference: FieldReference): FieldReference {
         return RewrittenFieldReference(fieldReference)

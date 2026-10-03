@@ -36,10 +36,9 @@ import com.android.tools.smali.dexlib2.builder.instruction.BuilderSwitchElement
 import com.android.tools.smali.dexlib2.iface.instruction.SwitchPayload
 
 abstract class BuilderSwitchPayload(opcode: Opcode) : BuilderInstruction(opcode), SwitchPayload {
-    @JvmField
     var referrer: MethodLocation? = null
 
-    fun getReferrer(): MethodLocation {
+    fun requireReferrer(): MethodLocation {
         if (referrer == null) {
             throw IllegalStateException("The referrer has not been set yet")
         }

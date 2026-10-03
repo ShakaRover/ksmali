@@ -41,7 +41,6 @@ open class ImmutableLineNumber(
         get() = DebugItemType.LINE_NUMBER
 
     companion object {
-        @JvmStatic
         fun of(lineNumber: LineNumber): ImmutableLineNumber {
             if (lineNumber is ImmutableLineNumber) {
                 return lineNumber

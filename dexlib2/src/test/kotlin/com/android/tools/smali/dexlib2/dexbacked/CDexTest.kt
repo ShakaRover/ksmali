@@ -77,7 +77,6 @@ class CDexTest {
     }
 
     companion object {
-        @JvmStatic
         private fun writeInt(buf: ByteArray, offset: Int, value: Int) {
             buf[offset] = value.toByte()
             buf[offset + 1] = (value shr 8).toByte()

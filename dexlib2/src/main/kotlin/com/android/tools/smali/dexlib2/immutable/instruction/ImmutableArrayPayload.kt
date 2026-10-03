@@ -55,10 +55,8 @@ open class ImmutableArrayPayload(
         get() = OPCODE.format
 
     companion object {
-        @JvmField
         val OPCODE: Opcode = Opcode.ARRAY_PAYLOAD
 
-        @JvmStatic
         fun of(instruction: ArrayPayload): ImmutableArrayPayload {
             if (instruction is ImmutableArrayPayload) {
                 return instruction

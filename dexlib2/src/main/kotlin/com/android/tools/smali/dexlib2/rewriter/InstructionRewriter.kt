@@ -54,7 +54,7 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import com.android.tools.smali.util.ExceptionWithContext
 
 open class InstructionRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<Instruction> {
     override fun rewrite(instruction: Instruction): Instruction {
         if (instruction is ReferenceInstruction) {

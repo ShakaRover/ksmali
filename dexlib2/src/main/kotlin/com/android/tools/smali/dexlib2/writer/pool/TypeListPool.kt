@@ -93,11 +93,11 @@ class TypeListPool(dexPool: DexPool) :
         }
 
         override fun toString(): String {
-            val sb = StringBuilder()
-            for (type in types) {
-                sb.append(type.toString())
+            return buildString {
+                for (type in types) {
+                    append(type.toString())
+                }
             }
-            return sb.toString()
         }
 
         override fun compareTo(o: Key<out Collection<out CharSequence>>): Int {

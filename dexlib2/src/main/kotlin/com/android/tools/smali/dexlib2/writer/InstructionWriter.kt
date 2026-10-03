@@ -548,7 +548,6 @@ internal constructor(
     }
 
     companion object {
-        @JvmStatic
         internal fun <StringRef : StringReference, TypeRef : TypeReference, FieldRefKey : FieldReference,
             MethodRefKey : MethodReference, ProtoRefKey : MethodProtoReference,
             MethodHandleKey : MethodHandleReference, CallSiteKey : CallSiteReference>

@@ -45,16 +45,15 @@ import com.android.tools.smali.util.ExceptionWithContext
 import java.util.ArrayList
 
 class DexBackedCallSiteReference(
-    @JvmField val dexFile: DexBackedDexFile,
-    @JvmField val callSiteIndex: Int
+    val dexFile: DexBackedDexFile,
+    val callSiteIndex: Int
 ) : BaseCallSiteReference() {
-    @JvmField
     val callSiteIdOffset: Int = dexFile.callSiteSection.getOffset(callSiteIndex)
 
     private var callSiteOffset: Int = -1
 
     override val name: String
-        get() = String.format("call_site_%d", callSiteIndex)
+        get() = "call_site_${callSiteIndex}"
 
     override val methodHandle: MethodHandleReference
         get() {

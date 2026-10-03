@@ -34,12 +34,11 @@ import com.android.tools.smali.dexlib2.base.BaseAnnotation
 import com.android.tools.smali.dexlib2.dexbacked.util.VariableSizeSet
 
 class DexBackedAnnotation(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     annotationOffset: Int
 ) : BaseAnnotation() {
     override val visibility: Int
 
-    @JvmField
     val typeIndex: Int
 
     private val elementsOffset: Int

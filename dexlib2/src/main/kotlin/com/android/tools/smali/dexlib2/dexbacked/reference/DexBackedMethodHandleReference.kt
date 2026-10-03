@@ -39,10 +39,9 @@ import com.android.tools.smali.dexlib2.iface.reference.Reference.InvalidReferenc
 import com.android.tools.smali.util.ExceptionWithContext
 
 class DexBackedMethodHandleReference(
-    @JvmField val dexFile: DexBackedDexFile,
-    @JvmField val methodHandleIndex: Int
+    val dexFile: DexBackedDexFile,
+    val methodHandleIndex: Int
 ) : BaseMethodHandleReference() {
-    @JvmField
     val methodHandleOffset: Int = dexFile.methodHandleSection.getOffset(methodHandleIndex)
 
     override val methodHandleType: Int

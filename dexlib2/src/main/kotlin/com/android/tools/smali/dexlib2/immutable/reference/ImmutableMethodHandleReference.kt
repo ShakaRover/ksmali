@@ -48,7 +48,6 @@ open class ImmutableMethodHandleReference(
         this(methodHandleType, memberReference as Reference)
 
     companion object {
-        @JvmStatic
         fun of(methodHandleReference: MethodHandleReference): ImmutableMethodHandleReference {
             if (methodHandleReference is ImmutableMethodHandleReference) {
                 return methodHandleReference

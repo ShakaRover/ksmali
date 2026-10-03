@@ -25,11 +25,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 @file:JvmName("PathUtil")
 
 package com.android.tools.smali.util
 
-import com.google.common.collect.Lists
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileReader
@@ -58,46 +58,44 @@ fun getRelativeFileInternal(canonicalBaseFile: File, canonicalFileToRelativize: 
         return canonicalFileToRelativize.path
     }
 
-    val sb = StringBuilder()
-
-    var commonDirs = 1
-    while (commonDirs < basePath.size && commonDirs < pathToRelativize.size) {
-        if (basePath[commonDirs] != pathToRelativize[commonDirs]) {
-            break
-        }
-        commonDirs++
-    }
-
-    var first = true
-    for (i in commonDirs until basePath.size) {
-        if (!first) {
-            sb.append(File.separatorChar)
-        } else {
-            first = false
-        }
-
-        sb.append("..")
-    }
-
-    first = true
-    for (i in commonDirs until pathToRelativize.size) {
-        if (first) {
-            if (sb.length != 0) {
-                sb.append(File.separatorChar)
+    return buildString {
+        var commonDirs = 1
+        while (commonDirs < basePath.size && commonDirs < pathToRelativize.size) {
+            if (basePath[commonDirs] != pathToRelativize[commonDirs]) {
+                break
             }
-            first = false
-        } else {
-            sb.append(File.separatorChar)
+            commonDirs++
         }
 
-        sb.append(pathToRelativize[i])
-    }
+        var first = true
+        for (i in commonDirs until basePath.size) {
+            if (!first) {
+                append(File.separatorChar)
+            } else {
+                first = false
+            }
 
-    if (sb.length == 0) {
-        return "."
-    }
+            append("..")
+        }
 
-    return sb.toString()
+        first = true
+        for (i in commonDirs until pathToRelativize.size) {
+            if (first) {
+                if (length != 0) {
+                    append(File.separatorChar)
+                }
+                first = false
+            } else {
+                append(File.separatorChar)
+            }
+
+            append(pathToRelativize[i])
+        }
+
+        if (length == 0) {
+            return "."
+        }
+    }
 }
 
 private fun getPathComponents(file0: File): List<String> {
@@ -116,7 +114,7 @@ private fun getPathComponents(file0: File): List<String> {
         file = parentFile
     }
 
-    return Lists.reverse(path)
+    return path.reversed()
 }
 
 @Throws(IOException::class)

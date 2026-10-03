@@ -36,7 +36,7 @@ import com.android.tools.smali.dexlib2.dexbacked.raw.FieldIdItem
 import com.android.tools.smali.dexlib2.iface.reference.Reference.InvalidReferenceException
 
 class DexBackedFieldReference(
-    @JvmField val dexFile: DexBackedDexFile,
+    val dexFile: DexBackedDexFile,
     private val fieldIndex: Int
 ) : BaseFieldReference() {
     override val definingClass: String

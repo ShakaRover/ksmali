@@ -53,7 +53,6 @@ import com.android.tools.smali.util.ExceptionWithContext
 import com.android.tools.smali.util.ImmutableConverter
 
 object ImmutableEncodedValueFactory {
-    @JvmStatic
     fun of(encodedValue: EncodedValue): ImmutableEncodedValue {
         when (encodedValue.valueType) {
             ValueType.BYTE -> return ImmutableByteEncodedValue.of(encodedValue as ByteEncodedValue)
@@ -84,7 +83,6 @@ object ImmutableEncodedValueFactory {
         }
     }
 
-    @JvmStatic
     fun defaultValueForType(type: String): EncodedValue {
         when (type[0]) {
             'Z' -> return ImmutableBooleanEncodedValue.FALSE_VALUE
@@ -100,7 +98,6 @@ object ImmutableEncodedValueFactory {
         }
     }
 
-    @JvmStatic
     fun ofNullable(encodedValue: EncodedValue?): ImmutableEncodedValue? {
         if (encodedValue == null) {
             return null
@@ -108,7 +105,6 @@ object ImmutableEncodedValueFactory {
         return of(encodedValue)
     }
 
-    @JvmStatic
     fun immutableListOf(list: Iterable<EncodedValue>?): List<ImmutableEncodedValue> {
         return CONVERTER.toList(list)
     }

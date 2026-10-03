@@ -35,7 +35,6 @@ import com.android.tools.smali.dexlib2.iface.value.DoubleEncodedValue
 
 open class ImmutableDoubleEncodedValue(override val value: Double) : BaseDoubleEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmStatic
         fun of(value: DoubleEncodedValue): ImmutableDoubleEncodedValue {
             if (value is ImmutableDoubleEncodedValue) {
                 return value

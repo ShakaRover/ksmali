@@ -53,7 +53,6 @@ object DexUtil {
      * @throws InvalidFile If the header appears to be a dex file, but is not valid for some reason
      * @throws UnsupportedFile If the dex header is valid, but uses unsupported functionality
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun verifyDexHeader(inputStream: InputStream): Int {
         if (!inputStream.markSupported()) {
@@ -82,23 +81,23 @@ object DexUtil {
      * @throws InvalidFile If the header appears to be a dex file, but is not valid for some reason
      * @throws UnsupportedFile If the dex header is valid, but uses unsupported functionality
      */
-    @JvmStatic
     fun verifyDexHeader(buf: ByteArray, offset: Int): Int {
         if (offset < 0 || offset > buf.size || buf.size - offset < HeaderItem.MAGIC_SIZE) {
             throw NotADexFile("File is too short")
         }
         val dexVersion = HeaderItem.getVersion(buf, offset)
         if (dexVersion == -1) {
-            val sb = StringBuilder("Not a valid dex magic value:")
-            for (i in 0 until HeaderItem.MAGIC_SIZE) {
-                sb.append(String.format(" %02x", buf[offset + i]))
+            val magic = buildString {
+                for (i in 0 until HeaderItem.MAGIC_SIZE) {
+                    append(" %02x".format(buf[offset + i]))
+                }
             }
-            throw NotADexFile(sb.toString())
+            throw NotADexFile("Not a valid dex magic value:" + magic)
         }
 
         if (!HeaderItem.isSupportedDexVersion(dexVersion)) {
             throw UnsupportedFile(
-                String.format("Dex version %03d is not supported", dexVersion)
+                "Dex version %03d is not supported".format(dexVersion)
             )
         }
 
@@ -112,7 +111,7 @@ object DexUtil {
         }
 
         if (endian != HeaderItem.LITTLE_ENDIAN_TAG) {
-            throw InvalidFile(String.format("Invalid endian tag: 0x%x", endian))
+            throw InvalidFile("Invalid endian tag: 0x%x".format(endian))
         }
 
         return dexVersion
@@ -128,19 +127,19 @@ object DexUtil {
      * @throws InvalidFile If the header appears to be a cdex file, but is not valid for some reason
      * @throws UnsupportedFile If the cdex header is valid, but uses unsupported functionality
      */
-    @JvmStatic
     fun verifyCdexHeader(buf: ByteArray, offset: Int): Int {
         val cdexVersion = CdexHeaderItem.getVersion(buf, offset)
         if (cdexVersion == -1) {
-            val sb = StringBuilder("Not a valid cdex magic value:")
-            for (i in 0 until 8) {
-                sb.append(String.format(" %02x", buf[offset + i]))
+            val magic = buildString {
+                for (i in 0 until 8) {
+                    append(" %02x".format(buf[offset + i]))
+                }
             }
-            throw NotADexFile(sb.toString())
+            throw NotADexFile("Not a valid cdex magic value:" + magic)
         }
 
         if (!CdexHeaderItem.isSupportedCdexVersion(cdexVersion)) {
-            throw UnsupportedFile(String.format("Dex version %03d is not supported", cdexVersion))
+            throw UnsupportedFile("Dex version %03d is not supported".format(cdexVersion))
         }
 
         val endian = HeaderItem.getEndian(buf, offset)
@@ -149,7 +148,7 @@ object DexUtil {
         }
 
         if (endian != HeaderItem.LITTLE_ENDIAN_TAG) {
-            throw InvalidFile(String.format("Invalid endian tag: 0x%x", endian))
+            throw InvalidFile("Invalid endian tag: 0x%x".format(endian))
         }
 
         return cdexVersion
@@ -164,7 +163,6 @@ object DexUtil {
      * @throws NotAnOdexFile If the file is not an odex file
      * @throws UnsupportedFile If the odex header is valid, but is an unsupported version
      */
-    @JvmStatic
     @Throws(IOException::class)
     fun verifyOdexHeader(inputStream: InputStream) {
         if (!inputStream.markSupported()) {
@@ -191,19 +189,19 @@ object DexUtil {
      * @throws NotAnOdexFile If the file is not an odex file
      * @throws UnsupportedFile If the odex header is valid, but uses unsupported functionality
      */
-    @JvmStatic
     fun verifyOdexHeader(buf: ByteArray, offset: Int) {
         val odexVersion = OdexHeaderItem.getVersion(buf, offset)
         if (odexVersion == -1) {
-            val sb = StringBuilder("Not a valid odex magic value:")
-            for (i in 0 until 8) {
-                sb.append(String.format(" %02x", buf[i]))
+            val magic = buildString {
+                for (i in 0 until 8) {
+                    append(" %02x".format(buf[i]))
+                }
             }
-            throw NotAnOdexFile(sb.toString())
+            throw NotAnOdexFile("Not a valid odex magic value:" + magic)
         }
 
         if (!OdexHeaderItem.isSupportedOdexVersion(odexVersion)) {
-            throw UnsupportedFile(String.format("Odex version %03d is not supported", odexVersion))
+            throw UnsupportedFile("Odex version %03d is not supported".format(odexVersion))
         }
     }
 

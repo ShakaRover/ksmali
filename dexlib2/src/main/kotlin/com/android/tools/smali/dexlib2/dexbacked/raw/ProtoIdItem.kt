@@ -41,7 +41,6 @@ object ProtoIdItem {
     const val RETURN_TYPE_OFFSET = 4
     const val PARAMETERS_OFFSET = 8
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {
@@ -61,40 +60,35 @@ object ProtoIdItem {
         }
     }
 
-    @JvmStatic
     fun getReferenceAnnotation(dexFile: DexBackedDexFile, protoIndex: Int): String {
         try {
             val protoString = asString(dexFile, protoIndex)
-            return String.format("proto_id_item[%d]: %s", protoIndex, protoString)
+            return "proto_id_item[${protoIndex}]: ${protoString}"
         } catch (ex: Exception) {
             ex.printStackTrace(System.err)
         }
-        return String.format("proto_id_item[%d]", protoIndex)
+        return "proto_id_item[${protoIndex}]"
     }
 
-    @JvmStatic
     fun asString(dexFile: DexBackedDexFile, protoIndex: Int): String {
         val offset = dexFile.protoSection.getOffset(protoIndex)
 
-        val sb = StringBuilder()
-        sb.append("(")
-
         val parametersOffset = dexFile.buffer.readSmallUint(offset + PARAMETERS_OFFSET)
-        sb.append(TypeListItem.asString(dexFile, parametersOffset))
-        sb.append(")")
-
         val returnTypeIndex = dexFile.buffer.readSmallUint(offset + RETURN_TYPE_OFFSET)
         val returnType = dexFile.typeSection.get(returnTypeIndex)
-        sb.append(returnType)
 
-        return sb.toString()
+        return buildString {
+            append("(")
+            append(TypeListItem.asString(dexFile, parametersOffset))
+            append(")")
+            append(returnType)
+        }
     }
 
-    @JvmStatic
     fun getProtos(dexFile: DexBackedDexFile): Array<String> {
         val mapItem = dexFile.getMapItemForSection(ItemType.PROTO_ID_ITEM) ?: return emptyArray()
 
-        val protoCount = mapItem.getItemCount()
+        val protoCount = mapItem.itemCount
         return Array(protoCount) { i -> asString(dexFile, i) }
     }
 }

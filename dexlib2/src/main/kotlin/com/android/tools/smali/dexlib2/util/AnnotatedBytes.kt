@@ -218,9 +218,9 @@ open class AnnotatedBytes(private val outputWidth: Int) {
 
     private fun formatAnnotation(offset: Int, endOffset: Int?, annotationMsg: String): String {
         return if (endOffset != null) {
-            String.format("[0x%x, 0x%x) \"%s\"", offset, endOffset, annotationMsg)
+            "[0x%x, 0x%x) \"%s\"".format(offset, endOffset, annotationMsg)
         } else {
-            String.format("[0x%x, ) \"%s\"", offset, annotationMsg)
+            "[0x%x, ) \"%s\"".format(offset, annotationMsg)
         }
     }
 

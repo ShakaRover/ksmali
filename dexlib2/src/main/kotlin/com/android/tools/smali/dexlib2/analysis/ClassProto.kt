@@ -63,10 +63,8 @@ import java.util.function.Supplier
  * and their offsets.
  */
 open class ClassProto(override val classPath: ClassPath, override val type: String) : TypeProto {
-    @JvmField
     protected var vtableFullyResolved = true
 
-    @JvmField
     protected var interfacesFullyResolved = true
 
     protected var unresolvedInterfaces: MutableSet<String>? = null
@@ -1192,7 +1190,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
             get() = method.implementation
     }
 
-    private abstract class FieldGap(@JvmField val offset: Int, @JvmField val size: Int) : Comparable<FieldGap> {
+    private abstract class FieldGap(val offset: Int, val size: Int) : Comparable<FieldGap> {
         companion object {
             fun newFieldGap(offset: Int, size: Int, oatVersion: Int): FieldGap {
                 return if (oatVersion >= 67) {

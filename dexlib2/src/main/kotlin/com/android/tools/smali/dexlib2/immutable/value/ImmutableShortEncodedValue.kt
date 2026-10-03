@@ -35,7 +35,6 @@ import com.android.tools.smali.dexlib2.iface.value.ShortEncodedValue
 
 open class ImmutableShortEncodedValue(override val value: Short) : BaseShortEncodedValue(), ImmutableEncodedValue {
     companion object {
-        @JvmStatic
         fun of(value: ShortEncodedValue): ImmutableShortEncodedValue {
             if (value is ImmutableShortEncodedValue) {
                 return value

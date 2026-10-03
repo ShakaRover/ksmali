@@ -37,7 +37,7 @@ import com.android.tools.smali.dexlib2.iface.debug.DebugItem
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 
 open class MethodImplementationRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<MethodImplementation> {
     override fun rewrite(methodImplementation: MethodImplementation): MethodImplementation {
         return RewrittenMethodImplementation(methodImplementation)

@@ -51,7 +51,7 @@ import java.util.zip.ZipFile
 /**
  * Represents a zip file that contains dex files (i.e. an apk or jar file)
  */
-class ZipDexContainer @JvmOverloads constructor(
+class ZipDexContainer constructor(
     private val zipFilePath: File,
     private val opcodes: Opcodes?,
     private val ignoreInvalid: Boolean = true

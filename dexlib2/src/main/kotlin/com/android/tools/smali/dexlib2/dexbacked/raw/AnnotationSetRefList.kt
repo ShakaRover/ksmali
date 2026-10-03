@@ -38,7 +38,6 @@ object AnnotationSetRefList {
     const val SIZE_OFFSET = 0
     const val LIST_OFFSET = 4
 
-    @JvmStatic
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
             override fun getItemName(): String {
@@ -61,11 +60,10 @@ object AnnotationSetRefList {
         }
     }
 
-    @JvmStatic
     fun getReferenceAnnotation(dexFile: DexBackedDexFile, annotationSetRefListOffset: Int): String {
         if (annotationSetRefListOffset == 0) {
             return "annotation_set_ref_list[NO_OFFSET]"
         }
-        return String.format("annotation_set_ref_list[0x%x]", annotationSetRefListOffset)
+        return "annotation_set_ref_list[0x%x]".format(annotationSetRefListOffset)
     }
 }

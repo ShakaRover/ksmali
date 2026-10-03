@@ -40,7 +40,7 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 open class DebugItemRewriter(
-    @JvmField protected val rewriters: Rewriters
+    protected val rewriters: Rewriters
 ) : Rewriter<DebugItem> {
     override fun rewrite(value: DebugItem): DebugItem {
         when (value.debugItemType) {

@@ -39,7 +39,6 @@ open class ImmutableExceptionHandler(
     override val handlerCodeAddress: Int
 ) : BaseExceptionHandler() {
     companion object {
-        @JvmStatic
         fun of(exceptionHandler: ExceptionHandler): ImmutableExceptionHandler {
             if (exceptionHandler is ImmutableExceptionHandler) {
                 return exceptionHandler
@@ -50,7 +49,6 @@ open class ImmutableExceptionHandler(
             )
         }
 
-        @JvmStatic
         fun immutableListOf(list: Iterable<ExceptionHandler>?): List<ImmutableExceptionHandler> {
             return CONVERTER.toList(list)
         }

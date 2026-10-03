@@ -75,7 +75,6 @@ open class ImmutableStartLocal(
         get() = DebugItemType.START_LOCAL
 
     companion object {
-        @JvmStatic
         fun of(startLocal: StartLocal): ImmutableStartLocal {
             if (startLocal is ImmutableStartLocal) {
                 return startLocal

@@ -123,7 +123,6 @@ class StringWrapperTest {
     }
 
     companion object {
-        @JvmStatic
         fun validateResult(expected: Array<String>, actual: Array<String?>) {
             Assert.assertTrue(actual.size >= expected.size)
 
@@ -137,7 +136,6 @@ class StringWrapperTest {
             }
         }
 
-        @JvmStatic
         fun validateResult2(expected: Array<String>, textToWrap: String, maxWidth: Int) {
             val result = StringWrapper.wrapStringOnBreaks(textToWrap, maxWidth).toList()
 

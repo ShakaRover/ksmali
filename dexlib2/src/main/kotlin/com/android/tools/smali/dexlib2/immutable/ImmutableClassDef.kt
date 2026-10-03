@@ -129,7 +129,6 @@ open class ImmutableClassDef(
     )
 
     companion object {
-        @JvmStatic
         fun of(classDef: ClassDef): ImmutableClassDef {
             if (classDef is ImmutableClassDef) {
                 return classDef
@@ -148,7 +147,6 @@ open class ImmutableClassDef(
             )
         }
 
-        @JvmStatic
         fun immutableSetOf(iterable: Iterable<ClassDef>?): Set<ImmutableClassDef> {
             return CONVERTER.toSet(iterable)
         }

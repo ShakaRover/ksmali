@@ -85,7 +85,6 @@ open class ImmutableMethod(
     )
 
     companion object {
-        @JvmStatic
         fun of(method: Method): ImmutableMethod {
             if (method is ImmutableMethod) {
                 return method
@@ -102,7 +101,6 @@ open class ImmutableMethod(
             )
         }
 
-        @JvmStatic
         fun immutableSetOf(list: Iterable<Method>?): SortedSet<ImmutableMethod> {
             return CONVERTER.toSortedSet(CollectionUtils.naturalOrdering(), list)
         }
