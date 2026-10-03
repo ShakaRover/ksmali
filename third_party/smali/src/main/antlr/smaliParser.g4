@@ -652,13 +652,20 @@ catchall_directive returns[AstNode n]
 
 parameter_directive returns[AstNode n]
   @init { List<AstNode> annotations = new ArrayList<AstNode>(); }
-  : PARAMETER_DIRECTIVE REGISTER (COMMA STRING_LITERAL)?
+  : PARAMETER_DIRECTIVE
+    ( reg=REGISTER (COMMA name=STRING_LITERAL)?   // .param p1[, "name"]
+    | name=STRING_LITERAL                          // legacy .parameter ["name"]
+    )?
     ({_input.LA(1) == ANNOTATION_DIRECTIVE}? annotation { annotations.add($annotation.n); })*
     ( END_PARAMETER_DIRECTIVE
-      { $n = ast(I_PARAMETER, _localctx.start, AstNode.leaf($REGISTER), $STRING_LITERAL,
+      { $n = ast(I_PARAMETER, _localctx.start,
+                 _localctx.reg != null ? AstNode.leaf($reg) : null,
+                 $name,
                  buildTree(I_ANNOTATIONS, annotations)); }
     | { statementsMethodAnnotations.addAll(annotations); }
-      { $n = ast(I_PARAMETER, _localctx.start, AstNode.leaf($REGISTER), $STRING_LITERAL,
+      { $n = ast(I_PARAMETER, _localctx.start,
+                 _localctx.reg != null ? AstNode.leaf($reg) : null,
+                 $name,
                  buildTree(I_ANNOTATIONS, new ArrayList<AstNode>())); }
     );
 
@@ -676,13 +683,19 @@ line_directive returns[AstNode n]
     { $n = ast(I_LINE, _localctx.start, $integral_literal.n); };
 
 local_directive returns[AstNode n]
-  : LOCAL_DIRECTIVE REGISTER (COMMA (NULL_LITERAL | name=STRING_LITERAL) COLON (VOID_TYPE | nvtd=nonvoid_type_descriptor)
+  : LOCAL_DIRECTIVE REGISTER (COMMA local_name COLON (VOID_TYPE | nvtd=nonvoid_type_descriptor)
                               (COMMA signature=STRING_LITERAL)? )?
     { $n = ast(I_LOCAL, _localctx.start, AstNode.leaf($REGISTER),
-               $NULL_LITERAL != null ? AstNode.leaf($NULL_LITERAL) : null,
-               $name,
+               _localctx.local_name != null ? $local_name.n : null,
                _localctx.nvtd != null ? $nvtd.n : null,
                $signature); };
+
+local_name returns[AstNode n]
+  : NULL_LITERAL { $n = AstNode.leaf($NULL_LITERAL); }
+  | STRING_LITERAL { $n = AstNode.leaf($STRING_LITERAL); }
+  // An unquoted local name is lexed as a SIMPLE_NAME. Normalize it to a STRING_LITERAL
+  // node so the tree walker can keep reading a single string_literal form.
+  | SIMPLE_NAME { $n = retypedText(STRING_LITERAL, $SIMPLE_NAME, "\"" + $SIMPLE_NAME.text + "\""); };
 
 end_local_directive returns[AstNode n]
   : END_LOCAL_DIRECTIVE REGISTER

@@ -60,9 +60,6 @@ class AssembleIntegrationTest {
         var assembled = 0
         val failures = mutableListOf<String>()
         for (fixture in fixtures) {
-            if (isUnsupported(fixture)) {
-                continue
-            }
             val text = String(Files.readAllBytes(fixture.toPath()), StandardCharsets.UTF_8)
             try {
                 compileSmali(text, MOST_RECENT_API)
@@ -88,25 +85,6 @@ class AssembleIntegrationTest {
             "../smali-integration-tests/src/test/smali",
             "../examples",
         )
-
-        // These fixtures are not valid input for the current smali front-end: assembling them fails
-        // identically with the pre-migration ANTLR3 front-end. They are excluded from this check so
-        // that it only reports regressions introduced by the parser/tree-walker itself.
-        private val PRE_EXISTING_UNSUPPORTED = arrayOf(
-            "InstructionTests/Format21h/Format21h.smali",  // requires const/high16 literals to be shifted
-            "AutofixTests/GotoTest.smali",                // uses unquoted .local names
-            "AnnotationTests/AnnotationTests.smali",      // uses the .parameter directive
-        )
-
-        private fun isUnsupported(fixture: File): Boolean {
-            val path = fixture.path.replace(File.separatorChar, '/')
-            for (unsupported in PRE_EXISTING_UNSUPPORTED) {
-                if (path.contains(unsupported)) {
-                    return true
-                }
-            }
-            return false
-        }
 
         private fun collectSmaliFiles(dir: File, out: MutableList<File>) {
             val files = dir.listFiles()

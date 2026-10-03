@@ -614,36 +614,51 @@ catchall_directive
   };
 
 parameters[List<SmaliMethodParameter> params]
-  : I_PARAMETERS (DOWN  (parameter[params])* UP)?;
+  @init { int paramOrdinal = 0; }
+  : I_PARAMETERS (DOWN  (parameter[params, paramOrdinal] { paramOrdinal++; })* UP)?;
 
-parameter[List<SmaliMethodParameter> params]
-  : I_PARAMETER (DOWN  REGISTER pname=string_literal? anns=annotations UP)?
+parameter[List<SmaliMethodParameter> params, int paramOrdinal]
+  : I_PARAMETER (DOWN
+        ( reg=REGISTER pname=string_literal? anns=annotations
+        | pname=string_literal? anns=annotations
+        ) UP)?
     {
-        final int registerNumber = parseRegister_short($REGISTER.text);
-        int totalMethodRegisters = methodTotalRegisters;
-        int methodParameterRegisters = this.methodParameterRegisters;
+        SmaliMethodParameter methodParameter;
+        if (_localctx.reg != null) {
+            final int registerNumber = parseRegister_short($reg.text);
+            int totalMethodRegisters = methodTotalRegisters;
+            int methodParameterRegisters = this.methodParameterRegisters;
 
-        if (registerNumber >= totalMethodRegisters) {
-            throw new SemanticException(_input, $I_PARAMETER, "Register %s is larger than the maximum register v%d " +
-                    "for this method", $REGISTER.text, totalMethodRegisters-1);
+            if (registerNumber >= totalMethodRegisters) {
+                throw new SemanticException(_input, $I_PARAMETER, "Register %s is larger than the maximum register v%d " +
+                        "for this method", $reg.text, totalMethodRegisters-1);
+            }
+            final int indexGuess = registerNumber - (totalMethodRegisters - methodParameterRegisters) - (methodIsStatic?0:1);
+
+            if (indexGuess < 0) {
+                throw new SemanticException(_input, $I_PARAMETER, "Register %s is not a parameter register.",
+                        $reg.text);
+            }
+
+            int parameterIndex = LinearSearch.linearSearch(params, SmaliMethodParameter.COMPARATOR,
+                new WithRegister() { public int getRegister() { return indexGuess; } },
+                    indexGuess);
+
+            if (parameterIndex < 0) {
+                throw new SemanticException(_input, $I_PARAMETER, "Register %s is the second half of a wide parameter.",
+                                    $reg.text);
+            }
+
+            methodParameter = params.get(parameterIndex);
+        } else {
+            // Legacy .parameter directive with no register: parameters are positional.
+            if (paramOrdinal >= params.size()) {
+                throw new SemanticException(_input, $I_PARAMETER,
+                        "No parameter exists for this parameter directive");
+            }
+            methodParameter = params.get(paramOrdinal);
         }
-        final int indexGuess = registerNumber - (totalMethodRegisters - methodParameterRegisters) - (methodIsStatic?0:1);
 
-        if (indexGuess < 0) {
-            throw new SemanticException(_input, $I_PARAMETER, "Register %s is not a parameter register.",
-                    $REGISTER.text);
-        }
-
-        int parameterIndex = LinearSearch.linearSearch(params, SmaliMethodParameter.COMPARATOR,
-            new WithRegister() { public int getRegister() { return indexGuess; } },
-                indexGuess);
-
-        if (parameterIndex < 0) {
-            throw new SemanticException(_input, $I_PARAMETER, "Register %s is the second half of a wide parameter.",
-                                $REGISTER.text);
-        }
-
-        SmaliMethodParameter methodParameter = params.get(parameterIndex);
         methodParameter.setName(_localctx.pname != null ? _localctx.pname.value : null);
         if (_localctx.anns != null && _localctx.anns.annotationsSet != null
                 && _localctx.anns.annotationsSet.size() > 0) {
@@ -957,7 +972,14 @@ insn_format21ih
       Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21ih.text);
       short regA = parseRegister_byte($REGISTER.text);
 
+      // A const/high16 literal is the high 16 bits of the value (e.g. 0x3000 means
+      // 0x30000000), but baksmali emits the already-shifted full value. Accept both by only
+      // shifting a literal that actually looks like a 16-bit hat. Anything else is left to the
+      // builder's checkIntegerHatLiteral, which reports the same error as before.
       int litB = $fixed_32bit_literal.value;
+      if ((litB & 0xFFFF) != 0 && litB >= Short.MIN_VALUE && litB <= 0xFFFF) {
+        litB = litB << 16;
+      }
 
       methodBuilder.addInstruction(new BuilderInstruction21ih(opcode, regA, litB));
     };
@@ -969,7 +991,12 @@ insn_format21lh
       Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21lh.text);
       short regA = parseRegister_byte($REGISTER.text);
 
+      // A const-wide/high16 literal is the high 16 bits of the value, but baksmali emits the
+      // already-shifted full value. Accept both, as for format 21ih above.
       long litB = $fixed_64bit_literal.value;
+      if ((litB & 0xFFFFFFFFFFFFL) != 0L && litB >= Short.MIN_VALUE && litB <= 0xFFFF) {
+        litB = litB << 48;
+      }
 
       methodBuilder.addInstruction(new BuilderInstruction21lh(opcode, regA, litB));
     };
