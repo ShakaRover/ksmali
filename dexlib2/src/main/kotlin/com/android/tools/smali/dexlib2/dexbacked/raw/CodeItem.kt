@@ -485,7 +485,7 @@ object CodeItem {
         }
 
         private fun annotateInstruction10x(out: AnnotatedBytes, instruction: Instruction) {
-            out.annotate(2, instruction.opcode.name)
+            out.annotate(2, instruction.opcode.mnemonic)
         }
 
         private fun annotateInstruction35c(
@@ -520,7 +520,7 @@ object CodeItem {
             out.annotate(
                 6, String.format(
                     "%s {%s}, %s",
-                    instruction.opcode.name, StringUtils.join(args, ", "), instruction.reference
+                    instruction.opcode.mnemonic, StringUtils.join(args, ", "), instruction.reference
                 )
             )
         }
@@ -534,7 +534,7 @@ object CodeItem {
             out.annotate(
                 6, String.format(
                     "%s {%s .. %s}, %s",
-                    instruction.opcode.name, formatRegister(startRegister),
+                    instruction.opcode.mnemonic, formatRegister(startRegister),
                     formatRegister(endRegister),
                     instruction.reference
                 )
@@ -608,7 +608,7 @@ object CodeItem {
 
             out.annotate(
                 instruction.codeUnits * 2, "%s %s",
-                instruction.opcode.name, StringUtils.join(args, ", ")
+                instruction.opcode.mnemonic, StringUtils.join(args, ", ")
             )
         }
 
@@ -619,7 +619,7 @@ object CodeItem {
             val elements = instruction.arrayElements
             val elementWidth = instruction.elementWidth
 
-            out.annotate(2, instruction.opcode.name)
+            out.annotate(2, instruction.opcode.mnemonic)
             out.indent()
             out.annotate(2, "element_width = %d", elementWidth)
             out.annotate(4, "size = %d", elements.size)
@@ -665,7 +665,7 @@ object CodeItem {
         ) {
             val elements = instruction.switchElements
 
-            out.annotate(2, instruction.opcode.name)
+            out.annotate(2, instruction.opcode.mnemonic)
             out.indent()
 
             out.annotate(2, "size = %d", elements.size)
@@ -689,7 +689,7 @@ object CodeItem {
         ) {
             val elements = instruction.switchElements
 
-            out.annotate(2, instruction.opcode.name)
+            out.annotate(2, instruction.opcode.mnemonic)
             out.indent()
             out.annotate(2, "size = %d", elements.size)
             if (elements.size > 0) {

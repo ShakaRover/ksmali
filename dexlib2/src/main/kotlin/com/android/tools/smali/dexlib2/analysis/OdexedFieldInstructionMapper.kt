@@ -84,7 +84,7 @@ open class OdexedFieldInstructionMapper(isArt: Boolean) {
             throw AnalysisException(
                 String.format(
                     "Incorrect field type \"%s\" for %s", fieldType,
-                    odexedOpcode.name
+                    odexedOpcode.mnemonic
                 )
             )
         }
@@ -93,7 +93,7 @@ open class OdexedFieldInstructionMapper(isArt: Boolean) {
     }
 
     private fun isCompatible(opcode: Opcode, type: Char): Boolean {
-        val valueType = opcodeValueTypeMap[opcode] ?: throw RuntimeException("Unexpected opcode: " + opcode.name)
+        val valueType = opcodeValueTypeMap[opcode] ?: throw RuntimeException("Unexpected opcode: " + opcode.mnemonic)
         return valueType == getValueType(type)
     }
 

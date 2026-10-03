@@ -49,7 +49,7 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 fun checkFormat(opcode: Opcode, expectedFormat: Format) {
     if (opcode.format != expectedFormat) {
         throw IllegalArgumentException(
-            String.format("Invalid opcode %s for %s", opcode.name, expectedFormat.name)
+            String.format("Invalid opcode %s for %s", opcode.mnemonic, expectedFormat.name)
         )
     }
 }

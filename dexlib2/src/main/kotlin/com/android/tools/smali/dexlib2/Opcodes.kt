@@ -78,7 +78,7 @@ class Opcodes private constructor(api: Int, artVersion: Int) {
                     opcodesByValue[opcodeValue.toInt()] = opcode
                 }
                 opcodeValues[opcode] = opcodeValue
-                opcodesByName[opcode.name.lowercase()] = opcode
+                opcodesByName[opcode.mnemonic.lowercase()] = opcode
             }
         }
     }

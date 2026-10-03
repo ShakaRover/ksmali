@@ -102,7 +102,7 @@ internal constructor(
     private fun getOpcodeValue(opcode: Opcode): Short {
         val value = opcodes.getOpcodeValue(opcode)
         if (value == null) {
-            throw ExceptionWithContext("Instruction %s is invalid for api %d", opcode.name, opcodes.api)
+            throw ExceptionWithContext("Instruction %s is invalid for api %d", opcode.mnemonic, opcodes.api)
         }
         return value
     }

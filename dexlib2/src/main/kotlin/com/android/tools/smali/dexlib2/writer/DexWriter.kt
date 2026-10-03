@@ -822,9 +822,9 @@ abstract class DexWriter<
             val list1 = encodedArraySection.getEncodedValueList(o1.key)
             val list2 = encodedArraySection.getEncodedValueList(o2.key)
             CollectionUtils.compareAsIterable(
-                Comparator<Any> { e1, e2 ->
+                Comparator<EncodedValue> { e1, e2 ->
                     @Suppress("UNCHECKED_CAST")
-                    (e1 as Comparable<Any>).compareTo(e2)
+                    (e1 as Comparable<Any>).compareTo(e2 as Any)
                 },
                 list1, list2
             )

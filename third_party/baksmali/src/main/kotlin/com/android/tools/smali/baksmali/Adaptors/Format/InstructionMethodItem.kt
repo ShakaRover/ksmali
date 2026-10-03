@@ -77,7 +77,7 @@ open class InstructionMethodItem<T : Instruction>(
             return false
         }
 
-        return opcode.isVolatileFieldAccessor || opcode == Opcode.THROW_VERIFICATION_ERROR
+        return opcode.isVolatileFieldAccessor() || opcode == Opcode.THROW_VERIFICATION_ERROR
     }
 
     private fun interface Writable {
@@ -382,7 +382,7 @@ open class InstructionMethodItem<T : Instruction>(
 
     @Throws(IOException::class)
     protected fun writeOpcode(writer: BaksmaliWriter) {
-        writer.write(instruction.opcode.name)
+        writer.write(instruction.opcode.mnemonic)
     }
 
     @Throws(IOException::class)

@@ -106,14 +106,12 @@ dependencies {
     dx depends.dx
 }
 
-// You must manually execute this task to regenerate SyntheticAccessorFSM.java, after modifying the ragel file
-// e.g. ./gradlew ragel
-task ragel(type:Exec) {
-    workingDir = 'src/main/ragel'
-
-    commandLine 'ragel', '-J', '-o', file('src/main/java/com/android/tools/smali/dexlib2/util/SyntheticAccessorFSM.java'),
-            'SyntheticAccessorFSM.rl'
-}
+// NOTE: SyntheticAccessorFSM is now maintained by hand in
+// src/main/kotlin/com/android/tools/smali/dexlib2/util/SyntheticAccessorFSM.kt.
+// The ragel task that used to regenerate src/main/java/.../SyntheticAccessorFSM.java
+// has been removed so that the build no longer emits Java sources into the source tree.
+// SyntheticAccessorFSM.rl is kept as the reference definition of the state machine; if
+// it ever changes, port the change into the Kotlin implementation by hand.
 
 task generateAccessorTestSource(type: JavaExec) {
     file(testAccessorOutputFile.parent).mkdirs()

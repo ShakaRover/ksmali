@@ -233,7 +233,7 @@ open class MethodAnalyzer(
                         this.analysisExceptionValue = ex
                         val codeAddress = getInstructionAddress(instructionToAnalyze)
                         ex.codeAddress = codeAddress
-                        ex.addContext(String.format("opcode: %s", instructionToAnalyze.instruction.opcode.name))
+                        ex.addContext(String.format("opcode: %s", instructionToAnalyze.instruction.opcode.mnemonic))
                         ex.addContext(String.format("code address: %d", codeAddress))
                         ex.addContext(String.format("method: %s", method))
                         break
@@ -590,7 +590,7 @@ open class MethodAnalyzer(
                     }
                 } else if (instructionOpcode != Opcode.FILL_ARRAY_DATA) {
                     val targetAddressOffset = offsetInstruction.codeOffset
-                    val targetInstruction = analyzedInstructionsByAddress.get(instructionCodeAddress + targetAddressOffset)
+                    val targetInstruction = analyzedInstructionsByAddress.get(instructionCodeAddress + targetAddressOffset)!!
                     addPredecessorSuccessor(instruction, targetInstruction, exceptionHandlers, instructionsToProcess)
                 }
             }
@@ -615,7 +615,7 @@ open class MethodAnalyzer(
     ) {
         if (!allowMoveException && successor.instruction.opcode == Opcode.MOVE_EXCEPTION) {
             throw AnalysisException(
-                "Execution can pass from the " + predecessor.instruction.opcode.name +
+                "Execution can pass from the " + predecessor.instruction.opcode.mnemonic +
                         " instruction at code address 0x" + Integer.toHexString(getInstructionAddress(predecessor)) +
                         " to the move-exception instruction at address 0x" +
                         Integer.toHexString(getInstructionAddress(successor))
@@ -1324,7 +1324,7 @@ open class MethodAnalyzer(
         }
         if (previousInstruction == null || !previousInstruction.instruction.opcode.setsResult()) {
             throw AnalysisException(
-                analyzedInstruction.instruction.opcode.name + " must occur after an " +
+                analyzedInstruction.instruction.opcode.mnemonic + " must occur after an " +
                         "invoke-*/fill-new-array instruction"
             )
         }
@@ -1440,7 +1440,7 @@ open class MethodAnalyzer(
 
                     val nextAddress = getInstructionAddress(analyzedInstruction) +
                             (analyzedInstruction.instruction as Instruction21t).codeOffset
-                    val branchInstruction = analyzedInstructionsByAddress.get(nextAddress)
+                    val branchInstruction = analyzedInstructionsByAddress.get(nextAddress)!!
 
                     val narrowingRegister = (prevAnalyzedInstruction.instruction as Instruction22c).registerB
                     val originalType = analyzedInstruction.getPreInstructionRegisterType(narrowingRegister)
