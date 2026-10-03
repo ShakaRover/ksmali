@@ -112,7 +112,7 @@ open class CustomInlineMethodResolver(private val classPath: ClassPath, inlineTa
         var resolved = false
         val typeProto = classPath.getClass(className)
         if (typeProto is ClassProto) {
-            val classDef: ClassDef = typeProto.classDef
+            val classDef: ClassDef = typeProto.getClassDef()
             for (method in classDef.methods) {
                 if (method == methodRef) {
                     resolved = true
