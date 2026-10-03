@@ -13,3 +13,6 @@
 
 # Local round-trip test artifacts (real APKs and outputs)
 /tests
+
+# Local fat-jar backups for old/new A/B comparison
+/backups

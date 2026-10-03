@@ -47,6 +47,23 @@ def maven_release_projects = ['smali', 'baksmali', 'dexlib2', 'util']
 subprojects {
     apply plugin: 'java-library'
     apply plugin: 'idea'
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = '1.8'
+        }
+    }
+
+    // Sources also live under third_party/<module>/; keep Kotlin files there in the source set too
+    sourceSets {
+        main {
+            kotlin.srcDir "${project.rootDir}/third_party/${project.name}/src/main/kotlin"
+        }
+        test {
+            kotlin.srcDir "${project.rootDir}/third_party/${project.name}/src/test/kotlin"
+        }
+    }
 
     if (JavaVersion.current().isJava8Compatible()) {
         allprojects {
@@ -173,6 +190,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21"
     }
 }
 
