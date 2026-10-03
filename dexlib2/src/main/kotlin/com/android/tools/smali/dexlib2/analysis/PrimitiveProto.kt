@@ -1,17 +1,17 @@
 /*
- * Copyright 2016, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
  *
- * Redistributions of source code must retain the above copyright
+ *     * Redistributions of source code must retain the above copyright
  * notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above
+ *     * Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer
  * in the documentation and/or other materials provided with the
  * distribution.
- * Neither the name of Google LLC nor the names of its
+ *     * Neither the name of Google LLC nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -28,28 +28,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.dexlib2.analysis;
 
-import com.android.tools.smali.dexlib2.iface.ClassDef;
-import com.android.tools.smali.dexlib2.iface.DexFile;
+package com.android.tools.smali.dexlib2.analysis
 
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
+import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.util.ExceptionWithContext
 
-public class DexClassProvider implements ClassProvider {
-    private final DexFile dexFile;
-    private Map<String, ClassDef> classMap = new HashMap<>();
+open class PrimitiveProto(override val classPath: ClassPath, override val type: String) : TypeProto {
+    override fun toString(): String = type
 
-    public DexClassProvider(DexFile dexFile) {
-        this.dexFile = dexFile;
+    override fun isInterface(): Boolean = false
 
-        for (ClassDef classDef: dexFile.getClasses()) {
-            classMap.put(classDef.getType(), classDef);
-        }
+    override fun implementsInterface(iface: String): Boolean = false
+
+    override val superclass: String?
+        get() = null
+
+    override fun getCommonSuperclass(other: TypeProto): TypeProto {
+        throw ExceptionWithContext("Cannot call getCommonSuperclass on PrimitiveProto")
     }
 
-    @Nullable @Override public ClassDef getClassDef(String type) {
-        return classMap.get(type);
+    override fun getFieldByOffset(fieldOffset: Int): FieldReference? {
+        return null
+    }
+
+    override fun getMethodByVtableIndex(vtableIndex: Int): Method? {
+        return null
+    }
+
+    override fun findMethodIndexInVtable(method: MethodReference): Int {
+        return -1
     }
 }

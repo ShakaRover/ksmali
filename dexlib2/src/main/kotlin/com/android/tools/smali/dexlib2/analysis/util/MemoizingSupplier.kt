@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,45 +28,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.dexlib2.analysis.util;
 
-import java.util.function.Supplier;
+package com.android.tools.smali.dexlib2.analysis.util
 
-/** 
+import java.util.function.Supplier
+
+/**
  * Based on Guava's NonSerializableMemoizing Supplier. This implementation is thread safe.
  */
-public class MemoizingSupplier<T> implements Supplier<T> {
+open class MemoizingSupplier<T> private constructor(delegate: Supplier<T>?) : Supplier<T> {
     // Delegate will only be null when the value was successfuly computed
-    private volatile Supplier<T> delegate;
-    private T value;
+    @Volatile
+    private var delegate: Supplier<T>? = delegate
 
-    private MemoizingSupplier(Supplier<T> delegate) {
+    private var value: T? = null
+
+    init {
         if (delegate == null) {
-            throw new NullPointerException("delegate == null");
+            throw NullPointerException("delegate == null")
         }
-        this.delegate = delegate;
     }
 
-    @Override
-    public T get() {
+    override fun get(): T {
         // Because Supplier is read-heavy, we use the "double-checked locking" pattern.
         if (delegate != null) {
-            synchronized (this) {
-                if (delegate != null) {
-                    T t = delegate.get();
-                    value = t;
-                    delegate = null;
+            synchronized(this) {
+                val currentDelegate = delegate
+                if (currentDelegate != null) {
+                    value = currentDelegate.get()
+                    delegate = null
                 }
             }
         }
         // This is safe because we checked `delegate.`
-        return value;
+        @Suppress("UNCHECKED_CAST")
+        return value as T
     }
 
-    public static <T extends Object> MemoizingSupplier<T> memoize(Supplier<T> delegate) {
-        if (delegate instanceof MemoizingSupplier) {
-            return (MemoizingSupplier<T>) delegate;
+    companion object {
+        @JvmStatic
+        fun <T> memoize(delegate: Supplier<T>): MemoizingSupplier<T> {
+            if (delegate is MemoizingSupplier<*>) {
+                @Suppress("UNCHECKED_CAST")
+                return delegate as MemoizingSupplier<T>
+            }
+            return MemoizingSupplier(delegate)
         }
-        return new MemoizingSupplier<>(delegate);
     }
 }

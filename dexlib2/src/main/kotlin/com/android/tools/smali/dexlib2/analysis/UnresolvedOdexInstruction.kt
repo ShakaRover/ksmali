@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,20 +28,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.dexlib2.analysis;
 
-import com.android.tools.smali.util.ExceptionWithContext;
+package com.android.tools.smali.dexlib2.analysis
 
-public class UnresolvedClassException extends ExceptionWithContext {
-    public UnresolvedClassException(Throwable cause) {
-        super(cause);
-    }
+import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 
-    public UnresolvedClassException(Throwable cause, String message, Object... formatArgs) {
-        super(cause, message, formatArgs);
-    }
+/**
+ * This represents a "fixed" odexed instruction, where the object register is always null and so the correct type
+ * can't be determined. Typically, these are replaced by an equivalent instruction that would have the same
+ * effect (namely, an NPE)
+ */
+open class UnresolvedOdexInstruction(
+    @JvmField val originalInstruction: Instruction,
+    //the register number that holds the (null) reference type that the instruction operates on
+    @JvmField val objectRegisterNum: Int
+) : Instruction {
+    override val opcode: Opcode
+        get() = originalInstruction.opcode
 
-    public UnresolvedClassException(String message, Object... formatArgs) {
-        super(message, formatArgs);
-    }
+    override val codeUnits: Int
+        get() = originalInstruction.codeUnits
 }

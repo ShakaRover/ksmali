@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,31 +28,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.dexlib2.analysis;
 
-import com.android.tools.smali.dexlib2.Opcode;
-import com.android.tools.smali.dexlib2.iface.instruction.Instruction;
+package com.android.tools.smali.dexlib2.analysis.reflection
 
-/**
- * This represents a "fixed" odexed instruction, where the object register is always null and so the correct type
- * can't be determined. Typically, these are replaced by an equivalent instruction that would have the same
- * effect (namely, an NPE)
- */
-public class UnresolvedOdexInstruction implements Instruction {
-    public final Instruction originalInstruction;
-    //the register number that holds the (null) reference type that the instruction operates on
-    public final int objectRegisterNum;
+import com.android.tools.smali.dexlib2.HiddenApiRestriction
+import com.android.tools.smali.dexlib2.analysis.reflection.util.ReflectionUtils
+import com.android.tools.smali.dexlib2.base.reference.BaseFieldReference
+import com.android.tools.smali.dexlib2.iface.Annotation
+import com.android.tools.smali.dexlib2.iface.Field
+import com.android.tools.smali.dexlib2.iface.value.EncodedValue
+import java.util.Collections
 
-    public UnresolvedOdexInstruction(Instruction originalInstruction, int objectRegisterNumber) {
-        this.originalInstruction = originalInstruction;
-        this.objectRegisterNum = objectRegisterNumber;
-    }
+open class ReflectionField(private val reflectedField: java.lang.reflect.Field) : BaseFieldReference(), Field {
+    override val accessFlags: Int
+        get() = reflectedField.modifiers
 
-    @Override public Opcode getOpcode() {
-        return originalInstruction.getOpcode();
-    }
+    override val initialValue: EncodedValue?
+        get() = null
 
-    @Override public int getCodeUnits() {
-        return originalInstruction.getCodeUnits();
-    }
+    override val annotations: Set<Annotation>
+        get() = Collections.emptySet()
+
+    override val definingClass: String
+        get() = ReflectionUtils.javaToDexName(reflectedField.declaringClass.name)
+
+    override val name: String
+        get() = reflectedField.name
+
+    override val type: String
+        get() = ReflectionUtils.javaToDexName(reflectedField.type.name)
+
+    override val hiddenApiRestrictions: Set<HiddenApiRestriction>
+        get() = Collections.emptySet()
 }

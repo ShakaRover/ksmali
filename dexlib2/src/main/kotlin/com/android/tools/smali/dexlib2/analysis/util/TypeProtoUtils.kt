@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,17 +28,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.dexlib2.analysis.util;
 
-import com.android.tools.smali.dexlib2.analysis.TypeProto;
-import com.android.tools.smali.dexlib2.analysis.UnresolvedClassException;
+package com.android.tools.smali.dexlib2.analysis.util
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import com.android.tools.smali.dexlib2.analysis.TypeProto
+import com.android.tools.smali.dexlib2.analysis.UnresolvedClassException
+import java.util.NoSuchElementException
 
-public class TypeProtoUtils {
+object TypeProtoUtils {
     /**
      * Get the chain of superclasses of the given class. The first element will be the immediate superclass followed by
      * it's superclass, etc. up to java.lang.Object.
@@ -50,59 +47,53 @@ public class TypeProtoUtils {
      *
      * @return An iterable containing the superclasses of this class.
      */
-    @Nonnull
-    public static Iterable<TypeProto> getSuperclassChain(@Nonnull final TypeProto typeProto) {
-        return new Iterable<TypeProto>() {
+    @JvmStatic
+    fun getSuperclassChain(typeProto: TypeProto): Iterable<TypeProto> {
+        return object : Iterable<TypeProto> {
+            override fun iterator(): Iterator<TypeProto> {
+                return object : Iterator<TypeProto> {
+                    private var type: TypeProto? = getSuperclassAsTypeProto(typeProto)
 
-            @Override public Iterator<TypeProto> iterator() {
-                return new Iterator<TypeProto>() {
-                    @Nullable private TypeProto type = getSuperclassAsTypeProto(typeProto);
+                    override fun hasNext(): Boolean = type != null
 
-                    @Override public boolean hasNext() {
-                        return type != null;
-                    }
-
-                    @Override public TypeProto next() {
-                        TypeProto type = this.type;
+                    override fun next(): TypeProto {
+                        val type = this.type
                         if (type == null) {
-                            throw new NoSuchElementException();
+                            throw NoSuchElementException()
                         }
 
-                        this.type = getSuperclassAsTypeProto(type);
-                        return type;
+                        this.type = getSuperclassAsTypeProto(type)
+                        return type
                     }
-
-                    @Override public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+                }
             }
-        };
+        }
     }
 
-    @Nullable
-    public static TypeProto getSuperclassAsTypeProto(@Nonnull TypeProto type) {
+    @JvmStatic
+    fun getSuperclassAsTypeProto(type: TypeProto): TypeProto? {
         try {
-            String next = type.getSuperclass();
+            val next = type.superclass
             if (next != null) {
-                return type.getClassPath().getClass(next);
+                return type.classPath.getClass(next)
             } else {
-                return null;
+                return null
             }
-        } catch (UnresolvedClassException ex) {
-            return type.getClassPath().getUnknownClass();
+        } catch (ex: UnresolvedClassException) {
+            return type.classPath.getUnknownClass()
         }
     }
 
-    public static boolean extendsFrom(@Nonnull TypeProto candidate, @Nonnull String possibleSuper) {
-        if (candidate.getType().equals(possibleSuper)) {
-            return true;
+    @JvmStatic
+    fun extendsFrom(candidate: TypeProto, possibleSuper: String): Boolean {
+        if (candidate.type == possibleSuper) {
+            return true
         }
-        for (TypeProto superProto: getSuperclassChain(candidate)) {
-            if (superProto.getType().equals(possibleSuper)) {
-                return true;
+        for (superProto in getSuperclassChain(candidate)) {
+            if (superProto.type == possibleSuper) {
+                return true
             }
         }
-        return false;
+        return false
     }
 }

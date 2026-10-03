@@ -1,17 +1,17 @@
 /*
- * Copyright 2016, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
  *
- * Redistributions of source code must retain the above copyright
+ *     * Redistributions of source code must retain the above copyright
  * notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above
+ *     * Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer
  * in the documentation and/or other materials provided with the
  * distribution.
- * Neither the name of Google LLC nor the names of its
+ *     * Neither the name of Google LLC nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -28,13 +28,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.dexlib2.analysis;
 
-import com.android.tools.smali.dexlib2.iface.ClassDef;
+package com.android.tools.smali.dexlib2.analysis
 
-import javax.annotation.Nullable;
+import com.android.tools.smali.dexlib2.iface.Method
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
-public interface ClassProvider {
-    @Nullable
-    ClassDef getClassDef(String type);
+interface TypeProto {
+    val classPath: ClassPath
+    val type: String
+    fun isInterface(): Boolean
+    fun implementsInterface(iface: String): Boolean
+    val superclass: String?
+    fun getCommonSuperclass(other: TypeProto): TypeProto
+    fun getFieldByOffset(fieldOffset: Int): FieldReference?
+    fun getMethodByVtableIndex(vtableIndex: Int): Method?
+    fun findMethodIndexInVtable(method: MethodReference): Int
 }

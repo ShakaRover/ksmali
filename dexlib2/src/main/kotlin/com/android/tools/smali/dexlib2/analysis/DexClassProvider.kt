@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -28,25 +28,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.dexlib2.analysis;
 
-import com.android.tools.smali.dexlib2.iface.Method;
-import com.android.tools.smali.dexlib2.iface.reference.FieldReference;
-import com.android.tools.smali.dexlib2.iface.reference.MethodReference;
+package com.android.tools.smali.dexlib2.analysis
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.android.tools.smali.dexlib2.iface.ClassDef
+import com.android.tools.smali.dexlib2.iface.DexFile
+import java.util.HashMap
 
-public interface TypeProto {
-    @Nonnull ClassPath getClassPath();
-    @Nonnull String getType();
-    boolean isInterface();
-    boolean implementsInterface(@Nonnull String iface);
-    @Nullable String getSuperclass();
-    @Nonnull TypeProto getCommonSuperclass(@Nonnull TypeProto other);
-    @Nullable
-    FieldReference getFieldByOffset(int fieldOffset);
-    @Nullable
-    Method getMethodByVtableIndex(int vtableIndex);
-    int findMethodIndexInVtable(@Nonnull MethodReference method);
+open class DexClassProvider(private val dexFile: DexFile) : ClassProvider {
+    private val classMap: MutableMap<String, ClassDef> = HashMap()
+
+    init {
+        for (classDef in dexFile.classes) {
+            classMap[classDef.type] = classDef
+        }
+    }
+
+    override fun getClassDef(type: String): ClassDef? {
+        return classMap[type]
+    }
 }
