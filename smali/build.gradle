@@ -51,9 +51,10 @@ sourceSets {
             srcDirs "${project.rootDir}/third_party/smali/src/main/java"
         }
         resources {
-            // This adds the generated .tokens files to the jar
+            // This adds the generated .tokens files to the jar. The .interp files are excluded
+            // because they are large and break the groovy template expansion below.
             srcDir 'build/generated-src/antlr/main'
-            include '**/*.tokens'
+            exclude '**/*.interp'
         }
     }
     test {
