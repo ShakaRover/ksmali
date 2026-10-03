@@ -1,0 +1,131 @@
+/*
+ * Copyright 2016, Google LLC
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above
+ * copyright notice, this list of conditions and the following disclaimer
+ * in the documentation and/or other materials provided with the
+ * distribution.
+ *     * Neither the name of Google LLC nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+package com.android.tools.smali.baksmali
+
+import com.beust.jcommander.JCommander
+import com.beust.jcommander.Parameter
+import com.google.common.collect.Lists
+import com.android.tools.smali.baksmali.HelpCommand.HlepCommand
+import com.android.tools.smali.util.jcommander.Command
+import com.android.tools.smali.util.jcommander.ExtendedParameters
+import com.android.tools.smali.util.jcommander.addExtendedCommand
+import java.io.IOException
+import java.util.Properties
+
+@ExtendedParameters(
+    includeParametersInUsage = true,
+    commandName = "baksmali",
+    postfixDescription = "See baksmali help <command> for more information about a specific command"
+)
+open class Main : Command(Lists.newArrayList<JCommander>()) {
+
+    @field:Parameter(
+        names = ["--help", "-h", "-?"], help = true,
+        description = "Show usage information"
+    )
+    private var help = false
+
+    @field:Parameter(
+        names = ["--version", "-v"], help = true,
+        description = "Print the version of baksmali and then exit"
+    )
+    @JvmField
+    var version = false
+
+    private lateinit var jc: JCommander
+
+    override fun run() {
+    }
+
+    override fun getJCommander(): JCommander {
+        return jc
+    }
+
+    companion object {
+        @JvmField
+        val VERSION: String = loadVersion()
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            val main = Main()
+
+            val jc = JCommander(main)
+            main.jc = jc
+            jc.programName = "baksmali"
+            val commandHierarchy = main.getCommandHierarchy()
+
+            addExtendedCommand(jc, DisassembleCommand(commandHierarchy))
+            addExtendedCommand(jc, DeodexCommand(commandHierarchy))
+            addExtendedCommand(jc, DumpCommand(commandHierarchy))
+            addExtendedCommand(jc, HelpCommand(commandHierarchy))
+            addExtendedCommand(jc, HlepCommand(commandHierarchy))
+            addExtendedCommand(jc, ListCommand(commandHierarchy))
+
+            jc.parse(*args)
+
+            if (main.version) {
+                version()
+            }
+
+            if (jc.parsedCommand == null || main.help) {
+                main.usage()
+                return
+            }
+
+            val command = jc.commands[jc.parsedCommand]!!.objects[0] as Command
+            command.run()
+        }
+
+        @JvmStatic
+        protected fun version() {
+            System.out.println("baksmali " + VERSION + " (http://smali.org)")
+            System.out.println("Copyright (C) 2010 Ben Gruver (JesusFreke@JesusFreke.com)")
+            System.out.println("BSD license (http://www.opensource.org/licenses/bsd-license.php)")
+            System.exit(0)
+        }
+
+        private fun loadVersion(): String {
+            val propertiesStream =
+                Main::class.java.classLoader.getResourceAsStream("baksmali.properties")
+            var version = "[unknown version]"
+            if (propertiesStream != null) {
+                val properties = Properties()
+                try {
+                    properties.load(propertiesStream)
+                    version = properties.getProperty("application.version") ?: version
+                } catch (ex: IOException) {
+                    // ignore
+                }
+            }
+            return version
+        }
+    }
+}
