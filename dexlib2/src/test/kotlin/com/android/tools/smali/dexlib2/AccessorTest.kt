@@ -35,7 +35,6 @@ import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.util.SyntheticAccessorResolver
-import com.google.common.collect.ImmutableMap
 import org.junit.Assert
 import org.junit.Test
 import java.io.IOException
@@ -109,23 +108,23 @@ class AccessorTest {
         private val operationTypes: Map<String, Int>
 
         init {
-            val builder = ImmutableMap.builder<String, Int>()
-            builder.put("postinc", SyntheticAccessorResolver.POSTFIX_INCREMENT)
-            builder.put("preinc", SyntheticAccessorResolver.PREFIX_INCREMENT)
-            builder.put("postdec", SyntheticAccessorResolver.POSTFIX_DECREMENT)
-            builder.put("predec", SyntheticAccessorResolver.PREFIX_DECREMENT)
-            builder.put("add", SyntheticAccessorResolver.ADD_ASSIGNMENT)
-            builder.put("sub", SyntheticAccessorResolver.SUB_ASSIGNMENT)
-            builder.put("mul", SyntheticAccessorResolver.MUL_ASSIGNMENT)
-            builder.put("div", SyntheticAccessorResolver.DIV_ASSIGNMENT)
-            builder.put("rem", SyntheticAccessorResolver.REM_ASSIGNMENT)
-            builder.put("and", SyntheticAccessorResolver.AND_ASSIGNMENT)
-            builder.put("or", SyntheticAccessorResolver.OR_ASSIGNMENT)
-            builder.put("xor", SyntheticAccessorResolver.XOR_ASSIGNMENT)
-            builder.put("shl", SyntheticAccessorResolver.SHL_ASSIGNMENT)
-            builder.put("shr", SyntheticAccessorResolver.SHR_ASSIGNMENT)
-            builder.put("ushr", SyntheticAccessorResolver.USHR_ASSIGNMENT)
-            operationTypes = builder.build()
+            operationTypes = buildMap {
+                put("postinc", SyntheticAccessorResolver.POSTFIX_INCREMENT)
+                put("preinc", SyntheticAccessorResolver.PREFIX_INCREMENT)
+                put("postdec", SyntheticAccessorResolver.POSTFIX_DECREMENT)
+                put("predec", SyntheticAccessorResolver.PREFIX_DECREMENT)
+                put("add", SyntheticAccessorResolver.ADD_ASSIGNMENT)
+                put("sub", SyntheticAccessorResolver.SUB_ASSIGNMENT)
+                put("mul", SyntheticAccessorResolver.MUL_ASSIGNMENT)
+                put("div", SyntheticAccessorResolver.DIV_ASSIGNMENT)
+                put("rem", SyntheticAccessorResolver.REM_ASSIGNMENT)
+                put("and", SyntheticAccessorResolver.AND_ASSIGNMENT)
+                put("or", SyntheticAccessorResolver.OR_ASSIGNMENT)
+                put("xor", SyntheticAccessorResolver.XOR_ASSIGNMENT)
+                put("shl", SyntheticAccessorResolver.SHL_ASSIGNMENT)
+                put("shr", SyntheticAccessorResolver.SHR_ASSIGNMENT)
+                put("ushr", SyntheticAccessorResolver.USHR_ASSIGNMENT)
+            }
         }
     }
 }

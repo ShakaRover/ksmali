@@ -35,7 +35,6 @@ java_binary_host {
     manifest: "manifest.txt",
 
     static_libs: [
-        "guava",
         "smali-dexlib2",
         "android-smali-util",
         "jcommander",

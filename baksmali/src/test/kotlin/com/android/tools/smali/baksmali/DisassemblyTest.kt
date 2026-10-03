@@ -30,7 +30,6 @@
 
 package com.android.tools.smali.baksmali
 
-import com.google.common.collect.Iterables
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import org.junit.Assert
@@ -60,7 +59,7 @@ open class DisassemblyTest : DexTest() {
         try {
             val inputDex: DexBackedDexFile = getInputDexFile(testName, options)
             Assert.assertEquals(1, inputDex.classSection.size)
-            val inputClass: ClassDef? = Iterables.getFirst(inputDex.classes, null)
+            val inputClass: ClassDef? = inputDex.classes.firstOrNull()
             Assert.assertNotNull(inputClass)
             val input = BaksmaliTestUtils.getNormalizedSmali(inputClass!!, options, true)
 

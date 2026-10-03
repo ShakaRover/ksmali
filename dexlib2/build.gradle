@@ -96,7 +96,6 @@ configurations {
 
 dependencies {
     implementation depends.findbugs
-    implementation depends.guava
 
     testImplementation depends.junit
     testImplementation depends.mockito

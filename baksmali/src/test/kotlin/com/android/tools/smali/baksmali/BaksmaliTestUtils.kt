@@ -30,7 +30,6 @@
 
 package com.android.tools.smali.baksmali
 
-import com.google.common.io.ByteStreams
 import org.antlr.v4.runtime.RecognitionException
 import com.android.tools.smali.baksmali.Adaptors.ClassDefinition
 import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
@@ -114,7 +113,7 @@ class BaksmaliTestUtils {
                 org.junit.Assert.fail("Could not load $fileName")
             }
 
-            return ByteStreams.toByteArray(smaliStream)
+            return smaliStream.readBytes()
         }
         @Throws(IOException::class)
         fun readResourceFully(fileName: String): String {

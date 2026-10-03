@@ -39,7 +39,6 @@ import com.android.tools.smali.util.jcommander.getSubcommand
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
-import com.google.common.collect.Iterables
 
 @Parameters(commandDescription = "Shows usage information")
 @ExtendedParameters(
@@ -62,7 +61,7 @@ open class ListHelpCommand(commandAncestors: List<JCommander>) : Command(command
             )
         } else {
             var printedHelp = false
-            val parentJc = Iterables.getLast(commandAncestors)
+            val parentJc = commandAncestors.last()
             for (cmd in cmds) {
                 val command = getSubcommand(parentJc, cmd)
                 if (command == null) {

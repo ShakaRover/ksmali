@@ -30,8 +30,6 @@
 
 package com.android.tools.smali.baksmali
 
-import com.google.common.base.Charsets
-import com.google.common.io.Resources
 import com.android.tools.smali.baksmali.Adaptors.ClassDefinition
 import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 import com.android.tools.smali.dexlib2.DexFileFactory
@@ -45,6 +43,7 @@ import java.io.IOException
 import java.io.StringWriter
 import java.net.URISyntaxException
 import java.net.URL
+import java.nio.charset.StandardCharsets
 
 class AnalysisTest {
 
@@ -132,13 +131,13 @@ class AnalysisTest {
 
     @Throws(URISyntaxException::class)
     private fun findResource(resource: String): File {
-        val resUrl: URL = Resources.getResource(resource)
+        val resUrl: URL = requireNotNull(AnalysisTest::class.java.classLoader.getResource(resource))
         return File(resUrl.toURI())
     }
 
     @Throws(URISyntaxException::class, IOException::class)
     private fun readResource(resource: String): String {
-        val url: URL = Resources.getResource(resource)
-        return Resources.toString(url, Charsets.UTF_8)
+        val url: URL = requireNotNull(AnalysisTest::class.java.classLoader.getResource(resource))
+        return url.readText(StandardCharsets.UTF_8)
     }
 }

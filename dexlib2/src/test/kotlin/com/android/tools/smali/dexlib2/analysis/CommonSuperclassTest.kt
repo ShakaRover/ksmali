@@ -34,7 +34,6 @@ import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableDexFile
-import com.google.common.collect.ImmutableSet
 import org.junit.Assert
 import org.junit.Test
 import java.io.IOException
@@ -56,7 +55,7 @@ class CommonSuperclassTest {
 
 
     init {
-        val classes = ImmutableSet.of(
+        val classes = setOf(
                 TestUtils.makeClassDef("Ljava/lang/Object;", null),
                 TestUtils.makeClassDef("Ltest/one;", "Ljava/lang/Object;"),
                 TestUtils.makeClassDef("Ltest/two;", "Ljava/lang/Object;"),

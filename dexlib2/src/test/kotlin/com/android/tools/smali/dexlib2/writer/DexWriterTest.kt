@@ -42,8 +42,6 @@ import com.android.tools.smali.dexlib2.immutable.value.ImmutableAnnotationEncode
 import com.android.tools.smali.dexlib2.immutable.value.ImmutableNullEncodedValue
 import com.android.tools.smali.dexlib2.writer.io.MemoryDataStore
 import com.android.tools.smali.dexlib2.writer.pool.DexPool
-import com.google.common.collect.ImmutableSet
-import com.google.common.collect.Iterables
 import org.junit.Assert
 import org.junit.Test
 import java.io.IOException
@@ -53,7 +51,7 @@ class DexWriterTest {
     @Test
     fun testAnnotationElementOrder() {
         // Elements are out of order wrt to the element name
-        val elements = ImmutableSet.of(
+        val elements = setOf(
             ImmutableAnnotationElement("zabaglione", ImmutableNullEncodedValue.INSTANCE),
             ImmutableAnnotationElement("blah", ImmutableNullEncodedValue.INSTANCE)
         )
@@ -62,20 +60,20 @@ class DexWriterTest {
             "Lorg/test/anno;", elements)
 
         val classDef = ImmutableClassDef("Lorg/test/blah;",
-            0, "Ljava/lang/Object;", null, null, ImmutableSet.of(annotation), null, null)
+            0, "Ljava/lang/Object;", null, null, setOf(annotation), null, null)
 
         val dataStore = MemoryDataStore()
 
         try {
-            DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
+            DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
         } catch (ex: IOException) {
             throw RuntimeException(ex)
         }
 
         val dexFile = DexBackedDexFile(Opcodes.getDefault(), dataStore.buffer)
-        val dbClassDef = Iterables.getFirst(dexFile.classes, null)
+        val dbClassDef = dexFile.classes.firstOrNull()
         Assert.assertNotNull(dbClassDef)
-        val dbAnnotation = Iterables.getFirst(dbClassDef!!.annotations, null)
+        val dbAnnotation = dbClassDef!!.annotations.firstOrNull()
         Assert.assertNotNull(dbAnnotation)
         val dbElements = ArrayList(dbAnnotation!!.elements)
 
@@ -88,14 +86,14 @@ class DexWriterTest {
     @Test
     fun testEncodedAnnotationElementOrder() {
         // Elements are out of order wrt to the element name
-        val encodedElements = ImmutableSet.of(
+        val encodedElements = setOf(
             ImmutableAnnotationElement("zabaglione", ImmutableNullEncodedValue.INSTANCE),
             ImmutableAnnotationElement("blah", ImmutableNullEncodedValue.INSTANCE)
         )
 
         val encodedAnnotations = ImmutableAnnotationEncodedValue("Lan/encoded/annotation", encodedElements)
 
-        val elements = ImmutableSet.of(
+        val elements = setOf(
             ImmutableAnnotationElement("encoded_annotation", encodedAnnotations)
         )
 
@@ -103,23 +101,23 @@ class DexWriterTest {
             "Lorg/test/anno;", elements)
 
         val classDef = ImmutableClassDef("Lorg/test/blah;",
-            0, "Ljava/lang/Object;", null, null, ImmutableSet.of(annotation), null, null)
+            0, "Ljava/lang/Object;", null, null, setOf(annotation), null, null)
 
         val dataStore = MemoryDataStore()
 
         try {
-            DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
+            DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
         } catch (ex: IOException) {
             throw RuntimeException(ex)
         }
 
         val dexFile = DexBackedDexFile(Opcodes.getDefault(), dataStore.buffer)
-        val dbClassDef = Iterables.getFirst(dexFile.classes, null)
+        val dbClassDef = dexFile.classes.firstOrNull()
         Assert.assertNotNull(dbClassDef)
-        val dbAnnotation = Iterables.getFirst(dbClassDef!!.annotations, null)
+        val dbAnnotation = dbClassDef!!.annotations.firstOrNull()
         Assert.assertNotNull(dbAnnotation)
 
-        val element = Iterables.getFirst(dbAnnotation!!.elements, null)
+        val element = dbAnnotation!!.elements.firstOrNull()
         val dbAnnotationEncodedValue = element!!.value as AnnotationEncodedValue
 
         val dbElements = ArrayList(dbAnnotationEncodedValue.elements)

@@ -56,9 +56,6 @@ import com.android.tools.smali.dexlib2.writer.builder.BuilderCallSiteReference
 import com.android.tools.smali.dexlib2.writer.builder.BuilderMethod
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder
 import com.android.tools.smali.dexlib2.writer.io.FileDataStore
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableSet
-import com.google.common.collect.Iterators
 import org.junit.Assert
 import org.junit.Test
 import java.io.File
@@ -73,25 +70,25 @@ class CallSiteTest {
             null, null,
             listOf<Method>(
                 ImmutableMethod("Lcls1", "method1",
-                    ImmutableList.of(), "V", AccessFlags.PUBLIC.value, null, null,
-                    ImmutableMethodImplementation(10, ImmutableList.of(
+                    listOf(), "V", AccessFlags.PUBLIC.value, null, null,
+                    ImmutableMethodImplementation(10, listOf(
                         ImmutableInstruction35c(Opcode.INVOKE_CUSTOM, 0, 0, 0, 0, 0, 0,
                             ImmutableCallSiteReference("call_site_1",
                                 ImmutableMethodHandleReference(
                                     MethodHandleType.INVOKE_STATIC,
                                     ImmutableMethodReference("Lcls1", "loader",
-                                        ImmutableList.of("Ljava/lang/invoke/Lookup;",
+                                        listOf("Ljava/lang/invoke/Lookup;",
                                             "Ljava/lang/String;",
                                             "Ljava/lang/invoke/MethodType;"),
                                         "Ljava/lang/invoke/CallSite;")),
-                                "someMethod", ImmutableMethodProtoReference(ImmutableList.of(), "V"),
-                                ImmutableList.of<EncodedValue>()))
+                                "someMethod", ImmutableMethodProtoReference(listOf(), "V"),
+                                listOf<EncodedValue>()))
                     ), null, null))
             ))
 
         val tempFile = File.createTempFile("dex", ".dex")
         DexFileFactory.writeDexFile(tempFile.path,
-            ImmutableDexFile(Opcodes.forArtVersion(111), ImmutableList.of(class1)))
+            ImmutableDexFile(Opcodes.forArtVersion(111), listOf(class1)))
 
         verifyDexFile(DexFileFactory.loadDexFile(tempFile, Opcodes.forArtVersion(111)))
     }
@@ -105,12 +102,12 @@ class CallSiteTest {
             ImmutableCallSiteReference("call_site_1",
                 ImmutableMethodHandleReference(
                     MethodHandleType.INVOKE_STATIC,
-                    ImmutableMethodReference("Lcls1;", "loader", ImmutableList.of("Ljava/lang/invoke/Lookup;",
+                    ImmutableMethodReference("Lcls1;", "loader", listOf("Ljava/lang/invoke/Lookup;",
                         "Ljava/lang/String;",
                         "Ljava/lang/invoke/MethodType;"),
                         "Ljava/lang/invoke/CallSite;")),
                 "someMethod",
-                ImmutableMethodProtoReference(ImmutableList.of(), "V"), ImmutableList.of<EncodedValue>()))
+                ImmutableMethodProtoReference(listOf(), "V"), listOf<EncodedValue>()))
 
         val methodImplementationBuilder = MethodImplementationBuilder(10)
         methodImplementationBuilder.addInstruction(
@@ -118,12 +115,12 @@ class CallSiteTest {
         )
 
         val method: BuilderMethod = dexBuilder.internMethod(
-            "Lcls1;", "method1", null, "V", 0, ImmutableSet.of(),
-            ImmutableSet.of(), methodImplementationBuilder.getMethodImplementation()
+            "Lcls1;", "method1", null, "V", 0, setOf(),
+            setOf(), methodImplementationBuilder.getMethodImplementation()
         )
         dexBuilder.internClassDef("Lcls1;", AccessFlags.PUBLIC.value, "Ljava/lang/Object;", null, null,
-            ImmutableSet.of(), null,
-            ImmutableList.of(method))
+            setOf(), null,
+            listOf(method))
 
         val tempFile = File.createTempFile("dex", ".dex")
         dexBuilder.writeTo(FileDataStore(tempFile))

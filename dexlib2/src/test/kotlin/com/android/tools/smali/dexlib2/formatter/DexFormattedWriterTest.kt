@@ -36,8 +36,6 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodHandleReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableAnnotationElement
 import com.android.tools.smali.dexlib2.immutable.reference.*
 import com.android.tools.smali.dexlib2.immutable.value.*
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableSet
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -236,7 +234,7 @@ class DexFormattedWriterTest {
 
         writer.writeEncodedValue(ImmutableAnnotationEncodedValue(
                 "Lannotation/type;",
-                ImmutableSet.of(
+                setOf(
                         ImmutableAnnotationElement("element1", ImmutableFieldEncodedValue(getFieldReference())),
                         ImmutableAnnotationElement("element2", ImmutableMethodEncodedValue(getMethodReference()))
                 )))
@@ -253,7 +251,7 @@ class DexFormattedWriterTest {
     fun testWriteEncodedValue_array() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeEncodedValue(ImmutableArrayEncodedValue(ImmutableList.of(
+        writer.writeEncodedValue(ImmutableArrayEncodedValue(listOf(
                 ImmutableFieldEncodedValue(getFieldReference()),
                 ImmutableMethodEncodedValue(getMethodReference()))))
 
@@ -450,13 +448,13 @@ class DexFormattedWriterTest {
         return ImmutableMethodReference(
                 "Ldefining/class;",
                 "methodName",
-                ImmutableList.of("Lparam1;", "Lparam2;"),
+                listOf("Lparam1;", "Lparam2;"),
                 "Lreturn/type;")
     }
 
     private fun getMethodProtoReference(): ImmutableMethodProtoReference {
         return ImmutableMethodProtoReference(
-                ImmutableList.of("Lparam1;", "Lparam2;"),
+                listOf("Lparam1;", "Lparam2;"),
                 "Lreturn/type;")
     }
 
@@ -491,7 +489,7 @@ class DexFormattedWriterTest {
                 getInvokeStaticMethodHandleReferenceForMethod(),
                 "callSiteMethodName",
                 getMethodProtoReference(),
-                ImmutableList.of(
+                listOf(
                         ImmutableFieldEncodedValue(getFieldReference()),
                         ImmutableMethodEncodedValue(getMethodReference())))
     }

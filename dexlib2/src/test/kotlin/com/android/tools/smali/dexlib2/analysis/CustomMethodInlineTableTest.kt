@@ -44,8 +44,6 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMultiDexContainer
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction10x
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction35mi
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableMap
 import org.junit.Assert
 import org.junit.Test
 import java.io.IOException
@@ -64,14 +62,14 @@ class CustomMethodInlineTableTest {
             null, methodImpl)
 
         val classDef: ClassDef = ImmutableClassDef("Lblah;", AccessFlags.PUBLIC.value, "Ljava/lang/Object;", null,
-            null, null, null, null, null, ImmutableList.of(method))
+            null, null, null, null, null, listOf(method))
 
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), ImmutableList.of(classDef))
+        val dexFile = ImmutableDexFile(Opcodes.getDefault(), listOf(classDef))
 
-        val container = ImmutableMultiDexContainer(ImmutableMap.of("classes.dex", dexFile))
+        val container = ImmutableMultiDexContainer(mapOf("classes.dex" to dexFile))
 
-        val resolver = ClassPathResolver(ImmutableList.of<String>(),
-            ImmutableList.of<String>(), ImmutableList.of<String>(), container.getEntry("classes.dex")!!)
+        val resolver = ClassPathResolver(listOf<String>(),
+            listOf<String>(), listOf<String>(), container.getEntry("classes.dex")!!)
         val classPath = ClassPath(resolver.resolvedClassProviders, false, ClassPath.NOT_ART)
 
         val inlineMethodResolver = CustomInlineMethodResolver(classPath, "Lblah;->blah()V")
@@ -97,14 +95,14 @@ class CustomMethodInlineTableTest {
             null, methodImpl)
 
         val classDef: ClassDef = ImmutableClassDef("Lblah;", AccessFlags.PUBLIC.value, "Ljava/lang/Object;", null,
-            null, null, null, null, ImmutableList.of(method), null)
+            null, null, null, null, listOf(method), null)
 
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), ImmutableList.of(classDef))
+        val dexFile = ImmutableDexFile(Opcodes.getDefault(), listOf(classDef))
 
-        val container = ImmutableMultiDexContainer(ImmutableMap.of("classes.dex", dexFile))
+        val container = ImmutableMultiDexContainer(mapOf("classes.dex" to dexFile))
 
-        val resolver = ClassPathResolver(ImmutableList.of<String>(),
-            ImmutableList.of<String>(), ImmutableList.of<String>(), container.getEntry("classes.dex")!!)
+        val resolver = ClassPathResolver(listOf<String>(),
+            listOf<String>(), listOf<String>(), container.getEntry("classes.dex")!!)
         val classPath = ClassPath(resolver.resolvedClassProviders, false, ClassPath.NOT_ART)
 
         val inlineMethodResolver = CustomInlineMethodResolver(classPath, "Lblah;->blah()V")
@@ -130,14 +128,14 @@ class CustomMethodInlineTableTest {
             null, methodImpl)
 
         val classDef: ClassDef = ImmutableClassDef("Lblah;", AccessFlags.PUBLIC.value, "Ljava/lang/Object;", null,
-            null, null, null, null, ImmutableList.of(method), null)
+            null, null, null, null, listOf(method), null)
 
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), ImmutableList.of(classDef))
+        val dexFile = ImmutableDexFile(Opcodes.getDefault(), listOf(classDef))
 
-        val container = ImmutableMultiDexContainer(ImmutableMap.of("classes.dex", dexFile))
+        val container = ImmutableMultiDexContainer(mapOf("classes.dex" to dexFile))
 
-        val resolver = ClassPathResolver(ImmutableList.of<String>(),
-            ImmutableList.of<String>(), ImmutableList.of<String>(), container.getEntry("classes.dex")!!)
+        val resolver = ClassPathResolver(listOf<String>(),
+            listOf<String>(), listOf<String>(), container.getEntry("classes.dex")!!)
         val classPath = ClassPath(resolver.resolvedClassProviders, false, ClassPath.NOT_ART)
 
         val inlineMethodResolver = CustomInlineMethodResolver(classPath, "Lblah;->blah()V")

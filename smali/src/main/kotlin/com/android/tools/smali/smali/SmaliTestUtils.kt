@@ -30,7 +30,6 @@
 
 package com.android.tools.smali.smali
 
-import com.google.common.collect.Iterables
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.RecognitionException
@@ -89,5 +88,5 @@ fun compileSmali(smaliText: String, apiLevel: Int): DexBackedClassDef {
 
     val dexFile = DexBackedDexFile(Opcodes.forApi(apiLevel), dataStore.buffer)
 
-    return requireNotNull(Iterables.getFirst(dexFile.classes, null))
+    return requireNotNull(dexFile.classes.firstOrNull())
 }

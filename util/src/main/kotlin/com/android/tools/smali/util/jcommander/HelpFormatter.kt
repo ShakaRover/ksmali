@@ -34,8 +34,6 @@ import com.android.tools.smali.util.WrappedIndentingWriter
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.ParameterDescription
 import com.beust.jcommander.Parameters
-import com.google.common.base.Joiner
-import com.google.common.collect.Iterables
 import java.io.IOException
 import java.io.StringWriter
 import java.util.Collections
@@ -97,7 +95,7 @@ class HelpFormatter {
             val stringWriter = StringWriter()
             val writer = WrappedIndentingWriter(stringWriter, width - 5, width)
 
-            val leafJc = Iterables.getLast(commandHierarchy)
+            val leafJc = commandHierarchy.last()
 
             writer.write("usage:")
             writer.indent(2)
@@ -160,7 +158,7 @@ class HelpFormatter {
                         writer.write("\n")
                         writer.indent(4)
                         if (param.names.isNotEmpty()) {
-                            writer.write(Joiner.on(',').join(param.parameter.names().toList()))
+                            writer.write(param.parameter.names().toList().joinToString(","))
                         }
                         if (getParameterArity(param) > 0) {
                             val argumentNames = parameterArgumentNames(param)
@@ -249,7 +247,7 @@ class HelpFormatter {
                         val aliases = getCommandAliases(command)
                         if (aliases.isNotEmpty()) {
                             writer.write("(")
-                            writer.write(Joiner.on(',').join(aliases))
+                            writer.write(aliases.joinToString(","))
                             writer.write(")")
                         }
 

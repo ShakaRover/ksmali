@@ -50,8 +50,6 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.immutable.instruction.ImmutableInstruction10x
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder
 import com.android.tools.smali.dexlib2.writer.io.MemoryDataStore
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableSet
 import org.junit.Assert
 import org.junit.Test
 import java.io.IOException
@@ -77,17 +75,17 @@ class JumboStringConversionTest {
             "Ljava/lang/Object;",
             null,
             null,
-            ImmutableSet.of<Annotation>(),
+            setOf<Annotation>(),
             null,
-            ImmutableList.of(
+            listOf(
                 dexBuilder.internMethod(
                     "Ltest;",
                     "test",
                     null,
                     "V",
                     0,
-                    ImmutableSet.of<Annotation>(),
-                    ImmutableSet.of(),
+                    setOf<Annotation>(),
+                    setOf(),
                     methodBuilder.getMethodImplementation()
                 )
             )
@@ -159,10 +157,10 @@ class JumboStringConversionTest {
                 get() = instructions
 
             override val tryBlocks: List<TryBlock<out ExceptionHandler>>
-                get() = ImmutableList.of()
+                get() = listOf()
 
             override val debugItems: Iterable<DebugItem>
-                get() = ImmutableList.of()
+                get() = listOf()
         }
 
         dexBuilder.internClassDef(
@@ -171,17 +169,17 @@ class JumboStringConversionTest {
             "Ljava/lang/Object;",
             null,
             null,
-            ImmutableSet.of<Annotation>(),
+            setOf<Annotation>(),
             null,
-            ImmutableList.of(
+            listOf(
                 dexBuilder.internMethod(
                     "Ltest;",
                     "test",
                     null,
                     "V",
                     0,
-                    ImmutableSet.of<Annotation>(),
-                    ImmutableSet.of(),
+                    setOf<Annotation>(),
+                    setOf(),
                     methodImpl
                 )
             )

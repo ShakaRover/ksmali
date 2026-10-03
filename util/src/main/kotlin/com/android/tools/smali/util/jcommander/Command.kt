@@ -32,7 +32,6 @@ package com.android.tools.smali.util.jcommander
 
 import com.android.tools.smali.util.getConsoleWidth
 import com.beust.jcommander.JCommander
-import com.google.common.collect.Iterables
 
 abstract class Command(
     protected val commandAncestors: List<JCommander>
@@ -49,7 +48,7 @@ abstract class Command(
     }
 
     protected open fun getJCommander(): JCommander {
-        val parentJc = Iterables.getLast(commandAncestors)
+        val parentJc = commandAncestors.last()
         return parentJc.commands[this.javaClass.getAnnotation(ExtendedParameters::class.java).commandName]!!
     }
 

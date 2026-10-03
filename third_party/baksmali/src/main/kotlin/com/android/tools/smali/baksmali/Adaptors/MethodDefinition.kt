@@ -53,7 +53,6 @@ import com.android.tools.smali.dexlib2.util.SyntheticAccessorResolver
 import com.android.tools.smali.dexlib2.util.TypeUtils
 import com.android.tools.smali.util.ExceptionWithContext
 import com.android.tools.smali.util.SparseIntArray
-import com.google.common.collect.ImmutableList
 import java.io.IOException
 
 class MethodDefinition(
@@ -61,9 +60,9 @@ class MethodDefinition(
     val method: Method,
     val methodImpl: MethodImplementation
 ) {
-    val instructions: ImmutableList<Instruction> = ImmutableList.copyOf(methodImpl.instructions)
+    val instructions: List<Instruction> = methodImpl.instructions.toList()
     val effectiveInstructions: MutableList<Instruction> = instructions.toMutableList()
-    val methodParameters: ImmutableList<MethodParameter> = ImmutableList.copyOf(method.parameters)
+    val methodParameters: List<MethodParameter> = method.parameters.toList()
     var registerFormatter: RegisterFormatter? = null
 
     val labelCache: LabelCache = LabelCache()
@@ -147,7 +146,7 @@ class MethodDefinition(
             writeAccessFlagsAndRestrictions(writer, method.accessFlags, method.hiddenApiRestrictions)
             writer.write(method.name)
             writer.write("(")
-            val methodParameters = ImmutableList.copyOf(method.parameters)
+            val methodParameters = method.parameters.toList()
             for (parameter in methodParameters) {
                 writer.writeType(parameter.type)
             }

@@ -50,7 +50,6 @@ java_binary_host {
     manifest: "manifest.txt",
 
     static_libs: [
-        "guava",
         "antlr4-runtime",
         "jcommander",
         // Soong automatically injects the Kotlin stdlib for any module with .kt sources

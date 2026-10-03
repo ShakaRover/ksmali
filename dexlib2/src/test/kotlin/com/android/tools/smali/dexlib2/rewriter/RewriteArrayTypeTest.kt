@@ -43,7 +43,6 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableDexFile
 import com.android.tools.smali.dexlib2.immutable.ImmutableField
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
-import com.google.common.collect.ImmutableSet
 import org.junit.Assert
 import org.junit.Test
 
@@ -62,7 +61,7 @@ class RewriteArrayTypeTest {
             )
         )
 
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(class1))
+        val dexFile = ImmutableDexFile(Opcodes.getDefault(), setOf(class1))
 
         val rewriter = DexRewriter(object : RewriterModule() {
             override fun getTypeRewriter(rewriters: Rewriters): Rewriter<String> {
@@ -100,7 +99,7 @@ class RewriteArrayTypeTest {
             )
         )
 
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(class1))
+        val dexFile = ImmutableDexFile(Opcodes.getDefault(), setOf(class1))
 
         val rewriter = DexRewriter(RewriterModule())
 

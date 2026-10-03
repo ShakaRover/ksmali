@@ -44,8 +44,6 @@ import com.android.tools.smali.dexlib2.immutable.value.ImmutableMethodEncodedVal
 import com.android.tools.smali.dexlib2.immutable.value.ImmutableMethodHandleEncodedValue
 import com.android.tools.smali.dexlib2.immutable.value.ImmutableMethodTypeEncodedValue
 import com.android.tools.smali.dexlib2.immutable.value.ImmutableTypeEncodedValue
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableSet
 import com.android.tools.smali.dexlib2.MethodHandleType
 import com.android.tools.smali.dexlib2.iface.reference.MethodHandleReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableAnnotationElement
@@ -161,7 +159,7 @@ class BaksmaliWriterTest {
             getInvokeStaticMethodHandleReferenceForMethodWithSpaces(),
             "callSiteMethodName with spaces",
             getMethodProtoReferenceWithSpaces(),
-            ImmutableList.of(
+            listOf(
                 ImmutableFieldEncodedValue(getFieldReferenceWithSpaces()),
                 ImmutableMethodEncodedValue(getMethodReferenceWithSpaces()))))
 
@@ -183,7 +181,7 @@ class BaksmaliWriterTest {
 
         writer.writeEncodedValue(ImmutableAnnotationEncodedValue(
             "Lannotation/type with spaces;",
-            ImmutableSet.of(
+            setOf(
                 ImmutableAnnotationElement(
                     "element with spaces 1",
                     ImmutableFieldEncodedValue(getFieldReferenceWithSpaces())),
@@ -206,7 +204,7 @@ class BaksmaliWriterTest {
     fun testWriteEncodedValue_array_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeEncodedValue(ImmutableArrayEncodedValue(ImmutableList.of(
+        writer.writeEncodedValue(ImmutableArrayEncodedValue(listOf(
             ImmutableFieldEncodedValue(getFieldReferenceWithSpaces()),
             ImmutableMethodEncodedValue(getMethodReferenceWithSpaces()))))
 
@@ -408,13 +406,13 @@ class BaksmaliWriterTest {
         return ImmutableMethodReference(
             "Ldefining/class/with spaces;",
             "methodName with spaces",
-            ImmutableList.of("Lparam with spaces 1;", "Lparam with spaces 2;"),
+            listOf("Lparam with spaces 1;", "Lparam with spaces 2;"),
             "Lreturn/type/with spaces;")
     }
 
     private fun getMethodProtoReferenceWithSpaces(): ImmutableMethodProtoReference {
         return ImmutableMethodProtoReference(
-            ImmutableList.of("Lparam with spaces 1;", "Lparam with spaces 2;"),
+            listOf("Lparam with spaces 1;", "Lparam with spaces 2;"),
             "Lreturn/type/with spaces;")
     }
 

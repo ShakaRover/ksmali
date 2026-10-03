@@ -36,7 +36,6 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableDexFile
 import com.android.tools.smali.dexlib2.writer.io.MemoryDataStore
 import com.android.tools.smali.dexlib2.writer.pool.DexPool
-import com.google.common.collect.ImmutableSet
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,7 +54,7 @@ class ZipDexContainerTest {
         val classDef = makeClassDef()
 
         val dataStore = MemoryDataStore()
-        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
+        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
         val dexBytes = dataStore.data
 
         val crc32 = CRC32()
@@ -89,7 +88,7 @@ class ZipDexContainerTest {
         val classDef = makeClassDef()
 
         val dataStore = MemoryDataStore()
-        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
+        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
         val dexBytes = dataStore.data
 
         val tempZip = File.createTempFile("test_order", ".apk")
@@ -124,7 +123,7 @@ class ZipDexContainerTest {
         val classDef = makeClassDef()
 
         val dataStore = MemoryDataStore()
-        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
+        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
         val dexBytes = dataStore.data
 
         val containerBytes = ByteArray(dexBytes.size * 2)
@@ -165,7 +164,7 @@ class ZipDexContainerTest {
         val classDef = makeClassDef()
 
         val dataStore = MemoryDataStore()
-        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
+        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
         val dexBytes = dataStore.data
 
         val containerBytesWithGarbage = ByteArray(dexBytes.size * 2 + 50)
@@ -204,7 +203,7 @@ class ZipDexContainerTest {
         val classDef = makeClassDef()
 
         val dataStore = MemoryDataStore()
-        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), ImmutableSet.of(classDef)))
+        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
         val dexBytes = dataStore.data
 
         val containerBytes = ByteArray(dexBytes.size)
@@ -244,6 +243,6 @@ class ZipDexContainerTest {
 
     private fun makeClassDef(): ImmutableClassDef {
         return ImmutableClassDef("Lorg/test/blah;",
-            0, "Ljava/lang/Object;", null, null, ImmutableSet.of(), null, null)
+            0, "Ljava/lang/Object;", null, null, setOf(), null, null)
     }
 }

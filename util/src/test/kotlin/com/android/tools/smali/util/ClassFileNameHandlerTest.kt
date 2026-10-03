@@ -30,8 +30,6 @@
 
 package com.android.tools.smali.util
 
-import com.google.common.base.Strings
-import com.google.common.io.Files
 import org.junit.Assert
 import org.junit.Test
 import java.io.File
@@ -116,9 +114,9 @@ class ClassFileNameHandlerTest {
 
     @Test
     fun testMultipleLongNames() {
-        val filenameFragment = Strings.repeat("a", 512)
+        val filenameFragment = "a".repeat(512)
 
-        val tempDir = Files.createTempDir().canonicalFile
+        val tempDir = createTempDir().canonicalFile
         val handler = ClassFileNameHandler(tempDir, ".smali")
 
         // put the differentiating character in the middle, where it will get stripped out by the filename shortening
@@ -126,19 +124,19 @@ class ClassFileNameHandlerTest {
         val file1 = handler.getUniqueFilenameForClass(
             "La/a/" + filenameFragment + "1" + filenameFragment + ";")
         checkFilename(tempDir, file1, "a", "a",
-            Strings.repeat("a", 124) + "#" + Strings.repeat("a", 118) + ".smali")
+            "a".repeat(124) + "#" + "a".repeat(118) + ".smali")
 
         val file2 = handler.getUniqueFilenameForClass(
             "La/a/" + filenameFragment + "2" + filenameFragment + ";")
         checkFilename(tempDir, file2, "a", "a",
-            Strings.repeat("a", 124) + "#" + Strings.repeat("a", 118) + ".1.smali")
+            "a".repeat(124) + "#" + "a".repeat(118) + ".1.smali")
 
         Assert.assertFalse(file1.absolutePath == file2.absolutePath)
     }
 
     @Test
     fun testBasicFunctionality() {
-        val tempDir = Files.createTempDir().canonicalFile
+        val tempDir = createTempDir().canonicalFile
         val handler = ClassFileNameHandler(tempDir, ".smali")
 
         var file = handler.getUniqueFilenameForClass("La/b/c/d;")
@@ -159,7 +157,7 @@ class ClassFileNameHandlerTest {
 
     @Test
     fun testCaseInsensitiveFilesystem() {
-        val tempDir = Files.createTempDir().canonicalFile
+        val tempDir = createTempDir().canonicalFile
         val handler = ClassFileNameHandler(tempDir, ".smali", false, false)
 
         var file = handler.getUniqueFilenameForClass("La/b/c;")
@@ -174,7 +172,7 @@ class ClassFileNameHandlerTest {
 
     @Test
     fun testCaseSensitiveFilesystem() {
-        val tempDir = Files.createTempDir().canonicalFile
+        val tempDir = createTempDir().canonicalFile
         if (!testCaseSensitivity(tempDir)) {
             // Test can only be performed on case sensitive systems
             return
@@ -194,7 +192,7 @@ class ClassFileNameHandlerTest {
 
     @Test
     fun testWindowsReservedFilenames() {
-        val tempDir = Files.createTempDir().canonicalFile
+        val tempDir = createTempDir().canonicalFile
         val handler = ClassFileNameHandler(tempDir, ".smali", false, true)
 
         var file = handler.getUniqueFilenameForClass("La/con/c;")
@@ -220,7 +218,7 @@ class ClassFileNameHandlerTest {
 
     @Test
     fun testIgnoringWindowsReservedFilenames() {
-        val tempDir = Files.createTempDir().canonicalFile
+        val tempDir = createTempDir().canonicalFile
         val handler = ClassFileNameHandler(tempDir, ".smali", true, false)
 
         var file = handler.getUniqueFilenameForClass("La/con/c;")
@@ -259,7 +257,7 @@ class ClassFileNameHandlerTest {
             return
         }
 
-        val tempDir = Files.createTempDir().canonicalFile
+        val tempDir = createTempDir().canonicalFile
         val handler = ClassFileNameHandler(tempDir, ".smali", true, false)
 
         var file = handler.getUniqueFilenameForClass("Lε;")
@@ -289,4 +287,6 @@ class ClassFileNameHandlerTest {
         }
         Assert.assertEquals(base.absolutePath, file.absolutePath)
     }
+
+    private fun createTempDir(): File = java.nio.file.Files.createTempDirectory("smali-classfilehandler").toFile()
 }

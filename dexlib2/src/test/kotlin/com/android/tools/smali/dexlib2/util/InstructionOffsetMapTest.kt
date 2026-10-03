@@ -36,14 +36,13 @@ import com.android.tools.smali.dexlib2.immutable.instruction.*
 import com.android.tools.smali.dexlib2.immutable.reference.ImmutableStringReference
 import com.android.tools.smali.dexlib2.immutable.reference.ImmutableTypeReference
 import com.android.tools.smali.util.ExceptionWithContext
-import com.google.common.collect.ImmutableList
 import org.junit.Assert
 import org.junit.Test
 
 class InstructionOffsetMapTest {
     @Test
     fun testInstructionOffsetMap() {
-        val instructions: ImmutableList<ImmutableInstruction> = ImmutableList.of(
+        val instructions: List<ImmutableInstruction> = listOf(
                 /*00: 0x00*/ ImmutableInstruction10t(Opcode.GOTO, 1),
                 /*01: 0x01*/ ImmutableInstruction10x(Opcode.NOP),
                 /*02: 0x02*/ ImmutableInstruction11n(Opcode.CONST_4, 2, 3),

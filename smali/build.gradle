@@ -90,7 +90,6 @@ dependencies {
     implementation depends.antlr_runtime
     implementation depends.jcommander
     implementation depends.coroutines
-    implementation depends.guava
 
     testImplementation depends.junit
 
@@ -167,9 +166,6 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {
     keep 'public class com.android.tools.smali.smali.Main { public static void main(java.lang.String[]); }'
     keep 'class com.beust.jcommander.** { *; }'
     keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
-
-    dontwarn 'com.google.common.**'
-    dontnote 'com.google.common.**'
 }
 
 sourcesJar {

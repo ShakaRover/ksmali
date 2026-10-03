@@ -48,7 +48,6 @@ sourceSets {
 dependencies {
     implementation project(':util')
     api project(':dexlib2')
-    implementation depends.guava
     implementation depends.jcommander
     implementation depends.coroutines
 
@@ -117,9 +116,6 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {
     keep 'public class com.android.tools.smali.util.jcommander.ColonParameterSplitter'
     keep 'class com.beust.jcommander.** { *; }'
     keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
-
-    dontwarn 'com.google.common.**'
-    dontnote 'com.google.common.**'
 }
 
 tasks.getByPath(':release').dependsOn(proguard)

@@ -34,10 +34,6 @@ options {
 @parser::header {
 package com.android.tools.smali.smali;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import com.android.tools.smali.dexlib2.*;
@@ -194,7 +190,7 @@ implements_spec returns[String type]
 
 implements_list returns[List<String> implementsList]
 @init { List<String> typeList; }
-  : {typeList = Lists.newArrayList();}
+  : {typeList = new ArrayList<>();}
     (implements_spec {typeList.add($implements_spec.type);} )*
   {
     if (typeList.size() > 0) {
@@ -254,16 +250,16 @@ access_or_restriction_list returns[int value, Set<HiddenApiRestriction> hiddenAp
         }
       )* UP)?
       {
-        ImmutableSet.Builder builder = ImmutableSet.builder();
+        Set<HiddenApiRestriction> restrictions = new LinkedHashSet<>();
         if (hiddenApiRestriction != null) {
-          builder.add(hiddenApiRestriction);
+          restrictions.add(hiddenApiRestriction);
         }
-        builder.addAll(domainSpecificApiRestrictions);
-        $hiddenApiRestrictions = builder.build();
+        restrictions.addAll(domainSpecificApiRestrictions);
+        $hiddenApiRestrictions = Collections.unmodifiableSet(restrictions);
       };
 
 fields returns[List<BuilderField> fieldsList]
-  @init {$fieldsList = Lists.newArrayList();}
+  @init {$fieldsList = new ArrayList<>();}
   : I_FIELDS (DOWN 
       (field
       {
@@ -271,7 +267,7 @@ fields returns[List<BuilderField> fieldsList]
       })* UP)?;
 
 methods returns[List<BuilderMethod> methodsList]
-  @init {$methodsList = Lists.newArrayList();}
+  @init {$methodsList = new ArrayList<>();}
   : I_METHODS (DOWN 
       (method
       {
@@ -350,7 +346,7 @@ fixed_32bit_literal returns[int value]
   | bool_literal { $value = $bool_literal.value?1:0; };
 
 array_elements returns[List<Number> elements]
-  : {$elements = Lists.newArrayList();}
+  : {$elements = new ArrayList<>();}
     I_ARRAY_ELEMENTS (DOWN 
       (fixed_64bit_literal_number
       {
@@ -358,14 +354,14 @@ array_elements returns[List<Number> elements]
       })* UP)?;
 
 packed_switch_elements returns[List<Label> elements]
-  @init {$elements = Lists.newArrayList();}
+  @init {$elements = new ArrayList<>();}
   :
     I_PACKED_SWITCH_ELEMENTS (DOWN 
       (label_ref { $elements.add($label_ref.label); })*
      UP)?;
 
 sparse_switch_elements returns[List<SwitchLabelElement> elements]
-  @init {$elements = Lists.newArrayList();}
+  @init {$elements = new ArrayList<>();}
   :
     I_SPARSE_SWITCH_ELEMENTS (DOWN 
        (fixed_32bit_literal label_ref
@@ -432,7 +428,7 @@ method returns[BuilderMethod ret]
 
     methodImplementation = methodBuilder.getMethodImplementation();
 
-    if (Iterables.isEmpty(methodImplementation.getInstructions())) {
+    if (!methodImplementation.getInstructions().iterator().hasNext()) {
       if (!isAbstract && !isNative) {
         throw new SemanticException(_input, $I_METHOD, "A non-abstract/non-native method must have at least 1 instruction");
       }
@@ -456,7 +452,7 @@ method returns[BuilderMethod ret]
         throw new SemanticException(_input, $I_METHOD, "try/catch blocks cannot be present in %s method", methodType);
       }
 
-      if (!Iterables.isEmpty(methodImplementation.getDebugItems())) {
+      if (methodImplementation.getDebugItems().iterator().hasNext()) {
         throw new SemanticException(_input, $I_METHOD, "debug directives cannot be present in %s method", methodType);
       }
 
@@ -503,7 +499,7 @@ method_name_and_prototype returns[String name, List<SmaliMethodParameter> parame
   : SIMPLE_NAME method_prototype
   {
     $name = $SIMPLE_NAME.text;
-    $parameterList = Lists.newArrayList();
+    $parameterList = new ArrayList<>();
 
     int paramRegister = 0;
     for (CharSequence type: $method_prototype.proto.getParameterTypes()) {
@@ -519,7 +515,7 @@ method_name_and_prototype returns[String name, List<SmaliMethodParameter> parame
 method_type_list returns[List<String> types]
   @init
   {
-    $types = Lists.newArrayList();
+    $types = new ArrayList<>();
   }
   : (
       nonvoid_type_descriptor
@@ -601,7 +597,7 @@ label_def
   };
 
 catches returns[List<BuilderTryBlock> tryBlocks]
-  @init {$tryBlocks = Lists.newArrayList();}
+  @init {$tryBlocks = new ArrayList<>();}
   : I_CATCHES (DOWN  catch_directive* catchall_directive* UP)?;
 
 catch_directive
@@ -714,7 +710,7 @@ source
     };
 
 call_site_extra_arguments returns[List<ImmutableEncodedValue> extraArguments]
-  : { $extraArguments = Lists.newArrayList(); }
+  : { $extraArguments = new ArrayList<>(); }
   I_CALL_SITE_EXTRA_ARGUMENTS (DOWN  (literal { $extraArguments.add($literal.encodedValue); })* UP)?;
 
 ordered_method_items
@@ -1386,11 +1382,11 @@ bool_literal returns[boolean value]
   : BOOL_LITERAL { $value = Boolean.parseBoolean($BOOL_LITERAL.text); };
 
 array_literal returns[List<EncodedValue> elements]
-  : {$elements = Lists.newArrayList();}
+  : {$elements = new ArrayList<>();}
     I_ENCODED_ARRAY (DOWN  (literal {$elements.add($literal.encodedValue);})* UP)?;
 
 annotations returns[Set<Annotation> annotationsSet]
-  : {HashMap<String, Annotation> annotationMap = Maps.newHashMap();}
+  : {HashMap<String, Annotation> annotationMap = new HashMap<>();}
     I_ANNOTATIONS (DOWN  (annotation
     {
         Annotation anno = $annotation.annotationValue;
@@ -1400,7 +1396,7 @@ annotations returns[Set<Annotation> annotationsSet]
         }
     })* UP)?
     {
-        $annotationsSet = ImmutableSet.copyOf(annotationMap.values());
+        $annotationsSet = Collections.unmodifiableSet(new LinkedHashSet<>(annotationMap.values()));
     };
 
 annotation returns[Annotation annotationValue]
@@ -1417,7 +1413,7 @@ annotation_element returns[AnnotationElement element]
     };
 
 subannotation returns[String annotationType, List<AnnotationElement> elements]
-  : {ArrayList<AnnotationElement> elements = Lists.newArrayList();}
+  : {ArrayList<AnnotationElement> elements = new ArrayList<>();}
     I_SUBANNOTATION (DOWN 
         CLASS_DESCRIPTOR
         (annotation_element

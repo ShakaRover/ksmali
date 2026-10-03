@@ -37,8 +37,6 @@ import com.android.tools.smali.dexlib2.analysis.TestUtils
 import com.android.tools.smali.dexlib2.analysis.TypeProto
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableDexFile
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableSet
 import org.junit.Assert
 import org.junit.Test
 import java.io.IOException
@@ -53,7 +51,7 @@ class SuperclassChainTest {
         val twoClassDef = TestUtils.makeClassDef("Ltest/two;", "Ltest/one;")
         val threeClassDef = TestUtils.makeClassDef("Ltest/three;", "Ltest/two;")
 
-        val classes = ImmutableSet.of<ClassDef>(
+        val classes = setOf<ClassDef>(
             objectClassDef, oneClassDef, twoClassDef, threeClassDef
         )
 
@@ -65,23 +63,23 @@ class SuperclassChainTest {
         val threeClassProto = classPath.getClass("Ltest/three;")
 
         Assert.assertEquals(
-            ImmutableList.of<TypeProto>(),
-            ImmutableList.copyOf(TypeProtoUtils.getSuperclassChain(objectClassProto))
+            listOf<TypeProto>(),
+            TypeProtoUtils.getSuperclassChain(objectClassProto).toList()
         )
 
         Assert.assertEquals(
-            ImmutableList.of(objectClassProto),
-            ImmutableList.copyOf(TypeProtoUtils.getSuperclassChain(oneClassProto))
+            listOf(objectClassProto),
+            TypeProtoUtils.getSuperclassChain(oneClassProto).toList()
         )
 
         Assert.assertEquals(
-            ImmutableList.of(oneClassProto, objectClassProto),
-            ImmutableList.copyOf(TypeProtoUtils.getSuperclassChain(twoClassProto))
+            listOf(oneClassProto, objectClassProto),
+            TypeProtoUtils.getSuperclassChain(twoClassProto).toList()
         )
 
         Assert.assertEquals(
-            ImmutableList.of(twoClassProto, oneClassProto, objectClassProto),
-            ImmutableList.copyOf(TypeProtoUtils.getSuperclassChain(threeClassProto))
+            listOf(twoClassProto, oneClassProto, objectClassProto),
+            TypeProtoUtils.getSuperclassChain(threeClassProto).toList()
         )
     }
 
@@ -92,7 +90,7 @@ class SuperclassChainTest {
 
         val twoClassDef = TestUtils.makeClassDef("Ltest/two;", "Ltest/one;")
         val threeClassDef = TestUtils.makeClassDef("Ltest/three;", "Ltest/two;")
-        val classes = ImmutableSet.of<ClassDef>(twoClassDef, threeClassDef)
+        val classes = setOf<ClassDef>(twoClassDef, threeClassDef)
         val classPath = ClassPath(DexClassProvider(ImmutableDexFile(Opcodes.getDefault(), classes)))
 
         val unknownClassProto = classPath.getUnknownClass()
@@ -101,13 +99,13 @@ class SuperclassChainTest {
         val threeClassProto = classPath.getClass("Ltest/three;")
 
         Assert.assertEquals(
-            ImmutableList.of(oneClassProto, unknownClassProto),
-            ImmutableList.copyOf(TypeProtoUtils.getSuperclassChain(twoClassProto))
+            listOf(oneClassProto, unknownClassProto),
+            TypeProtoUtils.getSuperclassChain(twoClassProto).toList()
         )
 
         Assert.assertEquals(
-            ImmutableList.of(twoClassProto, oneClassProto, unknownClassProto),
-            ImmutableList.copyOf(TypeProtoUtils.getSuperclassChain(threeClassProto))
+            listOf(twoClassProto, oneClassProto, unknownClassProto),
+            TypeProtoUtils.getSuperclassChain(threeClassProto).toList()
         )
     }
 }

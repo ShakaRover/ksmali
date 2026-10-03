@@ -30,9 +30,9 @@
 
 package com.android.tools.smali.util
 
-import com.google.common.collect.Ordering
 import org.junit.Assert
 import org.junit.Test
+import java.util.Collections
 
 class LinearSearchTest {
     @Test
@@ -90,8 +90,8 @@ class LinearSearchTest {
     }
 
     private fun doTest(list: List<Int>, key: Int, guess: Int) {
-        val expectedIndex = Ordering.natural<Int>().binarySearch(list, key)
+        val expectedIndex = Collections.binarySearch(list, key)
 
-        Assert.assertEquals(expectedIndex, linearSearch(list, Ordering.natural(), key, guess))
+        Assert.assertEquals(expectedIndex, linearSearch(list, naturalOrder(), key, guess))
     }
 }

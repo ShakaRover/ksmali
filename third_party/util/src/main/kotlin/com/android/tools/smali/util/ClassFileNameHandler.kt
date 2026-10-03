@@ -27,8 +27,6 @@
 
 package com.android.tools.smali.util
 
-import com.google.common.collect.ArrayListMultimap
-import com.google.common.collect.Multimap
 import java.io.File
 import java.io.IOException
 import java.io.UnsupportedEncodingException
@@ -198,7 +196,7 @@ class ClassFileNameHandler {
         // maps a normalized (but not suffixed) entry name to 1 or more FileSystemEntries.
         // Each FileSystemEntry associated with a normalized entry name must have a distinct
         // physical name
-        private val children: Multimap<String, FileSystemEntry> = ArrayListMultimap.create()
+        private val children: MutableMap<String, MutableList<FileSystemEntry>> = HashMap()
         private val physicalToEntry: MutableMap<String, FileSystemEntry> = HashMap()
         private val lastSuffixMap: MutableMap<String, Int> = HashMap()
 
@@ -213,7 +211,7 @@ class ClassFileNameHandler {
         @Throws(IOException::class)
         fun addChild(entry: FileSystemEntry): FileSystemEntry {
             val normalizedChildName = entry.getNormalizedName(false)
-            val entries = children.get(normalizedChildName)
+            val entries = children.getOrPut(normalizedChildName) { mutableListOf() }
             if (entry is DirectoryEntry) {
                 for (childEntry in entries) {
                     if (childEntry.logicalName == entry.logicalName) {

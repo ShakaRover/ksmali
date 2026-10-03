@@ -31,19 +31,18 @@
 package com.android.tools.smali.util
 
 import com.android.tools.smali.dexlib2.util.checkArrayPayloadElements
-import com.google.common.collect.ImmutableList
 import org.junit.Assert
 import org.junit.Test
 
 class PreconditionsTest {
 
   private fun verifyArrayPayloadElementIsValid(elementWidth: Int, value: Long) {
-    checkArrayPayloadElements(elementWidth, ImmutableList.of(value))
+    checkArrayPayloadElements(elementWidth, listOf(value))
   }
 
   private fun verifyArrayPayloadElementIsInvalid(elementWidth: Int, value: Long) {
     try {
-      checkArrayPayloadElements(elementWidth, ImmutableList.of(value))
+      checkArrayPayloadElements(elementWidth, listOf(value))
       Assert.fail()
     } catch (ex: IllegalArgumentException) {
       // expected exception

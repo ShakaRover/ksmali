@@ -54,8 +54,6 @@ import com.android.tools.smali.dexlib2.iface.debug.DebugItem
 import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction21c
 import com.android.tools.smali.dexlib2.iface.reference.Reference
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableSet
 import org.junit.Assert
 import org.junit.Test
 import java.io.IOException
@@ -90,11 +88,11 @@ class InstructionMethodItemTest {
         val methodImplementation = object : MethodImplementation {
             override val registerCount: Int = 1
 
-            override val instructions: Iterable<Instruction> = ImmutableList.of(instruction)
+            override val instructions: Iterable<Instruction> = listOf(instruction)
 
-            override val tryBlocks: List<TryBlock<ExceptionHandler>> = ImmutableList.of()
+            override val tryBlocks: List<TryBlock<ExceptionHandler>> = listOf()
 
-            override val debugItems: Iterable<DebugItem> = ImmutableList.of()
+            override val debugItems: Iterable<DebugItem> = listOf()
         }
 
         val method: Method = TestMethod(methodImplementation)
@@ -120,11 +118,11 @@ class InstructionMethodItemTest {
         private val methodImplementation: MethodImplementation
     ) : BaseMethodReference(), Method {
 
-        override val parameters: List<MethodParameter> = ImmutableList.of()
+        override val parameters: List<MethodParameter> = listOf()
 
         override val accessFlags: Int = 0
 
-        override val annotations: Set<Annotation> = ImmutableSet.of()
+        override val annotations: Set<Annotation> = setOf()
 
         override val implementation: MethodImplementation? = methodImplementation
 
@@ -132,11 +130,11 @@ class InstructionMethodItemTest {
 
         override val name: String = "test"
 
-        override val parameterTypes: List<CharSequence> = ImmutableList.of()
+        override val parameterTypes: List<CharSequence> = listOf()
 
         override val returnType: String = "V"
 
-        override val hiddenApiRestrictions: Set<HiddenApiRestriction> = ImmutableSet.of()
+        override val hiddenApiRestrictions: Set<HiddenApiRestriction> = setOf()
     }
 
     private class TestClassDef : BaseTypeReference(), ClassDef {
@@ -144,23 +142,23 @@ class InstructionMethodItemTest {
 
         override val superclass: String? = "Ljava/lang/Object;"
 
-        override val interfaces: List<String> = ImmutableList.of()
+        override val interfaces: List<String> = listOf()
 
         override val sourceFile: String? = null
 
-        override val annotations: Set<Annotation> = ImmutableSet.of()
+        override val annotations: Set<Annotation> = setOf()
 
-        override val staticFields: Iterable<Field> = ImmutableList.of()
+        override val staticFields: Iterable<Field> = listOf()
 
-        override val instanceFields: Iterable<Field> = ImmutableList.of()
+        override val instanceFields: Iterable<Field> = listOf()
 
-        override val fields: Iterable<Field> = ImmutableList.of()
+        override val fields: Iterable<Field> = listOf()
 
-        override val directMethods: Iterable<Method> = ImmutableList.of()
+        override val directMethods: Iterable<Method> = listOf()
 
-        override val virtualMethods: Iterable<Method> = ImmutableList.of()
+        override val virtualMethods: Iterable<Method> = listOf()
 
-        override val methods: Iterable<Method> = ImmutableList.of()
+        override val methods: Iterable<Method> = listOf()
 
         override val type: String = "Ltest;"
     }

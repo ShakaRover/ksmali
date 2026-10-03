@@ -33,16 +33,15 @@ package com.android.tools.smali.dexlib2.analysis
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
-import com.google.common.collect.ImmutableSet
 
 object TestUtils {
     fun makeClassDef(classType: String, superType: String?, vararg interfaces: String): ClassDef {
-        return ImmutableClassDef(classType, 0, superType, ImmutableSet.copyOf(interfaces),
+        return ImmutableClassDef(classType, 0, superType, interfaces.toSet(),
             null, null, null, null, null, null)
     }
 
     fun makeInterfaceDef(classType: String, vararg interfaces: String): ClassDef {
         return ImmutableClassDef(classType, AccessFlags.INTERFACE.value, "Ljava/lang/Object;",
-            ImmutableSet.copyOf(interfaces), null, null, null, null, null, null)
+            interfaces.toSet(), null, null, null, null, null, null)
     }
 }
