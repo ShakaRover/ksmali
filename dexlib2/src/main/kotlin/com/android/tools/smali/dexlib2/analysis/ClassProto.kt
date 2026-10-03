@@ -416,14 +416,14 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
     }
 
     override fun getFieldByOffset(fieldOffset: Int): FieldReference? {
-        if (getInstanceFields().size() == 0) {
+        if (instanceFields.size() == 0) {
             return null
         }
-        return getInstanceFields().get(fieldOffset)
+        return instanceFields.get(fieldOffset)
     }
 
     override fun getMethodByVtableIndex(vtableIndex: Int): Method? {
-        val vtable = getVtable()
+        val vtable = vtable
         if (vtableIndex < 0 || vtableIndex >= vtable.size) {
             return null
         }
@@ -432,7 +432,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
     }
 
     override fun findMethodIndexInVtable(method: MethodReference): Int {
-        return findMethodIndexInVtable(getVtable(), method)
+        return findMethodIndexInVtable(vtable, method)
     }
 
     private fun findMethodIndexInVtable(vtable: List<Method>, method: MethodReference): Int {
@@ -465,13 +465,14 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         return -1
     }
 
-    fun getInstanceFields(): SparseArray<FieldReference> {
-        if (classPath.isArt()) {
-            return artInstanceFieldsSupplier.get()
-        } else {
-            return dalvikInstanceFieldsSupplier.get()
+    val instanceFields: SparseArray<FieldReference>
+        get() {
+            if (classPath.isArt()) {
+                return artInstanceFieldsSupplier.get()
+            } else {
+                return dalvikInstanceFieldsSupplier.get()
+            }
         }
-    }
 
     private val dalvikInstanceFieldsSupplier: Supplier<SparseArray<FieldReference>> =
         MemoizingSupplier.memoize(Supplier { computeDalvikInstanceFields() })
@@ -567,7 +568,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
 
         val superFields: SparseArray<FieldReference>
         if (superclass != null) {
-            superFields = superclass.getInstanceFields()
+            superFields = superclass.instanceFields
         } else {
             superFields = SparseArray<FieldReference>()
         }
@@ -655,7 +656,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         if (superclassType != null) {
             // TODO: what to do if superclass doesn't exist?
             val superclass = classPath.getClass(superclassType) as ClassProto
-            val superFields = superclass.getInstanceFields()
+            val superFields = superclass.instanceFields
             var field: FieldReference? = null
             var lastOffset = 0
             for (i in 0 until superFields.size()) {
@@ -758,14 +759,14 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
     }
 
     private fun getNextFieldOffset(): Int {
-        val instanceFields = getInstanceFields()
-        if (instanceFields.size() == 0) {
+        val fields = instanceFields
+        if (fields.size() == 0) {
             return if (classPath.isArt()) 0 else 8
         }
 
-        val lastItemIndex = instanceFields.size() - 1
-        val fieldOffset = instanceFields.keyAt(lastItemIndex)
-        val lastField = instanceFields.valueAt(lastItemIndex)
+        val lastItemIndex = fields.size() - 1
+        val fieldOffset = fields.keyAt(lastItemIndex)
+        val lastField = fields.valueAt(lastItemIndex)
 
         return if (classPath.isArt()) {
             fieldOffset + getTypeSize(lastField.type[0])
@@ -777,15 +778,16 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         }
     }
 
-    fun getVtable(): List<Method> {
-        if (!classPath.isArt() || classPath.oatVersion < 72) {
-            return preDefaultMethodVtableSupplier.get()
-        } else if (classPath.oatVersion < 87) {
-            return buggyPostDefaultMethodVtableSupplier.get()
-        } else {
-            return postDefaultMethodVtableSupplier.get()
+    val vtable: List<Method>
+        get() {
+            if (!classPath.isArt() || classPath.oatVersion < 72) {
+                return preDefaultMethodVtableSupplier.get()
+            } else if (classPath.oatVersion < 87) {
+                return buggyPostDefaultMethodVtableSupplier.get()
+            } else {
+                return postDefaultMethodVtableSupplier.get()
+            }
         }
-    }
 
     //TODO: check the case when we have a package private method that overrides an interface method
     private val preDefaultMethodVtableSupplier: Supplier<List<Method>> =
@@ -799,14 +801,14 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         try {
             superclassType = superclass
         } catch (ex: UnresolvedClassException) {
-            vtable.addAll((classPath.getClass("Ljava/lang/Object;") as ClassProto).getVtable())
+            vtable.addAll((classPath.getClass("Ljava/lang/Object;") as ClassProto).vtable)
             vtableFullyResolved = false
             return vtable
         }
 
         if (superclassType != null) {
             val superclass = classPath.getClass(superclassType) as ClassProto
-            vtable.addAll(superclass.getVtable())
+            vtable.addAll(superclass.vtable)
 
             // if the superclass's vtable wasn't fully resolved, then we can't know where the new methods added by this
             // class should start, so we just propagate what we can from the parent and hope for the best.
@@ -851,14 +853,14 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         try {
             superclassType = superclass
         } catch (ex: UnresolvedClassException) {
-            vtable.addAll((classPath.getClass("Ljava/lang/Object;") as ClassProto).getVtable())
+            vtable.addAll((classPath.getClass("Ljava/lang/Object;") as ClassProto).vtable)
             vtableFullyResolved = false
             return vtable
         }
 
         if (superclassType != null) {
             val superclass = classPath.getClass(superclassType) as ClassProto
-            vtable.addAll(superclass.getVtable())
+            vtable.addAll(superclass.vtable)
 
             // if the superclass's vtable wasn't fully resolved, then we can't know where the new methods added by
             // this class should start, so we just propagate what we can from the parent and hope for the best.
@@ -1003,14 +1005,14 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         try {
             superclassType = superclass
         } catch (ex: UnresolvedClassException) {
-            vtable.addAll((classPath.getClass("Ljava/lang/Object;") as ClassProto).getVtable())
+            vtable.addAll((classPath.getClass("Ljava/lang/Object;") as ClassProto).vtable)
             vtableFullyResolved = false
             return vtable
         }
 
         if (superclassType != null) {
             val superclass = classPath.getClass(superclassType) as ClassProto
-            vtable.addAll(superclass.getVtable())
+            vtable.addAll(superclass.vtable)
 
             // if the superclass's vtable wasn't fully resolved, then we can't know where the new methods added by
             // this class should start, so we just propagate what we can from the parent and hope for the best.

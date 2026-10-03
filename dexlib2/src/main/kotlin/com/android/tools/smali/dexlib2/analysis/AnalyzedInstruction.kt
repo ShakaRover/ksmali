@@ -105,9 +105,8 @@ open class AnalyzedInstruction(
         return instructionIndex
     }
 
-    fun getPredecessorCount(): Int {
-        return predecessors.size
-    }
+    val predecessorCount: Int
+        get() = predecessors.size
 
     fun getPredecessors(): SortedSet<AnalyzedInstruction> {
         return Collections.unmodifiableSortedSet(predecessors)
@@ -166,14 +165,15 @@ open class AnalyzedInstruction(
      * an instruction index of -1.
      * @return a boolean value indicating whether this instruction is a beginning instruction
      */
-    fun isBeginningInstruction(): Boolean {
-        //if this instruction has no predecessors, it is either the fake "StartOfMethod" instruction or it is an
-        //unreachable instruction.
-        if (predecessors.size == 0) {
-            return false
+    val isBeginningInstruction: Boolean
+        get() {
+            //if this instruction has no predecessors, it is either the fake "StartOfMethod" instruction or it is an
+            //unreachable instruction.
+            if (predecessors.size == 0) {
+                return false
+            }
+            return predecessors.first().instructionIndex == -1
         }
-        return predecessors.first().instructionIndex == -1
-    }
 
     /*
      * Merges the given register type into the specified pre-instruction register, and also sets the post-instruction
@@ -378,7 +378,7 @@ open class AnalyzedInstruction(
         // branch of the following if-eqz/if-nez
         if (instructionIndex > 0 &&
             methodAnalyzer.classPath.isArt() &&
-            getPredecessorCount() == 1 &&
+            predecessorCount == 1 &&
             (instruction.opcode == Opcode.IF_EQZ || instruction.opcode == Opcode.IF_NEZ)
         ) {
             val prevInstruction = predecessors.first()
@@ -542,7 +542,7 @@ open class AnalyzedInstruction(
         // branch of the following if-eqz/if-nez
         if (instructionIndex > 0 &&
             methodAnalyzer.classPath.isArt() &&
-            getPredecessorCount() == 1 &&
+            predecessorCount == 1 &&
             (instruction.opcode == Opcode.IF_EQZ || instruction.opcode == Opcode.IF_NEZ)
         ) {
             val prevInstruction = predecessors.first()
@@ -627,9 +627,8 @@ open class AnalyzedInstruction(
         return (instruction as OneRegisterInstruction).registerA
     }
 
-    fun getRegisterCount(): Int {
-        return postRegisterMap.size
-    }
+    val registerCount: Int
+        get() = postRegisterMap.size
 
     fun getPostInstructionRegisterType(registerNumber: Int): RegisterType {
         return postRegisterMap[registerNumber]
