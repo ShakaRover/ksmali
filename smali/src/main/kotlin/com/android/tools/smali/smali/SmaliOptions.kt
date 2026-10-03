@@ -31,11 +31,11 @@
 package com.android.tools.smali.smali
 
 open class SmaliOptions {
-    @JvmField var apiLevel = 15
-    @JvmField var outputDexFile: String = "out.dex"
+    var apiLevel = 15
+    var outputDexFile: String = "out.dex"
 
-    @JvmField var jobs = Runtime.getRuntime().availableProcessors()
-    @JvmField var allowOdexOpcodes = false
-    @JvmField var verboseErrors = false
-    @JvmField var printTokens = false
+    var jobs = Runtime.getRuntime().availableProcessors()
+    var allowOdexOpcodes = false
+    var verboseErrors = false
+    var printTokens = false
 }

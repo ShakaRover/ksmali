@@ -89,6 +89,7 @@ dependencies {
     api project(':dexlib2')
     implementation depends.antlr_runtime
     implementation depends.jcommander
+    implementation depends.coroutines
     implementation depends.guava
 
     testImplementation depends.junit

@@ -32,11 +32,17 @@
 
 package com.android.tools.smali.smali
 
-import com.google.common.collect.Lists
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder
 import com.android.tools.smali.dexlib2.writer.io.FileDataStore
 import com.android.tools.smali.util.StringUtils
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.supervisorScope
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.Token
@@ -45,12 +51,7 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
-import java.util.Arrays
 import java.util.TreeSet
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
 
 /**
  * Assemble the specified files, using the given options
@@ -61,7 +62,7 @@ import java.util.concurrent.Future
  */
 @Throws(IOException::class)
 fun assemble(options: SmaliOptions, vararg input: String): Boolean =
-    assemble(options, Arrays.asList(*input))
+    assemble(options, input.toList())
 
 /**
  * Assemble the specified files, using the given options
@@ -72,59 +73,52 @@ fun assemble(options: SmaliOptions, vararg input: String): Boolean =
  */
 @Throws(IOException::class)
 fun assemble(options: SmaliOptions, input: List<String>): Boolean {
-    val filesToProcessSet = TreeSet<File>()
-
-    for (fileToProcess in input) {
-        val argFile = File(fileToProcess)
-
-        if (!argFile.exists()) {
-            throw IllegalArgumentException("Cannot find file or directory \"$fileToProcess\"")
-        }
-
-        if (argFile.isDirectory) {
-            getSmaliFilesInDir(argFile, filesToProcessSet)
-        } else if (argFile.isFile) {
-            filesToProcessSet.add(argFile)
-        }
-    }
-
-    var errors = false
-
+    val filesToProcess = collectSmaliFiles(input)
     val dexBuilder = DexBuilder(Opcodes.forApi(options.apiLevel))
 
-    val executor = Executors.newFixedThreadPool(options.jobs)
-    val tasks = Lists.newArrayList<Future<Boolean>>()
-
-    for (file in filesToProcessSet) {
-        tasks.add(executor.submit(Callable<Boolean> { assembleSmaliFile(file, dexBuilder, options) }))
-    }
-
-    for (task in tasks) {
-        while (true) {
-            try {
-                try {
-                    if (!task.get()) {
-                        errors = true
+    // Assemble every file on a dispatcher that honours the requested job count. supervisorScope +
+    // runCatching makes sure one failing file does not cancel the others (same behaviour as the
+    // old thread-pool implementation, which waited for every task).
+    val results = runBlocking {
+        supervisorScope {
+            filesToProcess
+                .map { file ->
+                    async(assemblyDispatcher(options.jobs)) {
+                        runCatching { assembleSmaliFile(file, dexBuilder, options) }
                     }
-                } catch (ex: ExecutionException) {
-                    throw RuntimeException(ex)
                 }
-            } catch (ex: InterruptedException) {
-                continue
-            }
-            break
+                .awaitAll()
         }
     }
 
-    executor.shutdown()
+    results.firstOrNull { it.isFailure }?.let { throw RuntimeException(it.exceptionOrNull()) }
 
-    if (errors) {
+    if (results.any { !it.getOrDefault(false) }) {
         return false
     }
 
     dexBuilder.writeTo(FileDataStore(File(options.outputDexFile)))
 
     return true
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+private fun assemblyDispatcher(jobs: Int): CoroutineDispatcher =
+    Dispatchers.Default.limitedParallelism(jobs.coerceAtLeast(1))
+
+private fun collectSmaliFiles(input: List<String>): List<File> {
+    val filesToProcess = TreeSet<File>()
+
+    for (path in input) {
+        val argFile = File(path)
+        require(argFile.exists()) { "Cannot find file or directory \"$path\"" }
+        when {
+            argFile.isDirectory -> getSmaliFilesInDir(argFile, filesToProcess)
+            argFile.isFile -> filesToProcess.add(argFile)
+        }
+    }
+
+    return filesToProcess.toList()
 }
 
 /**
@@ -136,88 +130,50 @@ fun assemble(options: SmaliOptions, input: List<String>): Boolean {
  */
 @Throws(IOException::class)
 fun printTokens(options: SmaliOptions, input: List<String>): Boolean {
-    val filesToProcessSet = TreeSet<File>()
-
-    for (fileToProcess in input) {
-        val argFile = File(fileToProcess)
-
-        if (!argFile.exists()) {
-            throw IllegalArgumentException("Cannot find file or directory \"$fileToProcess\"")
-        }
-
-        if (argFile.isDirectory) {
-            getSmaliFilesInDir(argFile, filesToProcessSet)
-        } else if (argFile.isFile) {
-            filesToProcessSet.add(argFile)
-        }
-    }
-
-    var errors = false
-
-    for (file in filesToProcessSet) {
+    val errors = collectSmaliFiles(input).map { file ->
         try {
-            if (!printTokensForSingleFile(file, options)) {
-                errors = true
-            }
+            printTokensForSingleFile(file, options)
         } catch (ex: Exception) {
             throw RuntimeException(ex)
         }
-    }
+    }.any { !it }
 
-    if (errors) {
-        return false
-    }
-
-    return true
+    return !errors
 }
 
 private fun getSmaliFilesInDir(dir: File, smaliFiles: MutableSet<File>) {
-    val files = dir.listFiles()
-    if (files != null) {
-        for (file in files) {
-            if (file.isDirectory) {
-                getSmaliFilesInDir(file, smaliFiles)
-            } else if (file.name.endsWith(".smali")) {
-                smaliFiles.add(file)
-            }
+    dir.listFiles()?.forEach { file ->
+        when {
+            file.isDirectory -> getSmaliFilesInDir(file, smaliFiles)
+            file.name.endsWith(".smali") -> smaliFiles.add(file)
         }
     }
 }
 
-private fun assembleSmaliFile(smaliFile: File, dexBuilder: DexBuilder, options: SmaliOptions): Boolean {
-    return FileInputStream(smaliFile).use { fis ->
-        val reader = InputStreamReader(fis, StandardCharsets.UTF_8)
-
-        val lexer = smaliLexer(CharStreams.fromReader(reader))
-        lexer.setApiLevel(options.apiLevel)
-        lexer.setSourceFile(smaliFile)
-        val tokens = CommonTokenStream(lexer)
+private fun assembleSmaliFile(smaliFile: File, dexBuilder: DexBuilder, options: SmaliOptions): Boolean =
+    FileInputStream(smaliFile).use { fis ->
+        val lexer = smaliLexer(CharStreams.fromReader(InputStreamReader(fis, StandardCharsets.UTF_8))).apply {
+            setApiLevel(options.apiLevel)
+            setSourceFile(smaliFile)
+        }
+        val tokenStream = CommonTokenStream(lexer)
 
         if (options.printTokens) {
-            tokens.getTokens()
-
-            for (i in 0 until tokens.size()) {
-                val token = tokens.get(i)
-                if (token.channel == Token.HIDDEN_CHANNEL) {
-                    continue
+            tokenStream.tokens.forEach { token ->
+                if (token.channel != Token.HIDDEN_CHANNEL) {
+                    val name = if (token.type == Token.EOF) "EOF" else smaliParser.tokenName(token.type)
+                    println("$name: ${token.text}")
                 }
-
-                val tokenName = if (token.type == Token.EOF) {
-                    "EOF"
-                } else {
-                    smaliParser.tokenName(token.type)
-                }
-                System.out.println("$tokenName: ${token.text}")
             }
-
             System.out.flush()
         }
 
-        val parser = smaliParser(tokens)
-        parser.setBuildParseTree(false)
-        parser.setVerboseErrors(options.verboseErrors)
-        parser.setAllowOdex(options.allowOdexOpcodes)
-        parser.setApiLevel(options.apiLevel)
+        val parser = smaliParser(tokenStream).apply {
+            setBuildParseTree(false)
+            setVerboseErrors(options.verboseErrors)
+            setAllowOdex(options.allowOdexOpcodes)
+            setApiLevel(options.apiLevel)
+        }
 
         val result = parser.smali_file()
 
@@ -225,20 +181,20 @@ private fun assembleSmaliFile(smaliFile: File, dexBuilder: DexBuilder, options: 
             return@use false
         }
 
-        val t = result.n
+        val tree = result.n
 
         if (options.printTokens) {
-            System.out.println(t.toStringTree())
+            println(tree.toStringTree())
         }
 
-        val treeStream = ListTokenStream(t.flatten())
+        val dexGen = smaliTreeWalker(ListTokenStream(tree.flatten())).apply {
+            setBuildParseTree(false)
+            setErrorHandler(NoSyncErrorStrategy())
+            setApiLevel(options.apiLevel)
+            setVerboseErrors(options.verboseErrors)
+            setDexBuilder(dexBuilder)
+        }
 
-        val dexGen = smaliTreeWalker(treeStream)
-        dexGen.setBuildParseTree(false)
-        dexGen.setErrorHandler(NoSyncErrorStrategy())
-        dexGen.setApiLevel(options.apiLevel)
-        dexGen.setVerboseErrors(options.verboseErrors)
-        dexGen.setDexBuilder(dexBuilder)
         try {
             dexGen.smali_file()
         } catch (ex: RuntimeException) {
@@ -250,33 +206,23 @@ private fun assembleSmaliFile(smaliFile: File, dexBuilder: DexBuilder, options: 
 
         dexGen.getNumberOfSyntaxErrors() == 0
     }
-}
 
-private fun printTokensForSingleFile(smaliFile: File, options: SmaliOptions): Boolean {
-    return FileInputStream(smaliFile).use { fis ->
-        val reader = InputStreamReader(fis, StandardCharsets.UTF_8)
+private fun printTokensForSingleFile(smaliFile: File, options: SmaliOptions): Boolean =
+    FileInputStream(smaliFile).use { fis ->
+        val lexer = smaliLexer(CharStreams.fromReader(InputStreamReader(fis, StandardCharsets.UTF_8))).apply {
+            setApiLevel(options.apiLevel)
+            setSourceFile(smaliFile)
+        }
+        val tokenStream = CommonTokenStream(lexer)
+        tokenStream.fill()
 
-        val lexer = smaliLexer(CharStreams.fromReader(reader))
-        lexer.setApiLevel(options.apiLevel)
-        lexer.setSourceFile(smaliFile)
-        val tokens = CommonTokenStream(lexer)
-        tokens.fill()
-
-        for (i in 0 until tokens.size()) {
-            val token = tokens.get(i)
-            if (token.channel == Token.HIDDEN_CHANNEL) {
-                continue
+        tokenStream.tokens.forEach { token ->
+            if (token.channel != Token.HIDDEN_CHANNEL) {
+                val name = if (token.type == Token.EOF) "EOF" else smaliParser.tokenName(token.type)
+                println("$name(\"${StringUtils.escapeString(token.text)}\")")
             }
-
-            val tokenName = if (token.type == Token.EOF) {
-                "EOF"
-            } else {
-                smaliParser.tokenName(token.type)
-            }
-            System.out.println("$tokenName(\"${StringUtils.escapeString(token.text)}\")")
         }
         System.out.flush()
 
         lexer.getNumberOfSyntaxErrors() == 0
     }
-}

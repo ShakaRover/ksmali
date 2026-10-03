@@ -97,7 +97,8 @@ subprojects {
                 proguard_gradle: 'com.guardsquare:proguard-gradle:7.1.0',
                 dx: 'com.google.android.tools:dx:1.7',
                 gson: 'com.google.code.gson:gson:2.3.1',
-                jcommander: 'org.jcommander:jcommander:1.85'
+                jcommander: 'org.jcommander:jcommander:1.85',
+                coroutines: 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0'
         ]
     }
 

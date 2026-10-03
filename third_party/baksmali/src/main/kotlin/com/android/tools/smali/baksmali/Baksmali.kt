@@ -34,73 +34,60 @@ import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.DexFile
 import com.android.tools.smali.util.ClassFileNameHandler
-import com.google.common.collect.Lists
-import com.google.common.collect.Ordering
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.supervisorScope
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
-import java.util.HashSet
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
 
-fun disassembleDexFile(dexFile: DexFile, outputDir: File, jobs: Int, options: BaksmaliOptions): Boolean {
-    return disassembleDexFile(dexFile, outputDir, jobs, options, null)
-}
+fun disassembleDexFile(dexFile: DexFile, outputDir: File, jobs: Int, options: BaksmaliOptions): Boolean =
+    disassembleDexFile(dexFile, outputDir, jobs, options, null)
 
 fun disassembleDexFile(
     dexFile: DexFile, outputDir: File, jobs: Int, options: BaksmaliOptions,
     classes: List<String>?
 ): Boolean {
-
-    //sort the classes, so that if we're on a case-insensitive file system and need to handle classes with file
-    //name collisions, then we'll use the same name for each class, if the dex file goes through multiple
-    //baksmali/smali cycles for some reason. If a class with a colliding name is added or removed, the filenames
-    //may still change of course
-    val classDefs = Ordering.natural<ClassDef>().sortedCopy(dexFile.classes)
+    // sort the classes, so that if we're on a case-insensitive file system and need to handle
+    // classes with file name collisions, then we'll use the same name for each class, if the dex
+    // file goes through multiple baksmali/smali cycles for some reason. If a class with a
+    // colliding name is added or removed, the filenames may still change of course
+    val classDefs = dexFile.classes.sortedBy { it.type }
 
     val fileNameHandler = ClassFileNameHandler(outputDir, ".smali")
+    val classSet = classes?.toHashSet()
 
-    val executor = Executors.newFixedThreadPool(jobs)
-    val tasks = Lists.newArrayList<Future<Boolean>>()
-
-    var classSet: MutableSet<String>? = null
-    if (classes != null) {
-        classSet = HashSet(classes)
-    }
-
-    for (classDef in classDefs) {
-        if (classSet != null && !classSet.contains(classDef.type)) {
-            continue
-        }
-        tasks.add(executor.submit(Callable<Boolean> { disassembleClass(classDef, fileNameHandler, options) }))
-    }
-
-    var errorOccurred = false
-    try {
-        for (task in tasks) {
-            while (true) {
-                try {
-                    if (!task.get()) {
-                        errorOccurred = true
+    // Disassemble each class on a dispatcher that honours the requested job count.
+    // supervisorScope + runCatching makes sure one failing class does not cancel the others (same
+    // behaviour as the old thread-pool implementation, which waited for every task).
+    val results = runBlocking {
+        supervisorScope {
+            classDefs
+                .filter { classSet == null || it.type in classSet }
+                .map { classDef ->
+                    async(disassemblyDispatcher(jobs)) {
+                        runCatching { disassembleClass(classDef, fileNameHandler, options) }
                     }
-                } catch (ex: InterruptedException) {
-                    continue
-                } catch (ex: ExecutionException) {
-                    throw RuntimeException(ex)
                 }
-                break
-            }
+                .awaitAll()
         }
-    } finally {
-        executor.shutdown()
     }
-    return !errorOccurred
+
+    results.firstOrNull { it.isFailure }?.let { throw RuntimeException(it.exceptionOrNull()) }
+
+    return results.all { it.getOrDefault(false) }
 }
+
+@OptIn(ExperimentalCoroutinesApi::class)
+private fun disassemblyDispatcher(jobs: Int): CoroutineDispatcher =
+    Dispatchers.Default.limitedParallelism(jobs.coerceAtLeast(1))
 
 private fun disassembleClass(
     classDef: ClassDef, fileNameHandler: ClassFileNameHandler, options: BaksmaliOptions
