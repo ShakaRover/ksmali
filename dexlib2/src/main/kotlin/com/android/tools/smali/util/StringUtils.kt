@@ -79,6 +79,10 @@ object StringUtils {
     @Deprecated("Use DexFormattedWriter#writeQuotedString(CharSequence)")
     @Throws(IOException::class)
     fun writeEscapedString(writer: Writer, value: String) {
+        writeEscapedStringImpl(writer, value)
+    }
+
+    internal fun writeEscapedStringImpl(writer: Writer, value: String) {
         for (i in value.indices) {
             val c = value[i]
 

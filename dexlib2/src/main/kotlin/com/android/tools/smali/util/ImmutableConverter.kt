@@ -42,7 +42,7 @@ abstract class ImmutableConverter<ImmutableItem, Item> {
 
     protected abstract fun makeImmutable(item: Item): ImmutableItem
 
-    fun toList(iterable: Iterable<out Item>?): List<ImmutableItem> {
+    fun toList(iterable: Iterable<Item>?): List<ImmutableItem> {
         if (iterable == null) {
             return emptyList()
         }
@@ -74,7 +74,7 @@ abstract class ImmutableConverter<ImmutableItem, Item> {
         return Collections.unmodifiableList(list)
     }
 
-    fun toSet(iterable: Iterable<out Item>?): Set<ImmutableItem> {
+    fun toSet(iterable: Iterable<Item>?): Set<ImmutableItem> {
         if (iterable == null) {
             return emptySet()
         }
@@ -107,7 +107,7 @@ abstract class ImmutableConverter<ImmutableItem, Item> {
 
     fun toSortedSet(
         comparator: Comparator<in ImmutableItem>,
-        iterable: Iterable<out Item>?
+        iterable: Iterable<Item>?
     ): SortedSet<ImmutableItem> {
         if (iterable == null) {
             return Collections.unmodifiableSortedSet(TreeSet(comparator))

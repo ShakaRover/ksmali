@@ -35,12 +35,12 @@ import com.android.tools.smali.dexlib2.writer.TypeListSection
 import com.android.tools.smali.dexlib2.writer.pool.TypeListPool.Key
 
 class TypeListPool(dexPool: DexPool) :
-    BaseNullableOffsetPool<Key<out Collection<out CharSequence>>>(dexPool),
-    TypeListSection<CharSequence, Key<out Collection<out CharSequence>>> {
+    BaseNullableOffsetPool<Key<out Collection<CharSequence>>>(dexPool),
+    TypeListSection<CharSequence, Key<out Collection<CharSequence>>> {
 
-    fun intern(types: Collection<out CharSequence>) {
+    fun intern(types: Collection<CharSequence>) {
         if (types.size > 0) {
-            val key = Key<Collection<out CharSequence>>(types)
+            val key = Key<Collection<CharSequence>>(types)
             val prev = internedItems.put(key, 0)
             if (prev == null) {
                 for (type in types) {
@@ -50,14 +50,14 @@ class TypeListPool(dexPool: DexPool) :
         }
     }
 
-    override fun getTypes(typesKey: Key<out Collection<out CharSequence>>?): Collection<out CharSequence> {
+    override fun getTypes(typesKey: Key<out Collection<CharSequence>>?): Collection<CharSequence> {
         if (typesKey == null) {
             return emptyList()
         }
         return typesKey.types
     }
 
-    override fun getNullableItemOffset(key: Key<out Collection<out CharSequence>>?): Int {
+    override fun getNullableItemOffset(key: Key<out Collection<CharSequence>>?): Int {
         if (key == null || key.types.size == 0) {
             return DexWriter.NO_OFFSET
         } else {
@@ -65,8 +65,8 @@ class TypeListPool(dexPool: DexPool) :
         }
     }
 
-    class Key<TypeCollection : Collection<out CharSequence>>(val types: TypeCollection) :
-        Comparable<Key<out Collection<out CharSequence>>> {
+    class Key<TypeCollection : Collection<CharSequence>>(val types: TypeCollection) :
+        Comparable<Key<out Collection<CharSequence>>> {
         override fun hashCode(): Int {
             var hashCode = 1
             for (type in types) {
@@ -77,7 +77,7 @@ class TypeListPool(dexPool: DexPool) :
 
         override fun equals(o: Any?): Boolean {
             if (o is Key<*>) {
-                val other = o as Key<out Collection<out CharSequence>>
+                val other = o as Key<out Collection<CharSequence>>
                 if (types.size != other.types.size) {
                     return false
                 }
@@ -100,7 +100,7 @@ class TypeListPool(dexPool: DexPool) :
             }
         }
 
-        override fun compareTo(o: Key<out Collection<out CharSequence>>): Int {
+        override fun compareTo(o: Key<out Collection<CharSequence>>): Int {
             val other = o.types.iterator()
             for (type in types) {
                 if (!other.hasNext()) {

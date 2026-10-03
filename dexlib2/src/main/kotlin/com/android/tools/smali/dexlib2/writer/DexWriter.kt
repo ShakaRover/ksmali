@@ -134,7 +134,7 @@ abstract class DexWriter<
     StringKey : CharSequence, StringRef : StringReference, TypeKey : CharSequence,
     TypeRef : TypeReference, ProtoRefKey : MethodProtoReference,
     FieldRefKey : FieldReference, MethodRefKey : MethodReference,
-    ClassKey : Comparable<in ClassKey>,
+    ClassKey : Comparable<ClassKey>,
     CallSiteKey : CallSiteReference,
     MethodHandleKey : MethodHandleReference,
     AnnotationKey : Annotation, AnnotationSetKey,
@@ -1038,17 +1038,18 @@ abstract class DexWriter<
             )
 
             for (methodKey in methods) {
-                var tryBlocks: List<out TryBlock<out ExceptionHandler>> = classSection.getTryBlocks(methodKey)
-                var instructions: Iterable<out Instruction>? = classSection.getInstructions(methodKey)
-                var debugItems: Iterable<out DebugItem>? = classSection.getDebugItems(methodKey)
+                var tryBlocks: List<TryBlock<out ExceptionHandler>> = classSection.getTryBlocks(methodKey)
+                var instructions: Iterable<Instruction>? = classSection.getInstructions(methodKey)
+                var debugItems: Iterable<DebugItem>? = classSection.getDebugItems(methodKey)
 
                 val instructionIterable = instructions
                 if (instructionIterable != null && stringSection.hasJumboIndexes) {
                     var needsFix = false
                     for (instruction in instructionIterable) {
                         if (instruction.opcode == Opcode.CONST_STRING) {
-                            if (stringSection.getItemIndex(
-                                    (instruction as ReferenceInstruction).reference as StringRef) >= 65536) {
+                            @Suppress("UNCHECKED_CAST")
+                            val stringRef = (instruction as ReferenceInstruction).reference as StringRef
+                            if (stringSection.getItemIndex(stringRef) >= 65536) {
                                 needsFix = true
                                 break
                             }
@@ -1103,8 +1104,9 @@ abstract class DexWriter<
             val instruction = instructions[i]
 
             if (instruction.opcode == Opcode.CONST_STRING) {
-                if (stringSection.getItemIndex(
-                        (instruction as ReferenceInstruction).reference as StringRef) >= 65536) {
+                @Suppress("UNCHECKED_CAST")
+                val stringRef = (instruction as ReferenceInstruction).reference as StringRef
+                if (stringSection.getItemIndex(stringRef) >= 65536) {
                     methodImplementation.replaceInstruction(i, BuilderInstruction31c(
                         Opcode.CONST_STRING_JUMBO,
                         (instruction as OneRegisterInstruction).registerA,
@@ -1117,8 +1119,8 @@ abstract class DexWriter<
 
     @Throws(IOException::class)
     private fun writeDebugItem(writer: DexDataWriter,
-                               parameterNames: Iterable<out StringKey?>?,
-                               debugItems: Iterable<out DebugItem>?): Int {
+                               parameterNames: Iterable<StringKey?>?,
+                               debugItems: Iterable<DebugItem>?): Int {
         var parameterCount = 0
         var lastNamedParameterIndex = -1
         if (parameterNames != null) {
@@ -1192,8 +1194,8 @@ abstract class DexWriter<
 
     @Throws(IOException::class)
     private fun writeCodeItem(writer: DexDataWriter, ehBuf: ByteArrayOutputStream, methodKey: MethodKey,
-                              tryBlocks: List<out TryBlock<out ExceptionHandler>>,
-                              instructions: Iterable<out Instruction>?,
+                              tryBlocks: List<TryBlock<out ExceptionHandler>>,
+                              instructions: Iterable<Instruction>?,
                               debugItemOffset: Int): Int {
         if (instructions == null && debugItemOffset == NO_OFFSET) {
             return -1
@@ -1567,11 +1569,11 @@ abstract class DexWriter<
             o1.key.toString().compareTo(o2.key.toString())
         }
 
-        private fun <T : Comparable<in T>> comparableKeyComparator(): Comparator<MutableMap.MutableEntry<out T, *>> {
+        private fun <T : Comparable<T>> comparableKeyComparator(): Comparator<MutableMap.MutableEntry<out T, *>> {
             return Comparator { o1, o2 -> o1.key.compareTo(o2.key) }
         }
 
-        private fun <T : Comparable<in T>> comparableValueComparator(): Comparator<MutableMap.MutableEntry<*, out T>> {
+        private fun <T : Comparable<T>> comparableValueComparator(): Comparator<MutableMap.MutableEntry<*, out T>> {
             return Comparator { o1, o2 -> o1.value.compareTo(o2.value) }
         }
 

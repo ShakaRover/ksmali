@@ -29,6 +29,7 @@ package com.android.tools.smali.util
 
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.util.Locale
 import java.util.regex.Pattern
 
 /**
@@ -36,7 +37,7 @@ import java.util.regex.Pattern
  * @return The current console width
  */
 fun getConsoleWidth(): Int {
-    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+    if (System.getProperty("os.name").lowercase(Locale.getDefault()).contains("windows")) {
         try {
             return attemptMode()
         } catch (ex: Exception) {

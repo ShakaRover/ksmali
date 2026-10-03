@@ -108,7 +108,7 @@ class DexBuilder(opcodes: Opcodes) : DexWriter<BuilderStringReference, BuilderSt
     }
 
     fun internField(definingClass: String, name: String, type: String, accessFlags: Int,
-                    initialValue: EncodedValue?, annotations: Set<out Annotation>,
+                    initialValue: EncodedValue?, annotations: Set<Annotation>,
                     hiddenApiRestrictions: Set<HiddenApiRestriction>): BuilderField {
         return BuilderField(
             fieldSection.internField(definingClass, name, type),
@@ -119,8 +119,8 @@ class DexBuilder(opcodes: Opcodes) : DexWriter<BuilderStringReference, BuilderSt
         )
     }
 
-    fun internMethod(definingClass: String, name: String, parameters: List<out MethodParameter>?,
-                     returnType: String, accessFlags: Int, annotations: Set<out Annotation>,
+    fun internMethod(definingClass: String, name: String, parameters: List<MethodParameter>?,
+                     returnType: String, accessFlags: Int, annotations: Set<Annotation>,
                      hiddenApiRestrictions: Set<HiddenApiRestriction>,
                      methodImplementation: MethodImplementation?): BuilderMethod {
         val params = parameters ?: emptyList()
@@ -135,9 +135,9 @@ class DexBuilder(opcodes: Opcodes) : DexWriter<BuilderStringReference, BuilderSt
     }
 
     fun internClassDef(type: String, accessFlags: Int, superclass: String?, interfaces: MutableList<String>?,
-                       sourceFile: String?, annotations: Set<out Annotation>,
-                       fields: Iterable<out BuilderField>?,
-                       methods: Iterable<out BuilderMethod>?): BuilderClassDef {
+                       sourceFile: String?, annotations: Set<Annotation>,
+                       fields: Iterable<BuilderField>?,
+                       methods: Iterable<BuilderMethod>?): BuilderClassDef {
         val interfacesList: List<String>
         if (interfaces == null) {
             interfacesList = emptyList()
@@ -258,7 +258,7 @@ class DexBuilder(opcodes: Opcodes) : DexWriter<BuilderStringReference, BuilderSt
         }
         throw IllegalArgumentException("Could not determine type of reference")
     }
-    private fun internMethodParameters(methodParameters: List<out MethodParameter>?): List<BuilderMethodParameter> {
+    private fun internMethodParameters(methodParameters: List<MethodParameter>?): List<BuilderMethodParameter> {
         if (methodParameters == null) {
             return emptyList()
         }
@@ -307,7 +307,7 @@ class DexBuilder(opcodes: Opcodes) : DexWriter<BuilderStringReference, BuilderSt
             else -> throw ExceptionWithContext("Unrecognized value type: %d", encodedValue.valueType)
         }
     }
-    internal fun internAnnotationElements(elements: Set<out AnnotationElement>):
+    internal fun internAnnotationElements(elements: Set<AnnotationElement>):
         Set<@JvmWildcard BuilderAnnotationElement> {
         return Collections.unmodifiableSet(
             elements.stream().map { annotationElement -> internAnnotationElement(annotationElement) }

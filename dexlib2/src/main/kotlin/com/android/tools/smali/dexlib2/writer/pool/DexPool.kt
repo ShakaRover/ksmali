@@ -71,8 +71,8 @@ import java.io.IOException
 
 class DexPool(opcodes: Opcodes) : DexWriter<CharSequence, StringReference, CharSequence, TypeReference,
     MethodProtoReference, FieldReference, MethodReference, PoolClassDef,
-    CallSiteReference, MethodHandleReference, Annotation, Set<out Annotation>,
-    TypeListPool.Key<out Collection<out CharSequence>>, Field, PoolMethod,
+    CallSiteReference, MethodHandleReference, Annotation, Set<Annotation>,
+    TypeListPool.Key<out Collection<CharSequence>>, Field, PoolMethod,
     ArrayEncodedValue, EncodedValue, AnnotationElement, StringPool, TypePool, ProtoPool, FieldPool, MethodPool,
     ClassPool, CallSitePool, MethodHandlePool, TypeListPool, AnnotationPool, AnnotationSetPool, EncodedArrayPool>(
     opcodes) {

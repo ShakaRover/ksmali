@@ -32,6 +32,6 @@ package com.android.tools.smali.dexlib2.writer
 
 interface IndexSection<Key> {
     fun getItemIndex(key: Key): Int
-    val items: Collection<out MutableMap.MutableEntry<out Key, Int>>
+    val items: Collection<MutableMap.MutableEntry<out Key, Int>>
     val itemCount: Int
 }

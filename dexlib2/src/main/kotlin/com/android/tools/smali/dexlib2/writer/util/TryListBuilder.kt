@@ -319,7 +319,7 @@ open class TryListBuilder<EH : ExceptionHandler> {
     private class TryBounds<EH : ExceptionHandler>(val start: MutableTryBlock<EH>, val end: MutableTryBlock<EH>)
 
     companion object {
-        fun <EH : ExceptionHandler> massageTryBlocks(tryBlocks: List<out TryBlock<out EH>>): List<TryBlock<EH>> {
+        fun <EH : ExceptionHandler> massageTryBlocks(tryBlocks: List<TryBlock<out EH>>): List<TryBlock<EH>> {
             val tlb = TryListBuilder<EH>()
 
             for (tryBlock in tryBlocks) {

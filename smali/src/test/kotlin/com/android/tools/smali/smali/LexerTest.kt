@@ -228,7 +228,7 @@ class LexerTest {
 
     companion object {
         private val tokenTypesByName: MutableMap<String, Int> = mutableMapOf<String, Int>().apply {
-            for (i in smaliParser.tokenNames.indices) {
+            for (i in 0..smaliParser.VOCABULARY.maxTokenType) {
                 this[smaliParser.tokenName(i)] = i
             }
         }

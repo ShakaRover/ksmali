@@ -47,7 +47,7 @@ class ArraySortedSet<T> private constructor(
 
     private constructor(
         comparator: Comparator<in T>,
-        collection: Collection<out T>
+        collection: Collection<T>
     ) : this(comparator, collectionToArray(collection))
 
     @Suppress("UNCHECKED_CAST")
@@ -161,6 +161,7 @@ class ArraySortedSet<T> private constructor(
         return result
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun equals(other: Any?): Boolean {
         if (other == null) {
             return false
@@ -188,7 +189,7 @@ class ArraySortedSet<T> private constructor(
 
         fun <T> of(
             comparator: Comparator<in T>,
-            collection: Collection<out T>
+            collection: Collection<T>
         ): ArraySortedSet<T> {
             return ArraySortedSet(comparator, collection)
         }
@@ -197,7 +198,7 @@ class ArraySortedSet<T> private constructor(
         @Suppress("UNCHECKED_CAST")
         fun <T> copyOf(
             comparator: Comparator<in T>,
-            collection: Collection<out T>
+            collection: Collection<T>
         ): ArraySortedSet<T> {
             val tmp = collection.stream().distinct().sorted(comparator)
                 .collect(Collectors.toList()) as List<T>
@@ -206,7 +207,7 @@ class ArraySortedSet<T> private constructor(
     }
 }
 
-private fun <T> collectionToArray(collection: Collection<out T>): Array<Any?> {
+private fun <T> collectionToArray(collection: Collection<T>): Array<Any?> {
     val array = arrayOfNulls<Any?>(collection.size)
     var i = 0
     for (item in collection) {

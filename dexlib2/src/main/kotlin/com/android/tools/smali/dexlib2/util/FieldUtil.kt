@@ -35,9 +35,9 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.iface.Field
 import java.util.function.Predicate
 
-val FIELD_IS_STATIC: Predicate<Field> = Predicate { input -> input != null && isStatic(input) }
+val FIELD_IS_STATIC: Predicate<Field> = Predicate { input -> isStatic(input) }
 
-val FIELD_IS_INSTANCE: Predicate<Field> = Predicate { input -> input != null && !isStatic(input) }
+val FIELD_IS_INSTANCE: Predicate<Field> = Predicate { input -> !isStatic(input) }
 
 fun isStatic(field: Field): Boolean {
     return AccessFlags.STATIC.isSet(field.accessFlags)

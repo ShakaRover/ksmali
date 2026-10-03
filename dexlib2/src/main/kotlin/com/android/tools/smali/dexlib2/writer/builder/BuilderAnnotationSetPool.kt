@@ -10,9 +10,9 @@ import java.util.stream.Collectors
 
 class BuilderAnnotationSetPool(dexBuilder: DexBuilder) : BaseBuilderPool(dexBuilder),
     AnnotationSetSection<BuilderAnnotation, BuilderAnnotationSet> {
-    private val internedItems: ConcurrentMap<Set<out Annotation>, BuilderAnnotationSet> = ConcurrentHashMap()
+    private val internedItems: ConcurrentMap<Set<Annotation>, BuilderAnnotationSet> = ConcurrentHashMap()
 
-    fun internAnnotationSet(annotations: Set<out Annotation>?): BuilderAnnotationSet {
+    fun internAnnotationSet(annotations: Set<Annotation>?): BuilderAnnotationSet {
         if (annotations == null) {
             return BuilderAnnotationSet.EMPTY
         }

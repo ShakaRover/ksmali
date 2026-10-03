@@ -77,8 +77,8 @@ import java.util.function.Function
 import java.util.function.Predicate
 
 class ClassPool(dexPool: DexPool) : BasePool<String, PoolClassDef>(dexPool),
-    ClassSection<CharSequence, CharSequence, TypeListPool.Key<out Collection<out CharSequence>>, PoolClassDef,
-        Field, PoolMethod, Set<out Annotation>, ArrayEncodedValue> {
+    ClassSection<CharSequence, CharSequence, TypeListPool.Key<out Collection<CharSequence>>, PoolClassDef,
+        Field, PoolMethod, Set<Annotation>, ArrayEncodedValue> {
 
     fun intern(classDef: ClassDef) {
         val poolClassDef = PoolClassDef(classDef)
@@ -311,7 +311,7 @@ class ClassPool(dexPool: DexPool) : BasePool<String, PoolClassDef>(dexPool),
         return key.hiddenApiRestrictions
     }
 
-    override fun getClassAnnotations(key: PoolClassDef): Set<out Annotation>? {
+    override fun getClassAnnotations(key: PoolClassDef): Set<Annotation>? {
         val annotations = key.annotations
         if (annotations.size == 0) {
             return null
@@ -319,7 +319,7 @@ class ClassPool(dexPool: DexPool) : BasePool<String, PoolClassDef>(dexPool),
         return annotations
     }
 
-    override fun getFieldAnnotations(key: Field): Set<out Annotation>? {
+    override fun getFieldAnnotations(key: Field): Set<Annotation>? {
         val annotations = key.annotations
         if (annotations.size == 0) {
             return null
@@ -327,7 +327,7 @@ class ClassPool(dexPool: DexPool) : BasePool<String, PoolClassDef>(dexPool),
         return annotations
     }
 
-    override fun getMethodAnnotations(key: PoolMethod): Set<out Annotation>? {
+    override fun getMethodAnnotations(key: PoolMethod): Set<Annotation>? {
         val annotations = key.annotations
         if (annotations.size == 0) {
             return null
@@ -335,13 +335,13 @@ class ClassPool(dexPool: DexPool) : BasePool<String, PoolClassDef>(dexPool),
         return annotations
     }
 
-    override fun getParameterAnnotations(key: PoolMethod): List<@JvmWildcard Set<out Annotation>>? {
+    override fun getParameterAnnotations(key: PoolMethod): List<@JvmWildcard Set<Annotation>>? {
         val parameters = key.parameters
         val hasParameterAnnotations = parameters.stream().anyMatch(HAS_PARAMETER_ANNOTATIONS)
 
         if (hasParameterAnnotations) {
-            return object : AbstractForwardSequentialList<Set<out Annotation>>() {
-                override fun iterator(): MutableIterator<Set<out Annotation>> {
+            return object : AbstractForwardSequentialList<Set<Annotation>>() {
+                override fun iterator(): MutableIterator<Set<Annotation>> {
                     return TransformedIterator(parameters.iterator(), PARAMETER_ANNOTATIONS)
                 }
 
@@ -360,8 +360,8 @@ class ClassPool(dexPool: DexPool) : BasePool<String, PoolClassDef>(dexPool),
         return null
     }
 
-    override fun getParameterNames(key: PoolMethod): Iterable<@JvmWildcard CharSequence>? {
-        return TransformedIterable(key.parameters, Function<MethodParameter, CharSequence> { input -> input.name })
+    override fun getParameterNames(key: PoolMethod): Iterable<@JvmWildcard CharSequence?>? {
+        return TransformedIterable(key.parameters, Function<MethodParameter, CharSequence?> { input -> input.name })
     }
 
     override fun getRegisterCount(key: PoolMethod): Int {

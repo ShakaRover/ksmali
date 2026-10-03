@@ -252,7 +252,7 @@ class ClassFileNameHandlerTest {
 
     @Test
     fun testUnicodeCollisionOnMac() {
-        if (!System.getProperty("os.name").toLowerCase().contains("mac")) {
+        if (!System.getProperty("os.name").lowercase().contains("mac")) {
             // The test is only applicable when run on a mac system
             return
         }

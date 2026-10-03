@@ -36,7 +36,7 @@ import com.android.tools.smali.dexlib2.writer.ProtoSection
 
 class ProtoPool(dexPool: DexPool) : BaseIndexPool<MethodProtoReference>(dexPool),
     ProtoSection<CharSequence, CharSequence, MethodProtoReference,
-        TypeListPool.Key<out Collection<out CharSequence>>> {
+        TypeListPool.Key<out Collection<CharSequence>>> {
 
     fun intern(reference: MethodProtoReference) {
         val prev = internedItems.put(reference, 0)
@@ -55,7 +55,7 @@ class ProtoPool(dexPool: DexPool) : BaseIndexPool<MethodProtoReference>(dexPool)
         return key.returnType
     }
 
-    override fun getParameters(key: MethodProtoReference): TypeListPool.Key<List<out CharSequence>> {
+    override fun getParameters(key: MethodProtoReference): TypeListPool.Key<List<CharSequence>> {
         return TypeListPool.Key(key.parameterTypes)
     }
 }

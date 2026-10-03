@@ -32,5 +32,5 @@ package com.android.tools.smali.dexlib2.writer
 
 interface OffsetSection<Key> {
     fun getItemOffset(key: Key): Int
-    val items: Collection<out MutableMap.MutableEntry<out Key, Int>>
+    val items: Collection<MutableMap.MutableEntry<out Key, Int>>
 }

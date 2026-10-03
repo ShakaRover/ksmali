@@ -35,12 +35,12 @@ import com.android.tools.smali.dexlib2.iface.Annotation
 import com.android.tools.smali.dexlib2.iface.MethodParameter
 
 class ParameterIterator(
-    types: List<out CharSequence>,
-    annotations: List<out Set<out Annotation>>,
+    types: List<CharSequence>,
+    annotations: List<Set<Annotation>>,
     names: Iterator<String?>
 ) : MutableIterator<MethodParameter> {
-    private val parameterTypes: Iterator<out CharSequence> = types.iterator()
-    private val parameterAnnotations: Iterator<out Set<out Annotation>> = annotations.iterator()
+    private val parameterTypes: Iterator<CharSequence> = types.iterator()
+    private val parameterAnnotations: Iterator<Set<Annotation>> = annotations.iterator()
     private val parameterNames: Iterator<String?> = names
 
     override fun hasNext(): Boolean {
@@ -49,7 +49,7 @@ class ParameterIterator(
 
     override fun next(): MethodParameter {
         val type: String = parameterTypes.next().toString()
-        val annotations: Set<out Annotation>
+        val annotations: Set<Annotation>
         val name: String?
 
         if (parameterAnnotations.hasNext()) {

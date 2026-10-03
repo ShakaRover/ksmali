@@ -39,7 +39,7 @@ import java.util.function.Function
  * The returned iterator supports `remove()` if [backingIterator] does.
  */
 class TransformedIterable<F, T>(
-    private val backingIterable: Iterable<out F>,
+    private val backingIterable: Iterable<F>,
     private val transformFunction: Function<F, T>
 ) : Iterable<T> {
     final override fun iterator(): MutableIterator<T> {
@@ -53,16 +53,16 @@ class TransformedIterable<F, T>(
      * The returned iterator supports `remove()` if [backingIterator] does.
      */
     class TransformedIterator<G, U> : MutableIterator<U> {
-        private val backingIterator: Iterator<out G>
+        private val backingIterator: Iterator<G>
         private val transformFunction: Function<G, U>
 
         constructor(
-            backingIterable: Iterable<out G>,
+            backingIterable: Iterable<G>,
             transformFunction: Function<G, U>
         ) : this(backingIterable.iterator(), transformFunction)
 
         constructor(
-            backingIterator: Iterator<out G>,
+            backingIterator: Iterator<G>,
             transformFunction: Function<G, U>
         ) {
             this.backingIterator = backingIterator
@@ -79,7 +79,7 @@ class TransformedIterable<F, T>(
 
         @Suppress("UNCHECKED_CAST")
         final override fun remove() {
-            (backingIterator as MutableIterator<out G>).remove()
+            (backingIterator as MutableIterator<G>).remove()
         }
     }
 }

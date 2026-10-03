@@ -33,10 +33,10 @@ package com.android.tools.smali.dexlib2.writer.pool
 import com.android.tools.smali.dexlib2.iface.Annotation
 import com.android.tools.smali.dexlib2.writer.AnnotationSetSection
 
-class AnnotationSetPool(dexPool: DexPool) : BaseNullableOffsetPool<Set<out Annotation>>(dexPool),
-    AnnotationSetSection<Annotation, Set<out Annotation>> {
+class AnnotationSetPool(dexPool: DexPool) : BaseNullableOffsetPool<Set<Annotation>>(dexPool),
+    AnnotationSetSection<Annotation, Set<Annotation>> {
 
-    fun intern(annotationSet: Set<out Annotation>) {
+    fun intern(annotationSet: Set<Annotation>) {
         if (annotationSet.size > 0) {
             val prev = internedItems.put(annotationSet, 0)
             if (prev == null) {
@@ -47,7 +47,7 @@ class AnnotationSetPool(dexPool: DexPool) : BaseNullableOffsetPool<Set<out Annot
         }
     }
 
-    override fun getAnnotations(key: Set<out Annotation>): Collection<@JvmWildcard Annotation> {
+    override fun getAnnotations(key: Set<Annotation>): Collection<@JvmWildcard Annotation> {
         return key
     }
 }

@@ -48,11 +48,18 @@ import java.io.Writer
 
 @Deprecated("use DexFormatter instead")
 fun getMethodDescriptor(methodReference: MethodReference): String {
-    return getMethodDescriptor(methodReference, false)
+    return getMethodDescriptorImpl(methodReference, false)
 }
 
 @Deprecated("use DexFormatter instead")
 fun getMethodDescriptor(methodReference: MethodReference, useImplicitReference: Boolean): String {
+    return getMethodDescriptorImpl(methodReference, useImplicitReference)
+}
+
+private fun getMethodDescriptorImpl(
+    methodReference: MethodReference,
+    useImplicitReference: Boolean
+): String {
     return buildString {
         if (!useImplicitReference) {
             append(methodReference.definingClass)
@@ -68,11 +75,10 @@ fun getMethodDescriptor(methodReference: MethodReference, useImplicitReference: 
     }
 }
 
-@Deprecated("use DexFormatter instead")
-fun getMethodProtoDescriptor(methodProtoReference: MethodProtoReference): String {
+private fun getMethodProtoDescriptorImpl(methodProtoReference: MethodProtoReference): String {
     val stringWriter = StringWriter()
     try {
-        writeMethodProtoDescriptor(stringWriter, methodProtoReference)
+        writeMethodProtoDescriptorImpl(stringWriter, methodProtoReference)
     } catch (ex: IOException) {
         // IOException shouldn't happen for a StringWriter...
         throw RuntimeException(ex)
@@ -81,8 +87,11 @@ fun getMethodProtoDescriptor(methodProtoReference: MethodProtoReference): String
 }
 
 @Deprecated("use DexFormatter instead")
-@Throws(IOException::class)
-fun writeMethodProtoDescriptor(writer: Writer, methodProtoReference: MethodProtoReference) {
+fun getMethodProtoDescriptor(methodProtoReference: MethodProtoReference): String {
+    return getMethodProtoDescriptorImpl(methodProtoReference)
+}
+
+internal fun writeMethodProtoDescriptorImpl(writer: Writer, methodProtoReference: MethodProtoReference) {
     writer.write('('.code)
     for (paramType in methodProtoReference.parameterTypes) {
         writer.write(paramType.toString())
@@ -93,13 +102,27 @@ fun writeMethodProtoDescriptor(writer: Writer, methodProtoReference: MethodProto
 
 @Deprecated("use DexFormatter instead")
 @Throws(IOException::class)
+fun writeMethodProtoDescriptor(writer: Writer, methodProtoReference: MethodProtoReference) {
+    writeMethodProtoDescriptorImpl(writer, methodProtoReference)
+}
+
+@Deprecated("use DexFormatter instead")
+@Throws(IOException::class)
 fun writeMethodDescriptor(writer: Writer, methodReference: MethodReference) {
-    writeMethodDescriptor(writer, methodReference, false)
+    writeMethodDescriptorImpl(writer, methodReference, false)
 }
 
 @Deprecated("use DexFormatter instead")
 @Throws(IOException::class)
 fun writeMethodDescriptor(writer: Writer, methodReference: MethodReference, useImplicitReference: Boolean) {
+    writeMethodDescriptorImpl(writer, methodReference, useImplicitReference)
+}
+
+internal fun writeMethodDescriptorImpl(
+    writer: Writer,
+    methodReference: MethodReference,
+    useImplicitReference: Boolean
+) {
     if (!useImplicitReference) {
         writer.write(methodReference.definingClass)
         writer.write("->")
@@ -115,11 +138,15 @@ fun writeMethodDescriptor(writer: Writer, methodReference: MethodReference, useI
 
 @Deprecated("use DexFormatter instead")
 fun getFieldDescriptor(fieldReference: FieldReference): String {
-    return getFieldDescriptor(fieldReference, false)
+    return getFieldDescriptorImpl(fieldReference, false)
 }
 
 @Deprecated("use DexFormatter instead")
 fun getFieldDescriptor(fieldReference: FieldReference, useImplicitReference: Boolean): String {
+    return getFieldDescriptorImpl(fieldReference, useImplicitReference)
+}
+
+private fun getFieldDescriptorImpl(fieldReference: FieldReference, useImplicitReference: Boolean): String {
     return buildString {
         if (!useImplicitReference) {
             append(fieldReference.definingClass)
@@ -143,12 +170,16 @@ fun getShortFieldDescriptor(fieldReference: FieldReference): String {
 @Deprecated("use DexFormatter instead")
 @Throws(IOException::class)
 fun writeFieldDescriptor(writer: Writer, fieldReference: FieldReference) {
-    writeFieldDescriptor(writer, fieldReference, false)
+    writeFieldDescriptorImpl(writer, fieldReference, false)
 }
 
 @Deprecated("use DexFormatter instead")
 @Throws(IOException::class)
 fun writeFieldDescriptor(writer: Writer, fieldReference: FieldReference, implicitReference: Boolean) {
+    writeFieldDescriptorImpl(writer, fieldReference, implicitReference)
+}
+
+internal fun writeFieldDescriptorImpl(writer: Writer, fieldReference: FieldReference, implicitReference: Boolean) {
     if (!implicitReference) {
         writer.write(fieldReference.definingClass)
         writer.write("->")
@@ -160,9 +191,13 @@ fun writeFieldDescriptor(writer: Writer, fieldReference: FieldReference, implici
 
 @Deprecated("use DexFormatter instead")
 fun getMethodHandleString(methodHandleReference: MethodHandleReference): String {
+    return getMethodHandleStringImpl(methodHandleReference)
+}
+
+private fun getMethodHandleStringImpl(methodHandleReference: MethodHandleReference): String {
     val stringWriter = StringWriter()
     try {
-        writeMethodHandle(stringWriter, methodHandleReference)
+        writeMethodHandleImpl(stringWriter, methodHandleReference)
     } catch (ex: IOException) {
         // IOException shouldn't happen for a StringWriter...
         throw RuntimeException(ex)
@@ -173,22 +208,30 @@ fun getMethodHandleString(methodHandleReference: MethodHandleReference): String 
 @Deprecated("use DexFormatter instead")
 @Throws(IOException::class)
 fun writeMethodHandle(writer: Writer, methodHandleReference: MethodHandleReference) {
+    writeMethodHandleImpl(writer, methodHandleReference)
+}
+
+internal fun writeMethodHandleImpl(writer: Writer, methodHandleReference: MethodHandleReference) {
     writer.write(MethodHandleType.toString(methodHandleReference.methodHandleType))
     writer.write('@'.code)
 
     val memberReference = methodHandleReference.memberReference
     if (memberReference is MethodReference) {
-        writeMethodDescriptor(writer, memberReference)
+        writeMethodDescriptorImpl(writer, memberReference, false)
     } else {
-        writeFieldDescriptor(writer, memberReference as FieldReference)
+        writeFieldDescriptorImpl(writer, memberReference as FieldReference, false)
     }
 }
 
 @Deprecated("use DexFormatter instead")
 fun getCallSiteString(callSiteReference: CallSiteReference): String {
+    return getCallSiteStringImpl(callSiteReference)
+}
+
+private fun getCallSiteStringImpl(callSiteReference: CallSiteReference): String {
     val stringWriter = StringWriter()
     try {
-        writeCallSite(stringWriter, callSiteReference)
+        writeCallSiteImpl(stringWriter, callSiteReference)
     } catch (ex: IOException) {
         // IOException shouldn't happen for a StringWriter...
         throw RuntimeException(ex)
@@ -199,33 +242,41 @@ fun getCallSiteString(callSiteReference: CallSiteReference): String {
 @Deprecated("use DexFormatter instead")
 @Throws(IOException::class)
 fun writeCallSite(writer: Writer, callSiteReference: CallSiteReference) {
+    writeCallSiteImpl(writer, callSiteReference)
+}
+
+internal fun writeCallSiteImpl(writer: Writer, callSiteReference: CallSiteReference) {
     writer.write(callSiteReference.name)
     writer.write('('.code)
     writer.write('"'.code)
-    StringUtils.writeEscapedString(writer, callSiteReference.methodName)
+    StringUtils.writeEscapedStringImpl(writer, callSiteReference.methodName)
     writer.write('"'.code)
     writer.write(", ")
-    writeMethodProtoDescriptor(writer, callSiteReference.methodProto)
+    writeMethodProtoDescriptorImpl(writer, callSiteReference.methodProto)
 
     for (encodedValue in callSiteReference.extraArguments) {
         writer.write(", ")
-        EncodedValueUtils.writeEncodedValue(writer, encodedValue)
+        EncodedValueUtils.writeEncodedValueImpl(writer, encodedValue)
     }
     writer.write(")@")
     val methodHandle = callSiteReference.methodHandle
     if (methodHandle.methodHandleType != MethodHandleType.INVOKE_STATIC) {
         throw IllegalArgumentException("The linker method handle for a call site must be of type invoke-static")
     }
-    writeMethodDescriptor(writer, callSiteReference.methodHandle.memberReference as MethodReference)
+    writeMethodDescriptorImpl(writer, callSiteReference.methodHandle.memberReference as MethodReference, false)
 }
 
 @Deprecated("use DexFormatter instead")
 fun getReferenceString(reference: Reference): String? {
-    return getReferenceString(reference, null)
+    return getReferenceStringImpl(reference, null)
 }
 
 @Deprecated("use DexFormatter instead")
 fun getReferenceString(reference: Reference, containingClass: String?): String? {
+    return getReferenceStringImpl(reference, containingClass)
+}
+
+private fun getReferenceStringImpl(reference: Reference, containingClass: String?): String? {
     if (reference is StringReference) {
         return "\"${StringUtils.escapeString(reference.string)}\""
     }
@@ -234,20 +285,20 @@ fun getReferenceString(reference: Reference, containingClass: String?): String? 
     }
     if (reference is FieldReference) {
         val useImplicitReference = reference.definingClass == containingClass
-        return getFieldDescriptor(reference, useImplicitReference)
+        return getFieldDescriptorImpl(reference, useImplicitReference)
     }
     if (reference is MethodReference) {
         val useImplicitReference = reference.definingClass == containingClass
-        return getMethodDescriptor(reference, useImplicitReference)
+        return getMethodDescriptorImpl(reference, useImplicitReference)
     }
     if (reference is MethodProtoReference) {
-        return getMethodProtoDescriptor(reference)
+        return getMethodProtoDescriptorImpl(reference)
     }
     if (reference is MethodHandleReference) {
-        return getMethodHandleString(reference)
+        return getMethodHandleStringImpl(reference)
     }
     if (reference is CallSiteReference) {
-        return getCallSiteString(reference)
+        return getCallSiteStringImpl(reference)
     }
     return null
 }

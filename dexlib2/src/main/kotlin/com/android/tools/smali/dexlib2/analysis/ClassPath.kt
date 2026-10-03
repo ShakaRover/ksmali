@@ -45,7 +45,7 @@ import java.util.HashSet
 import java.util.function.Supplier
 
 open class ClassPath(
-    providers: Iterable<out ClassProvider>,
+    providers: Iterable<ClassProvider>,
     private val checkPackagePrivateAccess: Boolean,
     val oatVersion: Int
 ) {

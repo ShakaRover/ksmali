@@ -55,7 +55,7 @@ class BuilderClassDef internal constructor(
     override val annotations: BuilderAnnotationSet,
     staticFields: SortedSet<BuilderField>?,
     instanceFields: SortedSet<BuilderField>?,
-    methods: Iterable<out BuilderMethod>?,
+    methods: Iterable<BuilderMethod>?,
     internal val staticInitializers: BuilderArrayEncodedValue?,
 ) : BaseTypeReference(), ClassDef {
     override val staticFields: SortedSet<BuilderField>
@@ -67,7 +67,7 @@ class BuilderClassDef internal constructor(
     var annotationDirectoryOffset = DexWriter.NO_OFFSET
 
     init {
-        val resolvedMethods: Iterable<out BuilderMethod> = methods ?: emptyList()
+        val resolvedMethods: Iterable<BuilderMethod> = methods ?: emptyList()
         this.staticFields = staticFields
             ?: Collections.unmodifiableSortedSet(TreeSet<BuilderField>())
         this.instanceFields = instanceFields

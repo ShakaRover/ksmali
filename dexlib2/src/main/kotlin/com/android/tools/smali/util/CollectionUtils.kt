@@ -79,7 +79,7 @@ class CollectionUtils private constructor() {
             }
             return lastMatchingIndex
         }
-        fun <T : Comparable<T>> compareAsList(list1: Collection<out T>, list2: Collection<out T>): Int {
+        fun <T : Comparable<T>> compareAsList(list1: Collection<T>, list2: Collection<T>): Int {
             var res = list1.size.compareTo(list2.size)
             if (res != 0) return res
             val elements2 = list2.iterator()
@@ -92,8 +92,8 @@ class CollectionUtils private constructor() {
 
         fun <T> compareAsIterable(
             comparator: Comparator<in T>,
-            it1: Iterable<out T>,
-            it2: Iterable<out T>
+            it1: Iterable<T>,
+            it2: Iterable<T>
         ): Int {
             val elements2 = it2.iterator()
             for (element1 in it1) {
@@ -110,7 +110,7 @@ class CollectionUtils private constructor() {
             return 0
         }
 
-        fun <T : Comparable<T>> compareAsIterable(it1: Iterable<out T>, it2: Iterable<out T>): Int {
+        fun <T : Comparable<T>> compareAsIterable(it1: Iterable<T>, it2: Iterable<T>): Int {
             val elements2 = it2.iterator()
             for (element1 in it1) {
                 if (!elements2.hasNext()) {
@@ -128,8 +128,8 @@ class CollectionUtils private constructor() {
 
         fun <T> compareAsList(
             elementComparator: Comparator<in T>,
-            list1: Collection<out T>,
-            list2: Collection<out T>
+            list1: Collection<T>,
+            list2: Collection<T>
         ): Int {
             var res = list1.size.compareTo(list2.size)
             if (res != 0) return res
@@ -141,12 +141,12 @@ class CollectionUtils private constructor() {
             return 0
         }
 
-        fun <T> listComparator(elementComparator: Comparator<in T>): Comparator<Collection<out T>> {
+        fun <T> listComparator(elementComparator: Comparator<in T>): Comparator<Collection<T>> {
             return Comparator { list1, list2 ->
                 compareAsList(elementComparator, list1, list2)
             }
         }
-        fun <T> isNaturalSortedSet(it: Iterable<out T>): Boolean {
+        fun <T> isNaturalSortedSet(it: Iterable<T>): Boolean {
             if (it is SortedSet<*>) {
                 val comparator = it.comparator()
                 return comparator == null || comparator == NaturalOrdering.INSTANCE
@@ -154,7 +154,7 @@ class CollectionUtils private constructor() {
             return false
         }
 
-        fun <T> isSortedSet(elementComparator: Comparator<*>, it: Iterable<out T>): Boolean {
+        fun <T> isSortedSet(elementComparator: Comparator<*>, it: Iterable<T>): Boolean {
             if (it is SortedSet<*>) {
                 val comparator = it.comparator()
                 if (comparator == null) {
@@ -166,7 +166,7 @@ class CollectionUtils private constructor() {
         }
 
         @Suppress("UNCHECKED_CAST")
-        private fun <T> toNaturalSortedSet(collection: Collection<out T>): SortedSet<T> {
+        private fun <T> toNaturalSortedSet(collection: Collection<T>): SortedSet<T> {
             if (isNaturalSortedSet(collection)) {
                 return collection as SortedSet<T>
             }
@@ -176,7 +176,7 @@ class CollectionUtils private constructor() {
 
         private fun <T> toSortedSet(
             elementComparator: Comparator<in T>,
-            collection: Collection<out T>
+            collection: Collection<T>
         ): SortedSet<T> {
             if (collection is SortedSet<*>) {
                 val comparator = collection.comparator()
@@ -188,13 +188,13 @@ class CollectionUtils private constructor() {
 
             return Collections.unmodifiableSortedSet(ArraySortedSet.copyOf(elementComparator, collection))
         }
-        fun <T> setComparator(elementComparator: Comparator<in T>): Comparator<Collection<out T>> {
+        fun <T> setComparator(elementComparator: Comparator<in T>): Comparator<Collection<T>> {
             return Comparator { list1, list2 ->
                 compareAsSet(elementComparator, list1, list2)
             }
         }
 
-        fun <T : Comparable<T>> compareAsSet(set1: Collection<out T>, set2: Collection<out T>): Int {
+        fun <T : Comparable<T>> compareAsSet(set1: Collection<T>, set2: Collection<T>): Int {
             val sortedSet1 = toNaturalSortedSet(set1)
             val sortedSet2 = toNaturalSortedSet(set2)
             return compareAsIterable(sortedSet1, sortedSet2)
@@ -202,8 +202,8 @@ class CollectionUtils private constructor() {
 
         fun <T> compareAsSet(
             elementComparator: Comparator<in T>,
-            list1: Collection<out T>,
-            list2: Collection<out T>
+            list1: Collection<T>,
+            list2: Collection<T>
         ): Int {
             val set1 = toSortedSet(elementComparator, list1)
             val set2 = toSortedSet(elementComparator, list2)

@@ -107,7 +107,7 @@ abstract class DebugInfo : Iterable<DebugItem> {
             // Create a MethodParameter iterator that uses our DexReader instance to read the parameter names.
             // After we have finished iterating over the parameters, reader will "point to" the beginning of the
             // debug instructions
-            val parameterIterator: Iterator<out MethodParameter> = ParameterIterator(
+            val parameterIterator: Iterator<MethodParameter> = ParameterIterator(
                 method.parameterTypes,
                 method.parameterAnnotations,
                 getParameterNames(reader)

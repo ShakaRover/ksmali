@@ -534,6 +534,7 @@ internal constructor(
         return getReferenceIndex(referenceInstruction.referenceType2, referenceInstruction.reference2)
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun getReferenceIndex(referenceType: Int, reference: Reference): Int {
         return when (referenceType) {
             ReferenceType.FIELD -> fieldSection.getItemIndex(reference as FieldRefKey)

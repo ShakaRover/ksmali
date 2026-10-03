@@ -33,6 +33,7 @@ import java.io.UnsupportedEncodingException
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
 import java.util.HashMap
+import java.util.Locale
 import java.util.regex.Pattern
 
 /**
@@ -151,7 +152,7 @@ class ClassFileNameHandler {
             var elementName = logicalName
             val parent = this.parent
             if (!preserveCase && parent != null && !parent.isCaseSensitive()) {
-                elementName = elementName.toLowerCase()
+                elementName = elementName.lowercase(Locale.getDefault())
             }
 
             if (modifyWindowsReservedFilenames && isReservedFileName(elementName)) {

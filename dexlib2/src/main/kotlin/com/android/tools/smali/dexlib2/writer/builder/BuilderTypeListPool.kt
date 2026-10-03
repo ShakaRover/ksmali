@@ -9,9 +9,9 @@ import java.util.stream.Collectors
 
 class BuilderTypeListPool(dexBuilder: DexBuilder) : BaseBuilderPool(dexBuilder),
     TypeListSection<BuilderTypeReference, BuilderTypeList> {
-    private val internedItems: ConcurrentMap<List<out CharSequence>, BuilderTypeList> = ConcurrentHashMap()
+    private val internedItems: ConcurrentMap<List<CharSequence>, BuilderTypeList> = ConcurrentHashMap()
 
-    fun internTypeList(types: List<out CharSequence>?): BuilderTypeList {
+    fun internTypeList(types: List<CharSequence>?): BuilderTypeList {
         if (types == null || types.size == 0) {
             return BuilderTypeList.EMPTY
         }

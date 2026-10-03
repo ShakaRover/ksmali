@@ -41,9 +41,9 @@ import java.util.function.Predicate
 private val directMask = AccessFlags.STATIC.value or AccessFlags.PRIVATE.value or
         AccessFlags.CONSTRUCTOR.value
 
-val METHOD_IS_DIRECT: Predicate<Method> = Predicate { input -> input != null && isDirect(input) }
+val METHOD_IS_DIRECT: Predicate<Method> = Predicate { input -> isDirect(input) }
 
-val METHOD_IS_VIRTUAL: Predicate<Method> = Predicate { input -> input != null && !isDirect(input) }
+val METHOD_IS_VIRTUAL: Predicate<Method> = Predicate { input -> !isDirect(input) }
 
 fun isDirect(method: Method): Boolean {
     return (method.accessFlags and directMask) != 0

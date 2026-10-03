@@ -75,6 +75,10 @@ object EncodedValueUtils {
     @Deprecated("use DexFormatter instead")
     @Throws(IOException::class)
     fun writeEncodedValue(writer: Writer, encodedValue: EncodedValue) {
+        writeEncodedValueImpl(writer, encodedValue)
+    }
+
+    internal fun writeEncodedValueImpl(writer: Writer, encodedValue: EncodedValue) {
         when (encodedValue.valueType) {
             ValueType.BOOLEAN ->
                 writer.write(java.lang.Boolean.toString((encodedValue as BooleanEncodedValue).value))
@@ -98,21 +102,21 @@ object EncodedValueUtils {
                 writeArray(writer, encodedValue as ArrayEncodedValue)
             ValueType.STRING -> {
                 writer.write('"'.code)
-                StringUtils.writeEscapedString(writer, (encodedValue as StringEncodedValue).value)
+                StringUtils.writeEscapedStringImpl(writer, (encodedValue as StringEncodedValue).value)
                 writer.write('"'.code)
             }
             ValueType.FIELD ->
-                writeFieldDescriptor(writer, (encodedValue as FieldEncodedValue).value)
+                writeFieldDescriptorImpl(writer, (encodedValue as FieldEncodedValue).value, false)
             ValueType.ENUM ->
-                writeFieldDescriptor(writer, (encodedValue as EnumEncodedValue).value)
+                writeFieldDescriptorImpl(writer, (encodedValue as EnumEncodedValue).value, false)
             ValueType.METHOD ->
-                writeMethodDescriptor(writer, (encodedValue as MethodEncodedValue).value)
+                writeMethodDescriptorImpl(writer, (encodedValue as MethodEncodedValue).value, false)
             ValueType.TYPE ->
                 writer.write((encodedValue as TypeEncodedValue).value)
             ValueType.METHOD_TYPE ->
-                writeMethodProtoDescriptor(writer, (encodedValue as MethodTypeEncodedValue).value)
+                writeMethodProtoDescriptorImpl(writer, (encodedValue as MethodTypeEncodedValue).value)
             ValueType.METHOD_HANDLE ->
-                writeMethodHandle(writer, (encodedValue as MethodHandleEncodedValue).value)
+                writeMethodHandleImpl(writer, (encodedValue as MethodHandleEncodedValue).value)
             ValueType.NULL -> writer.write("null")
             else -> throw IllegalArgumentException("Unknown encoded value type")
         }
@@ -127,7 +131,7 @@ object EncodedValueUtils {
             writer.write(", ")
             writer.write(element.name)
             writer.write('='.code)
-            writeEncodedValue(writer, element.value)
+            writeEncodedValueImpl(writer, element.value)
         }
 
         writer.write(']'.code)
@@ -143,7 +147,7 @@ object EncodedValueUtils {
             } else {
                 writer.write(", ")
             }
-            writeEncodedValue(writer, element)
+            writeEncodedValueImpl(writer, element)
         }
 
         writer.write(']'.code)

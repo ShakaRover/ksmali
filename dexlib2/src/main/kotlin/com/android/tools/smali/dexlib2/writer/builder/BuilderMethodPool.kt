@@ -26,7 +26,7 @@ class BuilderMethodPool(dexBuilder: DexBuilder) : BaseBuilderPool(dexBuilder),
         return existing ?: dexPoolMethodReference
     }
 
-    fun internMethod(definingClass: String, name: String, parameters: List<out CharSequence>,
+    fun internMethod(definingClass: String, name: String, parameters: List<CharSequence>,
                      returnType: String): BuilderMethodReference {
         return internMethod(MethodKey(definingClass, name, parameters, returnType))
     }
