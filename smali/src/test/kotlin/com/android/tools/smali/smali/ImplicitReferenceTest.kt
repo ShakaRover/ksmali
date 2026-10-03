@@ -116,32 +116,32 @@ class ImplicitReferenceTest {
         var field = fields["field1"]
         Assert.assertNotNull(field)
         Assert.assertNotNull(field!!.initialValue)
-        Assert.assertEquals(ValueType.METHOD, field!!.initialValue!!.valueType)
-        var methodEncodedValue = field!!.initialValue as MethodEncodedValue
+        Assert.assertEquals(ValueType.METHOD, field.initialValue!!.valueType)
+        var methodEncodedValue = field.initialValue as MethodEncodedValue
         Assert.assertEquals(classDef.type, methodEncodedValue.value.definingClass)
         Assert.assertEquals("toString", methodEncodedValue.value.name)
 
         field = fields["field2"]
         Assert.assertNotNull(field)
         Assert.assertNotNull(field!!.initialValue)
-        Assert.assertEquals(ValueType.METHOD, field!!.initialValue!!.valueType)
-        methodEncodedValue = field!!.initialValue as MethodEncodedValue
+        Assert.assertEquals(ValueType.METHOD, field.initialValue!!.valueType)
+        methodEncodedValue = field.initialValue as MethodEncodedValue
         Assert.assertEquals(classDef.type, methodEncodedValue.value.definingClass)
         Assert.assertEquals("V", methodEncodedValue.value.name)
 
         field = fields["field3"]
         Assert.assertNotNull(field)
         Assert.assertNotNull(field!!.initialValue)
-        Assert.assertEquals(ValueType.METHOD, field!!.initialValue!!.valueType)
-        methodEncodedValue = field!!.initialValue as MethodEncodedValue
+        Assert.assertEquals(ValueType.METHOD, field.initialValue!!.valueType)
+        methodEncodedValue = field.initialValue as MethodEncodedValue
         Assert.assertEquals(classDef.type, methodEncodedValue.value.definingClass)
         Assert.assertEquals("I", methodEncodedValue.value.name)
 
         field = fields["field4"]
         Assert.assertNotNull(field)
         Assert.assertNotNull(field!!.initialValue)
-        Assert.assertEquals(ValueType.TYPE, field!!.initialValue!!.valueType)
-        val typeEncodedValue = field!!.initialValue as TypeEncodedValue
+        Assert.assertEquals(ValueType.TYPE, field.initialValue!!.valueType)
+        val typeEncodedValue = field.initialValue as TypeEncodedValue
         Assert.assertEquals("I", typeEncodedValue.value)
     }
 
@@ -210,24 +210,24 @@ class ImplicitReferenceTest {
         var field = fields["field1"]
         Assert.assertNotNull(field)
         Assert.assertNotNull(field!!.initialValue)
-        Assert.assertEquals(ValueType.FIELD, field!!.initialValue!!.valueType)
-        var fieldEncodedValue = field!!.initialValue as FieldEncodedValue
+        Assert.assertEquals(ValueType.FIELD, field.initialValue!!.valueType)
+        var fieldEncodedValue = field.initialValue as FieldEncodedValue
         Assert.assertEquals(classDef.type, fieldEncodedValue.value.definingClass)
         Assert.assertEquals("someField", fieldEncodedValue.value.name)
 
         field = fields["field2"]
         Assert.assertNotNull(field)
         Assert.assertNotNull(field!!.initialValue)
-        Assert.assertEquals(ValueType.FIELD, field!!.initialValue!!.valueType)
-        fieldEncodedValue = field!!.initialValue as FieldEncodedValue
+        Assert.assertEquals(ValueType.FIELD, field.initialValue!!.valueType)
+        fieldEncodedValue = field.initialValue as FieldEncodedValue
         Assert.assertEquals(classDef.type, fieldEncodedValue.value.definingClass)
         Assert.assertEquals("V", fieldEncodedValue.value.name)
 
         field = fields["field3"]
         Assert.assertNotNull(field)
         Assert.assertNotNull(field!!.initialValue)
-        Assert.assertEquals(ValueType.FIELD, field!!.initialValue!!.valueType)
-        fieldEncodedValue = field!!.initialValue as FieldEncodedValue
+        Assert.assertEquals(ValueType.FIELD, field.initialValue!!.valueType)
+        fieldEncodedValue = field.initialValue as FieldEncodedValue
         Assert.assertEquals(classDef.type, fieldEncodedValue.value.definingClass)
         Assert.assertEquals("I", fieldEncodedValue.value.name)
     }

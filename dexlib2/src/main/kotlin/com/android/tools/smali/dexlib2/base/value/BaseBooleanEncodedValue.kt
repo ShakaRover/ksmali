@@ -40,17 +40,17 @@ abstract class BaseBooleanEncodedValue : BooleanEncodedValue {
         return if (value) 1 else 0
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is BooleanEncodedValue) {
-            return value == o.value
+    override fun equals(other: Any?): Boolean {
+        if (other is BooleanEncodedValue) {
+            return value == other.value
         }
         return false
     }
 
-    override fun compareTo(o: EncodedValue): Int {
-        var res = valueType.compareTo(o.valueType)
+    override fun compareTo(other: EncodedValue): Int {
+        var res = valueType.compareTo(other.valueType)
         if (res != 0) return res
-        return java.lang.Boolean.compare(value, (o as BooleanEncodedValue).value)
+        return java.lang.Boolean.compare(value, (other as BooleanEncodedValue).value)
     }
 
     override val valueType: Int

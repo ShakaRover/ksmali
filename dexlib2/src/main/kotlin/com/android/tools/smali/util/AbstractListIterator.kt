@@ -30,8 +30,6 @@
 
 package com.android.tools.smali.util
 
-import java.util.ListIterator
-
 abstract class AbstractListIterator<T> : MutableListIterator<T> {
     override fun hasNext(): Boolean {
         throw UnsupportedOperationException()
@@ -61,11 +59,11 @@ abstract class AbstractListIterator<T> : MutableListIterator<T> {
         throw UnsupportedOperationException()
     }
 
-    override fun set(t: T) {
+    override fun set(element: T) {
         throw UnsupportedOperationException()
     }
 
-    override fun add(t: T) {
+    override fun add(element: T) {
         throw UnsupportedOperationException()
     }
 }

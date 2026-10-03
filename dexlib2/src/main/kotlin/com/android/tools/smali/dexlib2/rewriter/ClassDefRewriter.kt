@@ -40,8 +40,8 @@ import com.android.tools.smali.util.ChainedIterable
 open class ClassDefRewriter(
     protected val rewriters: Rewriters
 ) : Rewriter<ClassDef> {
-    override fun rewrite(classDef: ClassDef): ClassDef {
-        return RewrittenClassDef(classDef)
+    override fun rewrite(value: ClassDef): ClassDef {
+        return RewrittenClassDef(value)
     }
 
     protected inner class RewrittenClassDef(

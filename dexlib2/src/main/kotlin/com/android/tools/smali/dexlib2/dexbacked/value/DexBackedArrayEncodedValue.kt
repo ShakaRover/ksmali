@@ -56,9 +56,9 @@ class DexBackedArrayEncodedValue(
             dexFile.dataBuffer, encodedArrayOffset, elementCount
         ) {
             override fun readNextItem(
-                dexReader: DexReader<out DexBuffer>,
+                reader: DexReader<out DexBuffer>,
                 index: Int
-            ): EncodedValue = DexBackedEncodedValue.readFrom(dexFile, dexReader)
+            ): EncodedValue = DexBackedEncodedValue.readFrom(dexFile, reader)
         }
 
     companion object {

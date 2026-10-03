@@ -88,10 +88,10 @@ interface MethodReference : Reference, Comparable<MethodReference> {
      * Equality for getParameters() should be tested by comparing the string representation of each element. I.e.
      * CharSequenceUtils.listEquals(this.getParameterTypes(), other.getParameterTypes())
      *
-     * @param o The object to be compared for equality with this MethodReference
+     * @param other The object to be compared for equality with this MethodReference
      * @return true if the specified object is equal to this MethodReference
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this MethodReference to another MethodReference.
@@ -100,8 +100,8 @@ interface MethodReference : Reference, Comparable<MethodReference> {
      * getReturnType() and getParameters(), in that order. getParameters() should be compared using the semantics
      * of com.android.tools.smali.util.CollectionUtils.compareAsList()
      *
-     * @param o The MethodReference to compare with this MethodReference
+     * @param other The MethodReference to compare with this MethodReference
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: MethodReference): Int
+    override fun compareTo(other: MethodReference): Int
 }

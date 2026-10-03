@@ -502,7 +502,7 @@ class ClassPool(dexPool: DexPool) : BasePool<String, PoolClassDef>(dexPool),
             input.annotations.size > 0
         }
 
-        private val PARAMETER_ANNOTATIONS = Function<MethodParameter, Set<out Annotation>> { input ->
+        private val PARAMETER_ANNOTATIONS = Function<MethodParameter, Set<Annotation>> { input ->
             input.annotations
         }
     }

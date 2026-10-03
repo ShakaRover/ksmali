@@ -34,11 +34,11 @@ abstract class MethodItem(val codeAddress: Int) : Comparable<MethodItem> {
     //an arbitrary double that determines how this item will be sorted with others at the same address
     abstract val sortOrder: Double
 
-    override fun compareTo(methodItem: MethodItem): Int {
-        val result = codeAddress.compareTo(methodItem.codeAddress)
+    override fun compareTo(other: MethodItem): Int {
+        val result = codeAddress.compareTo(other.codeAddress)
 
         if (result == 0) {
-            return sortOrder.compareTo(methodItem.sortOrder)
+            return sortOrder.compareTo(other.sortOrder)
         }
         return result
     }

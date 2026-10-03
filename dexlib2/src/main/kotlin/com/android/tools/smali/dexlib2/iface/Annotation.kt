@@ -83,10 +83,10 @@ interface Annotation : BasicAnnotation, Comparable<Annotation> {
      * This Annotation is equal to another Annotation if all of it's "fields" are equal. That is, if the return values
      * of getVisibility(), getType(), and getElements() are all equal.
      *
-     * @param o The object to be compared for equality with this Annotation
+     * @param other The object to be compared for equality with this Annotation
      * @return true if the specified object is equal to this Annotation
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compares this Annotation to another Annotation.
@@ -95,8 +95,8 @@ interface Annotation : BasicAnnotation, Comparable<Annotation> {
      * comparing the set of elements, the comparison is done with the semantics of
      * com.android.tools.smali.util.CollectionUtils.compareAsSet(), using the natural ordering of AnnotationElement.
      *
-     * @param o The Annotation to compare with this Annotation
+     * @param other The Annotation to compare with this Annotation
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: Annotation): Int
+    override fun compareTo(other: Annotation): Int
 }

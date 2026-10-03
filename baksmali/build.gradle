@@ -33,7 +33,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath depends.proguard_gradle
+        classpath libs.proguard.gradle
     }
 }
 
@@ -48,12 +48,12 @@ sourceSets {
 dependencies {
     implementation project(':util')
     api project(':dexlib2')
-    implementation depends.jcommander
-    implementation depends.coroutines
+    implementation libs.jcommander
+    implementation libs.coroutines
 
-    testImplementation depends.junit
+    testImplementation libs.junit
     testImplementation project(':smali')
-    testImplementation depends.antlr_runtime
+    testImplementation libs.antlr.runtime
 }
 
 processResources.inputs.property('version', version)
@@ -111,6 +111,12 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {
 
     dontobfuscate
     dontoptimize
+
+    // Optional annotations referenced by kotlinx-coroutines that are not on the
+    // runtime classpath; ProGuard aborts on these unresolved references unless told
+    // to ignore them.
+    dontwarn 'org.codehaus.mojo.animal_sniffer.**'
+    dontwarn 'android.annotation.**'
 
     keep 'public class com.android.tools.smali.baksmali.Main { public static void main(java.lang.String[]); }'
     keep 'public class com.android.tools.smali.util.jcommander.ColonParameterSplitter'

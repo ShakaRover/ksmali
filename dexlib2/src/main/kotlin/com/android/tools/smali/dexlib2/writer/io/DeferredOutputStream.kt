@@ -35,5 +35,5 @@ import java.io.OutputStream
 
 abstract class DeferredOutputStream : OutputStream() {
     @Throws(IOException::class)
-    abstract fun writeTo(output: OutputStream)
+    abstract fun writeTo(dest: OutputStream)
 }

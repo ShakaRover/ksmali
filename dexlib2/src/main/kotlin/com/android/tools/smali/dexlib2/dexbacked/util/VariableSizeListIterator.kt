@@ -97,11 +97,11 @@ abstract class VariableSizeListIterator<T> : MutableListIterator<T> {
         throw UnsupportedOperationException()
     }
 
-    override fun set(t: T) {
+    override fun set(element: T) {
         throw UnsupportedOperationException()
     }
 
-    override fun add(t: T) {
+    override fun add(element: T) {
         throw UnsupportedOperationException()
     }
 }

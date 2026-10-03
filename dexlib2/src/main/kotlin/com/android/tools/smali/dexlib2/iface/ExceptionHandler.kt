@@ -81,10 +81,10 @@ interface ExceptionHandler : Comparable<ExceptionHandler> {
      * This ExceptionHandler is equal to another ExceptionHandler if all of it's "fields" are equal. That is, if
      * the return values of getExceptionType() and getHandlerCodeAddress() are both equal.
      *
-     * @param o The object to be compared for equality with this ExceptionHandler
+     * @param other The object to be compared for equality with this ExceptionHandler
      * @return true if the specified object is equal to this ExceptionHandler
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this ExceptionHandler to another ExceptionHandler.
@@ -92,8 +92,8 @@ interface ExceptionHandler : Comparable<ExceptionHandler> {
      * The comparison is based on the comparison of the return values of getExceptionType() and
      * getHandlerCodeAddress() in that order. A null value for getExceptionType() compares after a non-null value.
      *
-     * @param o The ExceptionHandler to compare with this ExceptionHandler
+     * @param other The ExceptionHandler to compare with this ExceptionHandler
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: ExceptionHandler): Int
+    override fun compareTo(other: ExceptionHandler): Int
 }

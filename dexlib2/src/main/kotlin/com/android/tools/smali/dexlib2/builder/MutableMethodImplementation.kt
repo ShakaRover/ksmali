@@ -220,14 +220,14 @@ open class MutableMethodImplementation : MethodImplementation {
             }
 
             return object : AbstractList<BuilderInstruction>() {
-                override fun get(i: Int): BuilderInstruction {
-                    if (i >= size) {
+                override fun get(index: Int): BuilderInstruction {
+                    if (index >= size) {
                         throw IndexOutOfBoundsException()
                     }
                     if (needsFixInstructions) {
                         fixInstructions()
                     }
-                    return instructionList[i].instruction!!
+                    return instructionList[index].instruction!!
                 }
 
                 override val size: Int
@@ -509,12 +509,12 @@ open class MutableMethodImplementation : MethodImplementation {
                                 if (offset < Short.MIN_VALUE || offset > Short.MAX_VALUE) {
                                     replacement = BuilderInstruction30t(
                                         Opcode.GOTO_32,
-                                        (instruction as BuilderOffsetInstruction).target
+                                        instruction.target
                                     )
                                 } else {
                                     replacement = BuilderInstruction20t(
                                         Opcode.GOTO_16,
-                                        (instruction as BuilderOffsetInstruction).target
+                                        instruction.target
                                     )
                                 }
                                 replaceInstruction(location.index, replacement)
@@ -526,7 +526,7 @@ open class MutableMethodImplementation : MethodImplementation {
                             if (offset < Short.MIN_VALUE || offset > Short.MAX_VALUE) {
                                 val replacement = BuilderInstruction30t(
                                     Opcode.GOTO_32,
-                                    (instruction as BuilderOffsetInstruction).target
+                                    instruction.target
                                 )
                                 replaceInstruction(location.index, replacement)
                                 madeChanges = true

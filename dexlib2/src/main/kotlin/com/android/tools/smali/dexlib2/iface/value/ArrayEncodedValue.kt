@@ -60,10 +60,10 @@ interface ArrayEncodedValue : EncodedValue {
      *
      * This ArrayEncodedValue is equal to another ArrayEncodedValue if the values returned by getValue() are equal.
      *
-     * @param o The object to be compared for equality with this ArrayEncodedValue
+     * @param other The object to be compared for equality with this ArrayEncodedValue
      * @return true if the specified object is equal to this ArrayEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this ArrayEncodedValue to another EncodedValue.
@@ -72,8 +72,8 @@ interface ArrayEncodedValue : EncodedValue {
      * ArrayEncodedValue, the lists returned by getValue() are compared, based on the semantics of
      * com.android.tools.smali.util.ComparisonUtils.compareAsList(), using the natural ordering for EncodedValue.
      *
-     * @param o The EncodedValue to compare with this ArrayEncodedValue
+     * @param other The EncodedValue to compare with this ArrayEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

@@ -60,10 +60,10 @@ interface ShortEncodedValue : EncodedValue {
      *
      * This ShortEncodedValue is equal to another ShortEncodedValue if the values returned by getValue() are equal.
      *
-     * @param o The object to be compared for equality with this ShortEncodedValue
+     * @param other The object to be compared for equality with this ShortEncodedValue
      * @return true if the specified object is equal to this ShortEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this ShortEncodedValue to another EncodedValue.
@@ -71,8 +71,8 @@ interface ShortEncodedValue : EncodedValue {
      * The comparison is first done on the return values of getValueType(). If the other value is another
      * ShortEncodedValue, the return values of getValue() are compared.
      *
-     * @param o The EncodedValue to compare with this ShortEncodedValue
+     * @param other The EncodedValue to compare with this ShortEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

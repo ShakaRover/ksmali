@@ -1032,7 +1032,7 @@ abstract class DexWriter<
             val virtualMethods = classSection.getSortedVirtualMethods(classKey)
 
             val methods: Iterable<MethodKey> = ChainedIterable(
-                directMethods as Collection<MethodKey>, virtualMethods as Collection<MethodKey>
+                directMethods, virtualMethods
             )
 
             for (methodKey in methods) {
@@ -1302,7 +1302,7 @@ abstract class DexWriter<
                 writer.align()
 
                 // filter out unique lists of exception handlers
-                val exceptionHandlerOffsetMap = HashMap<List<out ExceptionHandler>, Int>()
+                val exceptionHandlerOffsetMap = HashMap<List<ExceptionHandler>, Int>()
                 for (tryBlock in massagedTryBlocks) {
                     exceptionHandlerOffsetMap[tryBlock.exceptionHandlers] = 0
                 }

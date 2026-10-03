@@ -39,8 +39,8 @@ import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 open class MethodImplementationRewriter(
     protected val rewriters: Rewriters
 ) : Rewriter<MethodImplementation> {
-    override fun rewrite(methodImplementation: MethodImplementation): MethodImplementation {
-        return RewrittenMethodImplementation(methodImplementation)
+    override fun rewrite(value: MethodImplementation): MethodImplementation {
+        return RewrittenMethodImplementation(value)
     }
 
     protected inner class RewrittenMethodImplementation(

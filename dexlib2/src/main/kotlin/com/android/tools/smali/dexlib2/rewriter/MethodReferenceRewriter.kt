@@ -36,8 +36,8 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 open class MethodReferenceRewriter(
     protected val rewriters: Rewriters
 ) : Rewriter<MethodReference> {
-    override fun rewrite(methodReference: MethodReference): MethodReference {
-        return RewrittenMethodReference(methodReference)
+    override fun rewrite(value: MethodReference): MethodReference {
+        return RewrittenMethodReference(value)
     }
 
     protected inner class RewrittenMethodReference(

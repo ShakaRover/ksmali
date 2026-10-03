@@ -60,10 +60,10 @@ interface CharEncodedValue : EncodedValue {
      *
      * This CharEncodedValue is equal to another CharEncodedValue if the values returned by getValue() are equal.
      *
-     * @param o The object to be compared for equality with this CharEncodedValue
+     * @param other The object to be compared for equality with this CharEncodedValue
      * @return true if the specified object is equal to this CharEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this CharEncodedValue to another EncodedValue.
@@ -71,8 +71,8 @@ interface CharEncodedValue : EncodedValue {
      * The comparison is first done on the return values of getValueType(). If the other value is another
      * CharEncodedValue, the return values of getValue() are compared.
      *
-     * @param o The EncodedValue to compare with this CharEncodedValue
+     * @param other The EncodedValue to compare with this CharEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

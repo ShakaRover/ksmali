@@ -40,17 +40,17 @@ abstract class BaseMethodEncodedValue : MethodEncodedValue {
         return value.hashCode()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is MethodEncodedValue) {
-            return value == o.value
+    override fun equals(other: Any?): Boolean {
+        if (other is MethodEncodedValue) {
+            return value == other.value
         }
         return false
     }
 
-    override fun compareTo(o: EncodedValue): Int {
-        var res = valueType.compareTo(o.valueType)
+    override fun compareTo(other: EncodedValue): Int {
+        var res = valueType.compareTo(other.valueType)
         if (res != 0) return res
-        return value.compareTo((o as MethodEncodedValue).value)
+        return value.compareTo((other as MethodEncodedValue).value)
     }
 
     override val valueType: Int

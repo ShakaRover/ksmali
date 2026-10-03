@@ -40,17 +40,17 @@ abstract class BaseByteEncodedValue : ByteEncodedValue {
         return value.toInt()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is ByteEncodedValue) {
-            return value == o.value
+    override fun equals(other: Any?): Boolean {
+        if (other is ByteEncodedValue) {
+            return value == other.value
         }
         return false
     }
 
-    override fun compareTo(o: EncodedValue): Int {
-        var res = valueType.compareTo(o.valueType)
+    override fun compareTo(other: EncodedValue): Int {
+        var res = valueType.compareTo(other.valueType)
         if (res != 0) return res
-        return value.compareTo((o as ByteEncodedValue).value)
+        return value.compareTo((other as ByteEncodedValue).value)
     }
 
     override val valueType: Int

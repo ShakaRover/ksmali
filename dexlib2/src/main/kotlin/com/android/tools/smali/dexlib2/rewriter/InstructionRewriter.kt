@@ -56,21 +56,21 @@ import com.android.tools.smali.util.ExceptionWithContext
 open class InstructionRewriter(
     protected val rewriters: Rewriters
 ) : Rewriter<Instruction> {
-    override fun rewrite(instruction: Instruction): Instruction {
-        if (instruction is ReferenceInstruction) {
-            when (instruction.opcode.format) {
-                Format.Format20bc -> return RewrittenInstruction20bc(instruction as Instruction20bc)
-                Format.Format21c -> return RewrittenInstruction21c(instruction as Instruction21c)
-                Format.Format22c -> return RewrittenInstruction22c(instruction as Instruction22c)
-                Format.Format31c -> return RewrittenInstruction31c(instruction as Instruction31c)
-                Format.Format35c -> return RewrittenInstruction35c(instruction as Instruction35c)
-                Format.Format3rc -> return RewrittenInstruction3rc(instruction as Instruction3rc)
-                Format.Format45cc -> return RewrittenInstruction45cc(instruction as Instruction45cc)
-                Format.Format4rcc -> return RewrittenInstruction4rcc(instruction as Instruction4rcc)
+    override fun rewrite(value: Instruction): Instruction {
+        if (value is ReferenceInstruction) {
+            when (value.opcode.format) {
+                Format.Format20bc -> return RewrittenInstruction20bc(value as Instruction20bc)
+                Format.Format21c -> return RewrittenInstruction21c(value as Instruction21c)
+                Format.Format22c -> return RewrittenInstruction22c(value as Instruction22c)
+                Format.Format31c -> return RewrittenInstruction31c(value as Instruction31c)
+                Format.Format35c -> return RewrittenInstruction35c(value as Instruction35c)
+                Format.Format3rc -> return RewrittenInstruction3rc(value as Instruction3rc)
+                Format.Format45cc -> return RewrittenInstruction45cc(value as Instruction45cc)
+                Format.Format4rcc -> return RewrittenInstruction4rcc(value as Instruction4rcc)
                 else -> throw IllegalArgumentException()
             }
         }
-        return instruction
+        return value
     }
 
     private fun rewriteReference(type: Int, reference: Reference): Reference {

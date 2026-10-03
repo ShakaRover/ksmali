@@ -51,17 +51,17 @@ import com.android.tools.smali.dexlib2.iface.value.TypeEncodedValue
 open class EncodedValueRewriter(
     protected val rewriters: Rewriters
 ) : Rewriter<EncodedValue> {
-    override fun rewrite(encodedValue: EncodedValue): EncodedValue {
-        when (encodedValue.valueType) {
-            ValueType.TYPE -> return RewrittenTypeEncodedValue(encodedValue as TypeEncodedValue)
-            ValueType.FIELD -> return RewrittenFieldEncodedValue(encodedValue as FieldEncodedValue)
-            ValueType.METHOD -> return RewrittenMethodEncodedValue(encodedValue as MethodEncodedValue)
-            ValueType.ENUM -> return RewrittenEnumEncodedValue(encodedValue as EnumEncodedValue)
-            ValueType.ARRAY -> return RewrittenArrayEncodedValue(encodedValue as ArrayEncodedValue)
+    override fun rewrite(value: EncodedValue): EncodedValue {
+        when (value.valueType) {
+            ValueType.TYPE -> return RewrittenTypeEncodedValue(value as TypeEncodedValue)
+            ValueType.FIELD -> return RewrittenFieldEncodedValue(value as FieldEncodedValue)
+            ValueType.METHOD -> return RewrittenMethodEncodedValue(value as MethodEncodedValue)
+            ValueType.ENUM -> return RewrittenEnumEncodedValue(value as EnumEncodedValue)
+            ValueType.ARRAY -> return RewrittenArrayEncodedValue(value as ArrayEncodedValue)
             ValueType.ANNOTATION -> return RewrittenAnnotationEncodedValue(
-                encodedValue as AnnotationEncodedValue
+                value as AnnotationEncodedValue
             )
-            else -> return encodedValue
+            else -> return value
         }
     }
 

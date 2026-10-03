@@ -72,10 +72,10 @@ interface MethodProtoReference : Reference, Comparable<MethodProtoReference> {
      * Equality for getParameters() should be tested by comparing the string representation of each element. I.e.
      * CharSequenceUtils.listEquals(this.getParameterTypes(), other.getParameterTypes())
      *
-     * @param o The object to be compared for equality with this MethodProtoReference
+     * @param other The object to be compared for equality with this MethodProtoReference
      * @return true if the specified object is equal to this MethodProtoReference
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this MethodProtoReference to another MethodProtoReference.
@@ -84,8 +84,8 @@ interface MethodProtoReference : Reference, Comparable<MethodProtoReference> {
      * in that order. getParameters() should be compared using the semantics of
      * com.android.tools.smali.util.CollectionUtils.compareAsList()
      *
-     * @param o The MethodReference to compare with this MethodProtoReference
+     * @param other The MethodReference to compare with this MethodProtoReference
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: MethodProtoReference): Int
+    override fun compareTo(other: MethodProtoReference): Int
 }

@@ -1218,14 +1218,14 @@ open class MethodAnalyzer(
             if (originalType.type == null || newType.type == null) {
                 return true
             }
-            if (originalType.type!!.isInterface()) {
-                return newType.type!!.implementsInterface(originalType.type!!.type)
+            if (originalType.type.isInterface()) {
+                return newType.type.implementsInterface(originalType.type.type)
             } else {
-                val commonSuperclass = newType.type!!.getCommonSuperclass(originalType.type!!)
-                if (commonSuperclass.type == originalType.type!!.type) {
+                val commonSuperclass = newType.type.getCommonSuperclass(originalType.type)
+                if (commonSuperclass.type == originalType.type.type) {
                     return true
                 }
-                if (commonSuperclass.type == newType.type!!.type) {
+                if (commonSuperclass.type == newType.type.type) {
                     return false
                 }
             }
@@ -1248,7 +1248,7 @@ open class MethodAnalyzer(
                 val registerType = RegisterType.getRegisterType(classPath, reference as TypeReference)
 
                 try {
-                    if (registerType.type != null && !registerType.type!!.isInterface()) {
+                    if (registerType.type != null && !registerType.type.isInterface()) {
                         val objectRegister =
                             (analyzedInstanceOfInstruction.instruction as TwoRegisterInstruction).registerB
 
@@ -1534,7 +1534,7 @@ open class MethodAnalyzer(
             ) {
                 throw AnalysisException("aget-wide used with non-array register: %s", arrayRegisterType.toString())
             }
-            val arrayProto = arrayRegisterType.type as ArrayProto
+            val arrayProto = arrayRegisterType.type
 
             if (arrayProto.dimensions != 1) {
                 throw AnalysisException(
@@ -1572,7 +1572,7 @@ open class MethodAnalyzer(
                 )
             }
 
-            val arrayProto = arrayRegisterType.type as ArrayProto
+            val arrayProto = arrayRegisterType.type
 
             val elementType = arrayProto.immediateElementType
 
@@ -1796,7 +1796,7 @@ open class MethodAnalyzer(
         }
 
         val instruction = analyzedInstruction.instruction as Instruction35mi
-        val resolvedMethod = inlineResolver!!.resolveExecuteInline(analyzedInstruction)
+        val resolvedMethod = inlineResolver.resolveExecuteInline(analyzedInstruction)
 
         val deodexedOpcode: Opcode
         val accessFlags = resolvedMethod.accessFlags
@@ -1824,7 +1824,7 @@ open class MethodAnalyzer(
         }
 
         val instruction = analyzedInstruction.instruction as Instruction3rmi
-        val resolvedMethod = inlineResolver!!.resolveExecuteInline(analyzedInstruction)
+        val resolvedMethod = inlineResolver.resolveExecuteInline(analyzedInstruction)
 
         val deodexedOpcode: Opcode
         val accessFlags = resolvedMethod.accessFlags
@@ -1921,17 +1921,17 @@ open class MethodAnalyzer(
         if (resolvedField == null) {
             throw AnalysisException(
                 "Could not resolve the field in class %s at offset %d",
-                objectRegisterType.type!!.type, fieldOffset
+                objectRegisterType.type.type, fieldOffset
             )
         }
 
         val thisClass = classPath.getClassDef(method.definingClass)
 
-        if (!TypeUtils.canAccessClass(thisClass.type, classPath.getClassDef(resolvedField!!.definingClass))) {
+        if (!TypeUtils.canAccessClass(thisClass.type, classPath.getClassDef(resolvedField.definingClass))) {
 
             // the class is not accessible. So we start looking at objectRegisterTypeProto (which may be different
             // than resolvedField.getDefiningClass()), and walk up the class hierarchy.
-            var fieldClass = classPath.getClassDef(objectRegisterTypeProto!!.type)
+            var fieldClass = classPath.getClassDef(objectRegisterTypeProto.type)
             while (!TypeUtils.canAccessClass(thisClass.type, fieldClass)) {
                 val superclass = fieldClass.superclass
                     ?: throw ExceptionWithContext(
@@ -1955,7 +1955,7 @@ open class MethodAnalyzer(
             )
         }
 
-        val fieldType = resolvedField!!.type
+        val fieldType = resolvedField.type
 
         val opcode = classPath.fieldInstructionMapper.getAndCheckDeodexedOpcode(
             fieldType, instruction.opcode
@@ -1963,7 +1963,7 @@ open class MethodAnalyzer(
 
         val deodexedInstruction = ImmutableInstruction22c(
             opcode, instruction.registerA,
-            instruction.registerB, resolvedField!!
+            instruction.registerB, resolvedField
         )
         analyzedInstruction.setDeodexedInstruction(deodexedInstruction)
 
@@ -2066,7 +2066,7 @@ open class MethodAnalyzer(
             resolvedMethod = objectRegisterTypeProto!!.getMethodByVtableIndex(methodIndex)
                 ?: throw AnalysisException(
                     "Could not resolve the method in class %s at index %d",
-                    objectRegisterType.type!!.type, methodIndex
+                    objectRegisterType.type.type, methodIndex
                 )
         }
 

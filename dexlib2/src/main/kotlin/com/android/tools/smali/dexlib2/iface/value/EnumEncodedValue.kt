@@ -64,10 +64,10 @@ interface EnumEncodedValue : EncodedValue {
      *
      * This EnumEncodedValue is equal to another EnumEncodedValue if the values returned by getValue() are equal.
      *
-     * @param o The object to be compared for equality with this EnumEncodedValue
+     * @param other The object to be compared for equality with this EnumEncodedValue
      * @return true if the specified object is equal to this EnumEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this EnumEncodedValue to another EncodedValue.
@@ -75,8 +75,8 @@ interface EnumEncodedValue : EncodedValue {
      * The comparison is first done on the return values of getValueType(). If the other value is another
      * EnumEncodedValue, the return values of getValue() are compared.
      *
-     * @param o The EncodedValue to compare with this EnumEncodedValue
+     * @param other The EncodedValue to compare with this EnumEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

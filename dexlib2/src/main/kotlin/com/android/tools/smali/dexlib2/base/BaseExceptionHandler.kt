@@ -52,29 +52,29 @@ abstract class BaseExceptionHandler : ExceptionHandler {
         return hashCode * 31 + handlerCodeAddress
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is ExceptionHandler) {
-            return exceptionType == o.exceptionType &&
-                    handlerCodeAddress == o.handlerCodeAddress
+    override fun equals(other: Any?): Boolean {
+        if (other is ExceptionHandler) {
+            return exceptionType == other.exceptionType &&
+                    handlerCodeAddress == other.handlerCodeAddress
         }
         return false
     }
 
-    override fun compareTo(o: ExceptionHandler): Int {
+    override fun compareTo(other: ExceptionHandler): Int {
         val exceptionType = exceptionType
         if (exceptionType == null) {
-            if (o.exceptionType != null) {
+            if (other.exceptionType != null) {
                 return 1
             }
         } else {
-            val otherExceptionType = o.exceptionType
+            val otherExceptionType = other.exceptionType
             if (otherExceptionType == null) {
                 return -1
             }
             val res = exceptionType.compareTo(otherExceptionType)
             if (res != 0) return res
         }
-        return handlerCodeAddress.compareTo(o.handlerCodeAddress)
+        return handlerCodeAddress.compareTo(other.handlerCodeAddress)
     }
 
     companion object {

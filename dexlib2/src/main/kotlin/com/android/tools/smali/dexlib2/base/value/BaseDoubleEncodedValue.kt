@@ -41,17 +41,17 @@ abstract class BaseDoubleEncodedValue : DoubleEncodedValue {
         return (v xor (v ushr 32)).toInt()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is DoubleEncodedValue) {
-            return java.lang.Double.doubleToRawLongBits(value) == java.lang.Double.doubleToRawLongBits(o.value)
+    override fun equals(other: Any?): Boolean {
+        if (other is DoubleEncodedValue) {
+            return java.lang.Double.doubleToRawLongBits(value) == java.lang.Double.doubleToRawLongBits(other.value)
         }
         return false
     }
 
-    override fun compareTo(o: EncodedValue): Int {
-        var res = valueType.compareTo(o.valueType)
+    override fun compareTo(other: EncodedValue): Int {
+        var res = valueType.compareTo(other.valueType)
         if (res != 0) return res
-        return java.lang.Double.compare(value, (o as DoubleEncodedValue).value)
+        return java.lang.Double.compare(value, (other as DoubleEncodedValue).value)
     }
 
     override val valueType: Int

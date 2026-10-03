@@ -69,18 +69,18 @@ interface TypeReference : Reference, CharSequence, Comparable<CharSequence> {
      *
      * Equivalently, This TypeReference is equal to another TypeReference iff this.getType().equals(other.getType()).
      *
-     * @param o The object to be compared for equality with this TypeReference
+     * @param other The object to be compared for equality with this TypeReference
      * @return true if the specified object is equal to this TypeReference
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this TypeReference to another TypeReference, or more generally to another CharSequence.
      *
      * The comparison is defined to be this.getType().compareTo(other.toString())
      *
-     * @param o The CharSequence to compare with this TypeReference
+     * @param other The CharSequence to compare with this TypeReference
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: CharSequence): Int
+    override fun compareTo(other: CharSequence): Int
 }

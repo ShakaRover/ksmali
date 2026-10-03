@@ -60,10 +60,10 @@ interface IntEncodedValue : EncodedValue {
      *
      * This IntEncodedValue is equal to another IntEncodedValue if the values returned by getValue() are equal.
      *
-     * @param o The object to be compared for equality with this IntEncodedValue
+     * @param other The object to be compared for equality with this IntEncodedValue
      * @return true if the specified object is equal to this IntEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this IntEncodedValue to another EncodedValue.
@@ -71,8 +71,8 @@ interface IntEncodedValue : EncodedValue {
      * The comparison is first done on the return values of getValueType(). If the other value is another
      * IntEncodedValue, the return values of getValue() are compared.
      *
-     * @param o The EncodedValue to compare with this IntEncodedValue
+     * @param other The EncodedValue to compare with this IntEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

@@ -77,10 +77,10 @@ interface FieldReference : Reference, Comparable<FieldReference> {
      * This FieldReference is equal to another FieldReference if all of it's "fields" are equal. That is, if
      * the return values of getDefiningClass(), getName() and getType() are all equal.
      *
-     * @param o The object to be compared for equality with this FieldReference
+     * @param other The object to be compared for equality with this FieldReference
      * @return true if the specified object is equal to this FieldReference
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this FieldReference to another FieldReference.
@@ -88,8 +88,8 @@ interface FieldReference : Reference, Comparable<FieldReference> {
      * The comparison is based on the comparison of the return values of getDefiningClass(), getName() and
      * getType(), in that order.
      *
-     * @param o The FieldReference to compare with this FieldReference
+     * @param other The FieldReference to compare with this FieldReference
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: FieldReference): Int
+    override fun compareTo(other: FieldReference): Int
 }

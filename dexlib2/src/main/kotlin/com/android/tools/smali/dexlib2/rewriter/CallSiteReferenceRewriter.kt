@@ -39,8 +39,8 @@ import com.android.tools.smali.dexlib2.iface.value.EncodedValue
 open class CallSiteReferenceRewriter(
     protected val rewriters: Rewriters
 ) : Rewriter<CallSiteReference> {
-    override fun rewrite(callSiteReference: CallSiteReference): CallSiteReference {
-        return RewrittenCallSiteReference(callSiteReference)
+    override fun rewrite(value: CallSiteReference): CallSiteReference {
+        return RewrittenCallSiteReference(value)
     }
 
     protected inner class RewrittenCallSiteReference(

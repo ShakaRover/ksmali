@@ -71,18 +71,18 @@ interface AnnotationElement : Comparable<AnnotationElement> {
      * This AnnotationElement is equal to another AnnotationElement if all of it's "fields" are equal. That is, if
      * the return values of getName() and getValue() are both equal.
      *
-     * @param o The object to be compared for equality with this AnnotationElement
+     * @param other The object to be compared for equality with this AnnotationElement
      * @return true if the specified object is equal to this AnnotationElement
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compares this AnnotationElement to another AnnotationElement.
      *
      * The comparison is based on the value of getName() and getValue(), in that order.
      *
-     * @param o The AnnotationElement to compare with this AnnotationElement
+     * @param other The AnnotationElement to compare with this AnnotationElement
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: AnnotationElement): Int
+    override fun compareTo(other: AnnotationElement): Int
 }

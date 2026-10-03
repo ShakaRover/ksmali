@@ -43,13 +43,13 @@ abstract class BaseCallSiteReference : BaseReference(), CallSiteReference {
         return hashCode
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o != null && o is CallSiteReference) {
-            return name == o.name &&
-                    methodHandle == o.methodHandle &&
-                    methodName == o.methodName &&
-                    methodProto == o.methodProto &&
-                    extraArguments == o.extraArguments
+    override fun equals(other: Any?): Boolean {
+        if (other != null && other is CallSiteReference) {
+            return name == other.name &&
+                    methodHandle == other.methodHandle &&
+                    methodName == other.methodName &&
+                    methodProto == other.methodProto &&
+                    extraArguments == other.extraArguments
         }
         return false
     }

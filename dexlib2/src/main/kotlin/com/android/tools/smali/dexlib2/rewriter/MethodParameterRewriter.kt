@@ -37,8 +37,8 @@ import com.android.tools.smali.dexlib2.iface.MethodParameter
 open class MethodParameterRewriter(
     protected val rewriters: Rewriters
 ) : Rewriter<MethodParameter> {
-    override fun rewrite(methodParameter: MethodParameter): MethodParameter {
-        return RewrittenMethodParameter(methodParameter)
+    override fun rewrite(value: MethodParameter): MethodParameter {
+        return RewrittenMethodParameter(value)
     }
 
     protected inner class RewrittenMethodParameter(

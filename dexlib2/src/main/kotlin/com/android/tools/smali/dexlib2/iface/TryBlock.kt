@@ -70,8 +70,8 @@ interface TryBlock<EH : ExceptionHandler> {
      * This TryBlock is equal to another TryBlock if all 3 fields are equal. The exception handlers are tested for
      * equality using the usual List equality semantics.
      *
-     * @param o The object to be compared for equality with this TryBlock
+     * @param other The object to be compared for equality with this TryBlock
      * @return true if the specified object is equal to this TryBlock
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 }

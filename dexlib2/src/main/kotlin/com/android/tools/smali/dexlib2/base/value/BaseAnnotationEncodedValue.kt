@@ -42,20 +42,20 @@ abstract class BaseAnnotationEncodedValue : AnnotationEncodedValue {
         return hashCode * 31 + elements.hashCode()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is AnnotationEncodedValue) {
-            return type == o.type && elements == o.elements
+    override fun equals(other: Any?): Boolean {
+        if (other is AnnotationEncodedValue) {
+            return type == other.type && elements == other.elements
         }
         return false
     }
 
-    override fun compareTo(o: EncodedValue): Int {
-        var res = valueType.compareTo(o.valueType)
+    override fun compareTo(other: EncodedValue): Int {
+        var res = valueType.compareTo(other.valueType)
         if (res != 0) return res
-        val other = o as AnnotationEncodedValue
-        res = type.compareTo(other.type)
+        val otherAnnotation = other as AnnotationEncodedValue
+        res = type.compareTo(otherAnnotation.type)
         if (res != 0) return res
-        return CollectionUtils.compareAsSet(elements, other.elements)
+        return CollectionUtils.compareAsSet(elements, otherAnnotation.elements)
     }
 
     override val valueType: Int

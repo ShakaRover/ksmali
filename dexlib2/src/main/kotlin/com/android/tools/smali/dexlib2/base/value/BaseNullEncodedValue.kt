@@ -40,12 +40,12 @@ abstract class BaseNullEncodedValue : NullEncodedValue {
         return 0
     }
 
-    override fun equals(o: Any?): Boolean {
-        return o is NullEncodedValue
+    override fun equals(other: Any?): Boolean {
+        return other is NullEncodedValue
     }
 
-    override fun compareTo(o: EncodedValue): Int {
-        var res = valueType.compareTo(o.valueType)
+    override fun compareTo(other: EncodedValue): Int {
+        var res = valueType.compareTo(other.valueType)
         if (res != 0) return res
         return 0
     }

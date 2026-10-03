@@ -216,14 +216,14 @@ abstract class AnnotationsDirectory {
                 this.currentIndex = 0
             }
 
-            override fun seekTo(itemIndex: Int): Int {
-                while (currentItemIndex < itemIndex && (currentIndex + 1) < size) {
+            override fun seekTo(key: Int): Int {
+                while (currentItemIndex < key && (currentIndex + 1) < size) {
                     currentIndex++
                     currentItemIndex =
                         dexFile.dataBuffer.readSmallUint(startOffset + (currentIndex * 8))
                 }
 
-                if (currentItemIndex == itemIndex) {
+                if (currentItemIndex == key) {
                     return dexFile.dataBuffer.readSmallUint(startOffset + (currentIndex * 8) + 4)
                 }
                 return 0

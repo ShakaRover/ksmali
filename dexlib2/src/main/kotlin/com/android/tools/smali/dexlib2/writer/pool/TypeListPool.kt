@@ -50,11 +50,11 @@ class TypeListPool(dexPool: DexPool) :
         }
     }
 
-    override fun getTypes(typesKey: Key<out Collection<CharSequence>>?): Collection<CharSequence> {
-        if (typesKey == null) {
+    override fun getTypes(key: Key<out Collection<CharSequence>>?): Collection<CharSequence> {
+        if (key == null) {
             return emptyList()
         }
-        return typesKey.types
+        return key.types
     }
 
     override fun getNullableItemOffset(key: Key<out Collection<CharSequence>>?): Int {
@@ -75,13 +75,13 @@ class TypeListPool(dexPool: DexPool) :
             return hashCode
         }
 
-        override fun equals(o: Any?): Boolean {
-            if (o is Key<*>) {
-                val other = o as Key<out Collection<CharSequence>>
-                if (types.size != other.types.size) {
+        override fun equals(other: Any?): Boolean {
+            if (other is Key<*>) {
+                val otherKey = other
+                if (types.size != otherKey.types.size) {
                     return false
                 }
-                val otherTypes = other.types.iterator()
+                val otherTypes = otherKey.types.iterator()
                 for (type in types) {
                     if (type.toString() != otherTypes.next().toString()) {
                         return false
@@ -100,18 +100,18 @@ class TypeListPool(dexPool: DexPool) :
             }
         }
 
-        override fun compareTo(o: Key<out Collection<CharSequence>>): Int {
-            val other = o.types.iterator()
+        override fun compareTo(other: Key<out Collection<CharSequence>>): Int {
+            val otherIterator = other.types.iterator()
             for (type in types) {
-                if (!other.hasNext()) {
+                if (!otherIterator.hasNext()) {
                     return 1
                 }
-                val comparison = type.toString().compareTo(other.next().toString())
+                val comparison = type.toString().compareTo(otherIterator.next().toString())
                 if (comparison != 0) {
                     return comparison
                 }
             }
-            if (other.hasNext()) {
+            if (otherIterator.hasNext()) {
                 return -1
             }
             return 0

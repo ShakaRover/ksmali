@@ -43,12 +43,12 @@ class MemoryDeferredOutputStream constructor(bufferSize: Int = DEFAULT_BUFFER_SI
     private var currentPosition = 0
 
     @Throws(IOException::class)
-    override fun writeTo(output: OutputStream) {
+    override fun writeTo(dest: OutputStream) {
         for (buffer in buffers) {
-            output.write(buffer)
+            dest.write(buffer)
         }
         if (currentPosition > 0) {
-            output.write(currentBuffer, 0, currentPosition)
+            dest.write(currentBuffer, 0, currentPosition)
         }
         buffers.clear()
         currentPosition = 0

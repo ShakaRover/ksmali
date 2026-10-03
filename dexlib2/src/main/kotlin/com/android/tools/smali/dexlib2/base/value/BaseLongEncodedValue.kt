@@ -42,17 +42,17 @@ abstract class BaseLongEncodedValue : LongEncodedValue {
         return hashCode * 31 + (v ushr 32).toInt()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is LongEncodedValue) {
-            return value == o.value
+    override fun equals(other: Any?): Boolean {
+        if (other is LongEncodedValue) {
+            return value == other.value
         }
         return false
     }
 
-    override fun compareTo(o: EncodedValue): Int {
-        var res = valueType.compareTo(o.valueType)
+    override fun compareTo(other: EncodedValue): Int {
+        var res = valueType.compareTo(other.valueType)
         if (res != 0) return res
-        return value.compareTo((o as LongEncodedValue).value)
+        return value.compareTo((other as LongEncodedValue).value)
     }
 
     override val valueType: Int

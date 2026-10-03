@@ -40,7 +40,7 @@ import com.android.tools.smali.util.IteratorUtils
 import java.util.Collections
 
 abstract class InlineMethodResolver protected constructor() {
-    abstract fun resolveExecuteInline(instruction: AnalyzedInstruction): Method
+    abstract fun resolveExecuteInline(analyzedInstruction: AnalyzedInstruction): Method
 
     private class InlineMethodResolver_version35 : InlineMethodResolver() {
         private val inlineMethods: Array<Method> = arrayOf(

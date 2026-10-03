@@ -39,17 +39,17 @@ abstract class BaseAnnotationElement : AnnotationElement {
         return hashCode * 31 + value.hashCode()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o != null && o is AnnotationElement) {
-            return name == o.name && value == o.value
+    override fun equals(other: Any?): Boolean {
+        if (other != null && other is AnnotationElement) {
+            return name == other.name && value == other.value
         }
         return false
     }
 
-    override fun compareTo(o: AnnotationElement): Int {
-        val res = name.compareTo(o.name)
+    override fun compareTo(other: AnnotationElement): Int {
+        val res = name.compareTo(other.name)
         if (res != 0) return res
-        return value.compareTo(o.value)
+        return value.compareTo(other.value)
     }
 
     companion object {

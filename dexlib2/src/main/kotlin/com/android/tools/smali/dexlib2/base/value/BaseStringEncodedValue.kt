@@ -40,17 +40,17 @@ abstract class BaseStringEncodedValue : StringEncodedValue {
         return value.hashCode()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is StringEncodedValue) {
-            return value == o.value
+    override fun equals(other: Any?): Boolean {
+        if (other is StringEncodedValue) {
+            return value == other.value
         }
         return false
     }
 
-    override fun compareTo(o: EncodedValue): Int {
-        var res = valueType.compareTo(o.valueType)
+    override fun compareTo(other: EncodedValue): Int {
+        var res = valueType.compareTo(other.valueType)
         if (res != 0) return res
-        return value.compareTo((o as StringEncodedValue).value)
+        return value.compareTo((other as StringEncodedValue).value)
     }
 
     override val valueType: Int

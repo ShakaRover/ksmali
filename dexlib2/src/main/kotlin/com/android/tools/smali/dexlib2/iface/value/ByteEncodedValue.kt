@@ -60,10 +60,10 @@ interface ByteEncodedValue : EncodedValue {
      *
      * This ByteEncodedValue is equal to another ByteEncodedValue if the values returned by getValue() are equal.
      *
-     * @param o The object to be compared for equality with this ByteEncodedValue
+     * @param other The object to be compared for equality with this ByteEncodedValue
      * @return true if the specified object is equal to this ByteEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this ByteEncodedValue to another EncodedValue.
@@ -71,8 +71,8 @@ interface ByteEncodedValue : EncodedValue {
      * The comparison is first done on the return values of getValueType(). If the other value is another
      * ByteEncodedValue, the return values of getValue() are compared.
      *
-     * @param o The EncodedValue to compare with this ByteEncodedValue
+     * @param other The EncodedValue to compare with this ByteEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

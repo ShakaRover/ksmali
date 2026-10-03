@@ -58,10 +58,10 @@ class DexBackedAnnotationEncodedValue(
             dexFile.dataBuffer, elementsOffset, elementCount
         ) {
             override fun readNextItem(
-                dexReader: DexReader<out DexBuffer>,
+                reader: DexReader<out DexBuffer>,
                 index: Int
             ): DexBackedAnnotationElement =
-                DexBackedAnnotationElement(dexFile, dexReader)
+                DexBackedAnnotationElement(dexFile, reader)
         }
 
     companion object {

@@ -43,25 +43,25 @@ abstract class BaseMethodReference : BaseReference(), MethodReference {
         return hashCode * 31 + parameterTypes.hashCode()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o != null && o is MethodReference) {
-            return definingClass == o.definingClass &&
-                    name == o.name &&
-                    returnType == o.returnType &&
-                    CharSequenceUtils.listEquals(parameterTypes, o.parameterTypes)
+    override fun equals(other: Any?): Boolean {
+        if (other != null && other is MethodReference) {
+            return definingClass == other.definingClass &&
+                    name == other.name &&
+                    returnType == other.returnType &&
+                    CharSequenceUtils.listEquals(parameterTypes, other.parameterTypes)
         }
         return false
     }
 
-    override fun compareTo(o: MethodReference): Int {
-        var res = definingClass.compareTo(o.definingClass)
+    override fun compareTo(other: MethodReference): Int {
+        var res = definingClass.compareTo(other.definingClass)
         if (res != 0) return res
-        res = name.compareTo(o.name)
+        res = name.compareTo(other.name)
         if (res != 0) return res
-        res = returnType.compareTo(o.returnType)
+        res = returnType.compareTo(other.returnType)
         if (res != 0) return res
         return CollectionUtils.compareAsIterable(
-            CollectionUtils.usingToStringOrdering(), parameterTypes, o.parameterTypes
+            CollectionUtils.usingToStringOrdering(), parameterTypes, other.parameterTypes
         )
     }
 

@@ -91,18 +91,15 @@ sourceSets {
 
 configurations {
     accessorTestGenerator
-    dx
 }
 
 dependencies {
-    implementation depends.findbugs
+    implementation libs.findbugs
 
-    testImplementation depends.junit
-    testImplementation depends.mockito
+    testImplementation libs.junit
+    testImplementation libs.mockito
 
     accessorTestGenerator project('accessorTestGenerator')
-
-    dx depends.dx
 }
 
 // NOTE: SyntheticAccessorFSM is now maintained by hand in
@@ -122,22 +119,15 @@ task generateAccessorTestSource(type: JavaExec) {
 }
 compileAccessorTestJava.dependsOn(generateAccessorTestSource)
 
-// You must manually execute this task to regenerate src/test/resources/accessorTest.dex
-task generateAccessorTestDex(type: JavaExec, dependsOn: compileAccessorTestJava) {
-    def outputDex = file('src/test/resources/accessorTest.dex')
-    file(outputDex.parent).mkdirs()
-
-    inputs.dir(project.sourceSets.accessorTest.output.classesDirs)
-    outputs.file outputDex
-
-    main 'com.android.dx.command.Main'
-    classpath = configurations.dx
-
-    args '--dex'
-    args '--no-strict'
-    args "--output=${outputDex}"
-    args sourceSets.accessorTest.output.classesDirs
-}
+// NOTE: The old generateAccessorTestDex task (which shelled out to
+// com.google.android.tools:dx:1.7) has been removed. It was only ever a manual
+// regeneration helper and was not part of the `test` task graph (verified with
+// `./gradlew :dexlib2:test --dry-run`). It had also gone stale: the committed
+// src/test/resources/accessorTest.dex still uses the upstream `org.jf.dexlib2`
+// package that AccessorTest looks for, while AccessorTest.stg now emits
+// `com.android.tools.smali.dexlib2`, and Android's d8 does not accept dx's CLI
+// or reproduce its synthetic accessors. Regenerating it is therefore not
+// possible with the current tooling; the committed dex is the source of truth.
 
 publish {
     publishing {

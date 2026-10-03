@@ -166,7 +166,7 @@ class DexFormatterTest {
                 }
 
                 @Throws(IOException::class)
-                override fun writeQuotedString(string: CharSequence) {
+                override fun writeQuotedString(charSequence: CharSequence) {
                     writer.write("quoted string")
                 }
 

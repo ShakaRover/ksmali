@@ -414,7 +414,7 @@ open class AnalyzedInstruction(
                                 )
                             }
 
-                            if (MethodAnalyzer.isNotWideningConversion(originalType, newType!!)) {
+                            if (MethodAnalyzer.isNotWideningConversion(originalType, newType)) {
                                 if (originalSourceRegister != -1) {
                                     if (originalSourceRegister != moveInstruction.registerB) {
                                         originalSourceRegister = -1
@@ -575,7 +575,7 @@ open class AnalyzedInstruction(
                                 )
                             }
 
-                            if (MethodAnalyzer.isNotWideningConversion(originalType, newType!!)) {
+                            if (MethodAnalyzer.isNotWideningConversion(originalType, newType)) {
                                 if (originalSourceRegister != -1) {
                                     if (originalSourceRegister != moveInstruction.registerB) {
                                         originalSourceRegister = -1
@@ -621,10 +621,10 @@ open class AnalyzedInstruction(
         return preRegisterMap[registerNumber]
     }
 
-    override fun compareTo(analyzedInstruction: AnalyzedInstruction): Int {
-        if (instructionIndex < analyzedInstruction.instructionIndex) {
+    override fun compareTo(other: AnalyzedInstruction): Int {
+        if (instructionIndex < other.instructionIndex) {
             return -1
-        } else if (instructionIndex == analyzedInstruction.instructionIndex) {
+        } else if (instructionIndex == other.instructionIndex) {
             return 0
         } else {
             return 1
@@ -635,10 +635,10 @@ open class AnalyzedInstruction(
         val analyzedInstruction: AnalyzedInstruction,
         val registerNumber: Int
     ) {
-        override fun equals(o: Any?): Boolean {
-            if (this === o) return true
-            if (o == null || javaClass != o.javaClass) return false
-            val that = o as PredecessorOverrideKey
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || javaClass != other.javaClass) return false
+            val that = other as PredecessorOverrideKey
             return registerNumber == that.registerNumber &&
                     analyzedInstruction == that.analyzedInstruction
         }

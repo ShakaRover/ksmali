@@ -38,15 +38,15 @@ abstract class BaseStringReference : BaseReference(), StringReference {
         return string.hashCode()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o != null && o is StringReference) {
-            return string == o.string
+    override fun equals(other: Any?): Boolean {
+        if (other != null && other is StringReference) {
+            return string == other.string
         }
         return false
     }
 
-    override fun compareTo(o: CharSequence): Int {
-        return string.compareTo(o.toString())
+    override fun compareTo(other: CharSequence): Int {
+        return string.compareTo(other.toString())
     }
 
     override val length: Int

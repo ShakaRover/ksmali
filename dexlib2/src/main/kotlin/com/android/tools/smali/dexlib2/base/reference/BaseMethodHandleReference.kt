@@ -42,31 +42,31 @@ abstract class BaseMethodHandleReference : BaseReference(), MethodHandleReferenc
         return hashCode
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o != null && o is MethodHandleReference) {
-            return methodHandleType == o.methodHandleType &&
-                    memberReference == o.memberReference
+    override fun equals(other: Any?): Boolean {
+        if (other != null && other is MethodHandleReference) {
+            return methodHandleType == other.methodHandleType &&
+                    memberReference == other.memberReference
         }
         return false
     }
 
-    override fun compareTo(o: MethodHandleReference): Int {
-        val res = methodHandleType.compareTo(o.methodHandleType)
+    override fun compareTo(other: MethodHandleReference): Int {
+        val res = methodHandleType.compareTo(other.methodHandleType)
         if (res != 0) return res
 
         val reference = memberReference
         if (reference is FieldReference) {
             // "This should never happen", but if it does, we'll arbitrarily say a field reference compares less than
             // a method reference
-            if (o.memberReference !is FieldReference) {
+            if (other.memberReference !is FieldReference) {
                 return -1
             }
-            return reference.compareTo(o.memberReference as FieldReference)
+            return reference.compareTo(other.memberReference as FieldReference)
         } else {
-            if (o.memberReference !is MethodReference) {
+            if (other.memberReference !is MethodReference) {
                 return 1
             }
-            return (reference as MethodReference).compareTo(o.memberReference as MethodReference)
+            return (reference as MethodReference).compareTo(other.memberReference as MethodReference)
         }
     }
 

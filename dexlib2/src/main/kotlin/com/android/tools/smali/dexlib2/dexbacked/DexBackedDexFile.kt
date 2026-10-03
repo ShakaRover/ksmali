@@ -72,7 +72,7 @@ open class DexBackedDexFile internal constructor(
     val buffer: DexBuffer
     val dataBuffer: DexBuffer
 
-    private lateinit var opcodesField: Opcodes
+    private var opcodesField: Opcodes
 
     override val opcodes: Opcodes
         get() = opcodesField

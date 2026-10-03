@@ -1194,22 +1194,22 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
             fun newFieldGap(offset: Int, size: Int, oatVersion: Int): FieldGap {
                 return if (oatVersion >= 67) {
                     object : FieldGap(offset, size) {
-                        override fun compareTo(o: FieldGap): Int {
-                            val result = o.size.compareTo(size)
+                        override fun compareTo(other: FieldGap): Int {
+                            val result = other.size.compareTo(size)
                             if (result != 0) {
                                 return result
                             }
-                            return offset.compareTo(o.offset)
+                            return offset.compareTo(other.offset)
                         }
                     }
                 } else {
                     object : FieldGap(offset, size) {
-                        override fun compareTo(o: FieldGap): Int {
-                            val result = size.compareTo(o.size)
+                        override fun compareTo(other: FieldGap): Int {
+                            val result = size.compareTo(other.size)
                             if (result != 0) {
                                 return result
                             }
-                            return o.offset.compareTo(offset)
+                            return other.offset.compareTo(offset)
                         }
                     }
                 }

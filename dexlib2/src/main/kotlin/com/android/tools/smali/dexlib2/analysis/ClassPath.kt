@@ -149,7 +149,7 @@ open class ClassPath(
                             listOf(
                                 ReflectionClassDef(Class::class.java),
                                 ReflectionClassDef(Cloneable::class.java),
-                                ReflectionClassDef(Object::class.java),
+                                ReflectionClassDef(Any::class.java),
                                 ReflectionClassDef(Serializable::class.java),
                                 ReflectionClassDef(String::class.java),
                                 ReflectionClassDef(Throwable::class.java)

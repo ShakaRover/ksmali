@@ -86,7 +86,7 @@ private fun attemptCommand(command: Array<String>): String? {
             if (buffer == null) {
                 buffer = StringBuffer()
             }
-            buffer!!.append(line)
+            buffer.append(line)
             line = reader.readLine()
         }
 

@@ -41,19 +41,19 @@ abstract class BaseAnnotation : Annotation {
         return hashCode * 31 + elements.hashCode()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is Annotation) {
-            return visibility == o.visibility && type == o.type && elements == o.elements
+    override fun equals(other: Any?): Boolean {
+        if (other is Annotation) {
+            return visibility == other.visibility && type == other.type && elements == other.elements
         }
         return false
     }
 
-    override fun compareTo(o: Annotation): Int {
-        var res = visibility.compareTo(o.visibility)
+    override fun compareTo(other: Annotation): Int {
+        var res = visibility.compareTo(other.visibility)
         if (res != 0) return res
-        res = type.compareTo(o.type)
+        res = type.compareTo(other.type)
         if (res != 0) return res
-        return CollectionUtils.compareAsSet(elements, o.elements)
+        return CollectionUtils.compareAsSet(elements, other.elements)
     }
 
     companion object {

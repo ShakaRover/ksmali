@@ -66,7 +66,7 @@ class ParameterIterator(
 
         return object : BaseMethodParameter() {
             override val annotations: Set<Annotation>
-                get() = annotations as Set<Annotation>
+                get() = annotations
 
             override val name: String?
                 get() = name

@@ -40,12 +40,12 @@ open class LabelMethodItem(
 
     override val sortOrder: Double get() = 0.0
 
-    override fun compareTo(methodItem: MethodItem): Int {
-        var result = super.compareTo(methodItem)
+    override fun compareTo(other: MethodItem): Int {
+        var result = super.compareTo(other)
 
         if (result == 0) {
-            if (methodItem is LabelMethodItem) {
-                result = labelPrefix.compareTo(methodItem.labelPrefix)
+            if (other is LabelMethodItem) {
+                result = labelPrefix.compareTo(other.labelPrefix)
             }
         }
         return result
@@ -56,11 +56,11 @@ open class LabelMethodItem(
         return codeAddress
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o !is LabelMethodItem) {
+    override fun equals(other: Any?): Boolean {
+        if (other !is LabelMethodItem) {
             return false
         }
-        return this.compareTo(o) == 0
+        return this.compareTo(other) == 0
     }
 
     @Throws(IOException::class)

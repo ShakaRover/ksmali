@@ -34,11 +34,11 @@ import com.android.tools.smali.dexlib2.iface.ExceptionHandler
 import com.android.tools.smali.dexlib2.iface.TryBlock
 
 abstract class BaseTryBlock<EH : ExceptionHandler> : TryBlock<EH> {
-    override fun equals(o: Any?): Boolean {
-        if (o is TryBlock<*>) {
-            return startCodeAddress == o.startCodeAddress &&
-                    codeUnitCount == o.codeUnitCount &&
-                    exceptionHandlers == o.exceptionHandlers
+    override fun equals(other: Any?): Boolean {
+        if (other is TryBlock<*>) {
+            return startCodeAddress == other.startCodeAddress &&
+                    codeUnitCount == other.codeUnitCount &&
+                    exceptionHandlers == other.exceptionHandlers
         }
         return false
     }

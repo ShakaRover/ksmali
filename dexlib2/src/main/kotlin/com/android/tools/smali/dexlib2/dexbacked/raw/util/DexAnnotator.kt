@@ -141,7 +141,7 @@ class DexAnnotator(
         try {
             // Need to annotate the debug info offset table first, to propagate the debug info identities
             if (dexFile is CDexBackedDexFile) {
-                moveTo(dexFile.baseDataOffset + (dexFile as CDexBackedDexFile).debugInfoOffsetsPos)
+                moveTo(dexFile.baseDataOffset + dexFile.debugInfoOffsetsPos)
                 CdexDebugOffsetTable.annotate(this, dexFile.buffer)
             }
 

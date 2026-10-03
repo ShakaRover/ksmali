@@ -1,0 +1,26 @@
+[versions]
+findbugs = "3.0.2"
+junit = "4.13.2"
+junitLegacy = "4.6"
+mockito = "5.24.0"
+antlr = "4.13.2"
+proguard = "7.10.0"
+jcommander = "1.85"
+coroutines = "1.10.2"
+st4 = "4.3.4"
+jgit = "6.10.0.202406032230-r"
+kotlin = "2.4.20"
+
+[libraries]
+findbugs = { module = "com.google.code.findbugs:jsr305", version.ref = "findbugs" }
+junit = { module = "junit:junit", version.ref = "junit" }
+junit-legacy = { module = "junit:junit", version.ref = "junitLegacy" }
+mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+antlr = { module = "org.antlr:antlr4", version.ref = "antlr" }
+antlr-runtime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
+proguard-gradle = { module = "com.guardsquare:proguard-gradle", version.ref = "proguard" }
+jcommander = { module = "org.jcommander:jcommander", version.ref = "jcommander" }
+coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+st4 = { module = "org.antlr:ST4", version.ref = "st4" }
+jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

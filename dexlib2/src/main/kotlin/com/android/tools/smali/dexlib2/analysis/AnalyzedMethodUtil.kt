@@ -62,7 +62,7 @@ object AnalyzedMethodUtil {
         if (checkClass) {
             val classPath = type.classPath
             val methodClassDef = classPath.getClassDef(virtualMethod.definingClass)
-            if (!TypeUtils.canAccessClass(type.type, methodClassDef!!)) {
+            if (!TypeUtils.canAccessClass(type.type, methodClassDef)) {
                 return false
             }
         }

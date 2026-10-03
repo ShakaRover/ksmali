@@ -76,24 +76,24 @@ class PackedSwitchMethodItem(
     }
 
     @Throws(IOException::class)
-    override fun writeTo(writer0: BaksmaliWriter): Boolean {
-        var writer = writer0
+    override fun writeTo(writer: BaksmaliWriter): Boolean {
+        var writerOut = writer
         if (commentedOut) {
-            writer = methodDef.classDef.getCommentingWriter(writer)
+            writerOut = methodDef.classDef.getCommentingWriter(writerOut)
         }
-        writer.write(".packed-switch ")
-        writer.writeEncodedValue(ImmutableIntEncodedValue(firstKey))
-        writer.indent(4)
-        writer.write('\n')
+        writerOut.write(".packed-switch ")
+        writerOut.writeEncodedValue(ImmutableIntEncodedValue(firstKey))
+        writerOut.indent(4)
+        writerOut.write('\n')
         var key = firstKey
         for (target in targets) {
-            target.writeTargetTo(writer)
-            writeCommentIfResourceId(writer, key)
-            writer.write('\n')
+            target.writeTargetTo(writerOut)
+            writeCommentIfResourceId(writerOut, key)
+            writerOut.write('\n')
             key++
         }
-        writer.deindent(4)
-        writer.write(".end packed-switch")
+        writerOut.deindent(4)
+        writerOut.write(".end packed-switch")
         return true
     }
 

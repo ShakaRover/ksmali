@@ -40,21 +40,21 @@ abstract class BaseFieldReference : BaseReference(), FieldReference {
         return hashCode * 31 + type.hashCode()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is FieldReference) {
-            return definingClass == o.definingClass &&
-                    name == o.name &&
-                    type == o.type
+    override fun equals(other: Any?): Boolean {
+        if (other is FieldReference) {
+            return definingClass == other.definingClass &&
+                    name == other.name &&
+                    type == other.type
         }
         return false
     }
 
-    override fun compareTo(o: FieldReference): Int {
-        var res = definingClass.compareTo(o.definingClass)
+    override fun compareTo(other: FieldReference): Int {
+        var res = definingClass.compareTo(other.definingClass)
         if (res != 0) return res
-        res = name.compareTo(o.name)
+        res = name.compareTo(other.name)
         if (res != 0) return res
-        return type.compareTo(o.type)
+        return type.compareTo(other.type)
     }
 
     override fun toString(): String {

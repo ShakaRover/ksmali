@@ -64,23 +64,23 @@ class SparseSwitchMethodItem(
     }
 
     @Throws(IOException::class)
-    override fun writeTo(writer0: BaksmaliWriter): Boolean {
-        var writer = writer0
+    override fun writeTo(writer: BaksmaliWriter): Boolean {
+        var writerOut = writer
         if (commentedOut) {
-            writer = methodDef.classDef.getCommentingWriter(writer)
+            writerOut = methodDef.classDef.getCommentingWriter(writerOut)
         }
 
-        writer.write(".sparse-switch\n")
-        writer.indent(4)
+        writerOut.write(".sparse-switch\n")
+        writerOut.indent(4)
         for (target in targets) {
-            writer.writeEncodedValue(ImmutableIntEncodedValue(target.key))
-            writer.write(" -> ")
-            target.writeTargetTo(writer)
-            writeCommentIfResourceId(writer, target.key)
-            writer.write('\n')
+            writerOut.writeEncodedValue(ImmutableIntEncodedValue(target.key))
+            writerOut.write(" -> ")
+            target.writeTargetTo(writerOut)
+            writeCommentIfResourceId(writerOut, target.key)
+            writerOut.write('\n')
         }
-        writer.deindent(4)
-        writer.write(".end sparse-switch")
+        writerOut.deindent(4)
+        writerOut.write(".end sparse-switch")
         return true
     }
 

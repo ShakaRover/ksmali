@@ -60,10 +60,10 @@ interface BooleanEncodedValue : EncodedValue {
      *
      * This BooleanEncodedValue is equal to another BooleanEncodedValue if the values returned by getValue() are equal.
      *
-     * @param o The object to be compared for equality with this BooleanEncodedValue
+     * @param other The object to be compared for equality with this BooleanEncodedValue
      * @return true if the specified object is equal to this BooleanEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this BooleanEncodedValue to another EncodedValue.
@@ -72,8 +72,8 @@ interface BooleanEncodedValue : EncodedValue {
      * BooleanEncodedValue, the return values of getValue() are compared, based on the semantics of
      * Boolean.compareTo().
      *
-     * @param o The EncodedValue to compare with this BooleanEncodedValue
+     * @param other The EncodedValue to compare with this BooleanEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

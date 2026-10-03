@@ -69,10 +69,10 @@ interface MethodHandleReference : Reference, Comparable<MethodHandleReference> {
      * This MethodHandleReference is equal to another MethodHandleReference if all of its fields are equal. That is, if
      * the return values of getMethodHandleType() and getMemberReference() are all equal.
      *
-     * @param o The object to be compared for equality with this MethodHandleReference
+     * @param other The object to be compared for equality with this MethodHandleReference
      * @return true if the specified object is equal to this MethodHandleReference
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this MethodHandleReference to another MethodHandleReference.
@@ -80,8 +80,8 @@ interface MethodHandleReference : Reference, Comparable<MethodHandleReference> {
      * The comparison is based on the comparison of the return values of getMethodHandleType() and getMemberReference()
      * in that order.
      *
-     * @param o The MethodHandleReference to compare with this MethodHandleReference
+     * @param other The MethodHandleReference to compare with this MethodHandleReference
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: MethodHandleReference): Int
+    override fun compareTo(other: MethodHandleReference): Int
 }

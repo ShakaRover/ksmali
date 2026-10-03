@@ -76,13 +76,13 @@ class DexBackedTryBlock(
                     dexFile.dataBuffer, reader.offset, sizeWithCatchAll
                 ) {
                     override fun readNextItem(
-                        dexReader: DexReader<out DexBuffer>,
+                        reader: DexReader<out DexBuffer>,
                         index: Int
                     ): DexBackedExceptionHandler {
                         return if (index == sizeWithCatchAll - 1) {
-                            DexBackedCatchAllExceptionHandler(dexReader)
+                            DexBackedCatchAllExceptionHandler(reader)
                         } else {
-                            DexBackedTypedExceptionHandler(dexFile, dexReader)
+                            DexBackedTypedExceptionHandler(dexFile, reader)
                         }
                     }
                 }

@@ -40,17 +40,17 @@ abstract class BaseFloatEncodedValue : FloatEncodedValue {
         return java.lang.Float.floatToRawIntBits(value)
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is FloatEncodedValue) {
-            return java.lang.Float.floatToRawIntBits(value) == java.lang.Float.floatToRawIntBits(o.value)
+    override fun equals(other: Any?): Boolean {
+        if (other is FloatEncodedValue) {
+            return java.lang.Float.floatToRawIntBits(value) == java.lang.Float.floatToRawIntBits(other.value)
         }
         return false
     }
 
-    override fun compareTo(o: EncodedValue): Int {
-        var res = valueType.compareTo(o.valueType)
+    override fun compareTo(other: EncodedValue): Int {
+        var res = valueType.compareTo(other.valueType)
         if (res != 0) return res
-        return java.lang.Float.compare(value, (o as FloatEncodedValue).value)
+        return java.lang.Float.compare(value, (other as FloatEncodedValue).value)
     }
 
     override val valueType: Int

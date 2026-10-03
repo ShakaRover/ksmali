@@ -38,20 +38,20 @@ abstract class BaseTypeReference : BaseReference(), TypeReference {
         return type.hashCode()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o != null) {
-            if (o is TypeReference) {
-                return type == o.type
+    override fun equals(other: Any?): Boolean {
+        if (other != null) {
+            if (other is TypeReference) {
+                return type == other.type
             }
-            if (o is CharSequence) {
-                return type == o.toString()
+            if (other is CharSequence) {
+                return type == other.toString()
             }
         }
         return false
     }
 
-    override fun compareTo(o: CharSequence): Int {
-        return type.compareTo(o.toString())
+    override fun compareTo(other: CharSequence): Int {
+        return type.compareTo(other.toString())
     }
 
     override val length: Int

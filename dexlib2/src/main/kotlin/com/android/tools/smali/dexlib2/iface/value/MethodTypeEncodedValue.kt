@@ -63,10 +63,10 @@ interface MethodTypeEncodedValue : EncodedValue {
      * This MethodTypeEncodedValue is equal to another MethodTypeEncodedValue if the values returned by getValue()
      * are equal.
      *
-     * @param o The object to be compared for equality with this MethodTypeEncodedValue
+     * @param other The object to be compared for equality with this MethodTypeEncodedValue
      * @return true if the specified object is equal to this MethodTypeEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this MethodTypeEncodedValue to another EncodedValue.
@@ -74,8 +74,8 @@ interface MethodTypeEncodedValue : EncodedValue {
      * The comparison is first done on the return values of getValueType(). If the other value is another
      * MethodTypeEncodedValue, the return values of getValue() are compared.
      *
-     * @param o The EncodedValue to compare with this MethodTypeEncodedValue
+     * @param other The EncodedValue to compare with this MethodTypeEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

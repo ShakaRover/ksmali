@@ -61,10 +61,10 @@ interface LongEncodedValue : EncodedValue {
      *
      * This LongEncodedValue is equal to another LongEncodedValue if the values returned by getValue() are equal.
      *
-     * @param o The object to be compared for equality with this LongEncodedValue
+     * @param other The object to be compared for equality with this LongEncodedValue
      * @return true if the specified object is equal to this LongEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this LongEncodedValue to another EncodedValue.
@@ -72,8 +72,8 @@ interface LongEncodedValue : EncodedValue {
      * The comparison is first done on the return values of getValueType(). If the other value is another
      * LongEncodedValue, the return values of getValue() are compared.
      *
-     * @param o The EncodedValue to compare with this LongEncodedValue
+     * @param other The EncodedValue to compare with this LongEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

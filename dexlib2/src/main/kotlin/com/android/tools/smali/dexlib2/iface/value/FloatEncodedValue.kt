@@ -66,10 +66,10 @@ interface FloatEncodedValue : EncodedValue {
      *
      * Note: this isn't quite the same as getValue() == getValue(), due to various NaN issues and signed zero issues.
      *
-     * @param o The object to be compared for equality with this FloatEncodedValue
+     * @param other The object to be compared for equality with this FloatEncodedValue
      * @return true if the specified object is equal to this FloatEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this FloatEncodedValue to another EncodedValue.
@@ -77,8 +77,8 @@ interface FloatEncodedValue : EncodedValue {
      * The comparison is first done on the return values of getValueType(). If the other value is another
      * FloatEncodedValue, the return values of getValue() are compared, using the semantics of Float.compare()
      *
-     * @param o The EncodedValue to compare with this FloatEncodedValue
+     * @param other The EncodedValue to compare with this FloatEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

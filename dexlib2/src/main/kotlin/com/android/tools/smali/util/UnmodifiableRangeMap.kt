@@ -31,7 +31,6 @@
 package com.android.tools.smali.util
 
 import java.util.Collections
-import java.util.Map.Entry
 
 /*
  * Based on guava's ImmutableRangeMap
@@ -57,7 +56,7 @@ class UnmodifiableRangeMap<K : Comparable<K>, V> private constructor(
         }
     }
 
-    fun getEntry(key: K?): Entry<Range<K>, V>? {
+    fun getEntry(key: K?): Map.Entry<Range<K>, V>? {
         if (key == null) {
             return null
         }
@@ -71,7 +70,7 @@ class UnmodifiableRangeMap<K : Comparable<K>, V> private constructor(
         }
     }
     class Builder<K : Comparable<K>, V> {
-        private val entries: MutableList<Entry<Range<K>, V>> = ArrayList()
+        private val entries: MutableList<Map.Entry<Range<K>, V>> = ArrayList()
 
         fun put(range: Range<K>?, value: V?): Builder<K, V> {
             if (range == null || value == null) {
@@ -81,7 +80,7 @@ class UnmodifiableRangeMap<K : Comparable<K>, V> private constructor(
             if (range.isEmpty()) {
                 throw IllegalArgumentException("Ranges cannot be empty")
             }
-            entries.add(UnmodifiableEntry(range, value!!))
+            entries.add(UnmodifiableEntry(range, value))
             return this
         }
 
@@ -108,16 +107,11 @@ class UnmodifiableRangeMap<K : Comparable<K>, V> private constructor(
         }
     }
 
-    class UnmodifiableEntry<K, V>(private val key: K, private val value: V) : Entry<K, V> {
-        override fun getKey(): K {
-            return key
-        }
-
-        override fun getValue(): V {
-            return value
-        }
-
-        override fun setValue(value: V): V {
+    class UnmodifiableEntry<K, V>(
+        override val key: K,
+        override val value: V
+    ) : Map.Entry<K, V> {
+        fun setValue(value: V): V {
             throw UnsupportedOperationException()
         }
     }

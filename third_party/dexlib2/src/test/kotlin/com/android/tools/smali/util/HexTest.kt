@@ -28,14 +28,9 @@
 package com.android.tools.smali.util
 
 import org.junit.Assert
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExpectedException
 
 class HexTest {
-
-    @get:Rule
-    val thrown: ExpectedException = ExpectedException.none()
 
     @Test
     fun testU8() {
@@ -136,15 +131,15 @@ class HexTest {
     @Test
     fun testDumpthrowIllegalArgumentException() {
         val bytes = byteArrayOf(17, 16, 17, 17, 17, 16, 17, 17, 17, 17)
-        thrown.expect(IllegalArgumentException::class.java)
-        Hex.dump(bytes, 4, 1, -2147483648, 1, 5)
-        // Method is not expected to return due to exception thrown
+        Assert.assertThrows(IllegalArgumentException::class.java) {
+            Hex.dump(bytes, 4, 1, -2147483648, 1, 5)
+        }
     }
 
     @Test
     fun testDumpthrowIndexOutOfBoundsException() {
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        Hex.dump(ByteArray(0), 4, 1, -2147483648, 1, 4)
-        // Method is not expected to return due to exception thrown
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            Hex.dump(ByteArray(0), 4, 1, -2147483648, 1, 4)
+        }
     }
 }

@@ -38,9 +38,9 @@ sourceSets {
 
 dependencies {
     implementation project(':dexlib2')
-    implementation depends.findbugs
-    implementation depends.jcommander
-    testImplementation depends.junit
+    implementation libs.findbugs
+    implementation libs.jcommander
+    testImplementation libs.junit
 }
 
 publish {

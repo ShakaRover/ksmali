@@ -67,10 +67,10 @@ interface DoubleEncodedValue : EncodedValue {
      *
      * Note: this isn't quite the same as getValue() == getValue(), due to various NaN issues and signed zero issues.
      *
-     * @param o The object to be compared for equality with this DoubleEncodedValue
+     * @param other The object to be compared for equality with this DoubleEncodedValue
      * @return true if the specified object is equal to this DoubleEncodedValue
      */
-    override fun equals(o: Any?): Boolean
+    override fun equals(other: Any?): Boolean
 
     /**
      * Compare this DoubleEncodedValue to another EncodedValue.
@@ -78,8 +78,8 @@ interface DoubleEncodedValue : EncodedValue {
      * The comparison is first done on the return values of getValueType(), and then if the other value is another
      * DoubleEncodedValue, the return values of getValue() are compared, using the semantics of Double.compare()
      *
-     * @param o The EncodedValue to compare with this DoubleEncodedValue
+     * @param other The EncodedValue to compare with this DoubleEncodedValue
      * @return An integer representing the result of the comparison
      */
-    override fun compareTo(o: EncodedValue): Int
+    override fun compareTo(other: EncodedValue): Int
 }

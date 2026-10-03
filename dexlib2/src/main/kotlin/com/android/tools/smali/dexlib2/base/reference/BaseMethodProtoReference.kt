@@ -41,19 +41,19 @@ abstract class BaseMethodProtoReference : BaseReference(), MethodProtoReference 
         return hashCode * 31 + parameterTypes.hashCode()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is MethodProtoReference) {
-            return returnType == o.returnType &&
-                    CharSequenceUtils.listEquals(parameterTypes, o.parameterTypes)
+    override fun equals(other: Any?): Boolean {
+        if (other is MethodProtoReference) {
+            return returnType == other.returnType &&
+                    CharSequenceUtils.listEquals(parameterTypes, other.parameterTypes)
         }
         return false
     }
 
-    override fun compareTo(o: MethodProtoReference): Int {
-        var res = returnType.compareTo(o.returnType)
+    override fun compareTo(other: MethodProtoReference): Int {
+        var res = returnType.compareTo(other.returnType)
         if (res != 0) return res
         return CollectionUtils.compareAsIterable(
-            CollectionUtils.usingToStringOrdering(), parameterTypes, o.parameterTypes
+            CollectionUtils.usingToStringOrdering(), parameterTypes, other.parameterTypes
         )
     }
 
