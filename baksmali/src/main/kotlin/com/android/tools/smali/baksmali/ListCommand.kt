@@ -52,7 +52,7 @@ class ListCommand(commandAncestors: List<JCommander>) : Command(commandAncestors
     private var help = false
 
     override fun setupCommand(jc: JCommander) {
-        val hierarchy = getCommandHierarchy()
+        val hierarchy = commandHierarchy
 
         addExtendedCommand(jc, ListStringsCommand(hierarchy))
         addExtendedCommand(jc, ListMethodsCommand(hierarchy))

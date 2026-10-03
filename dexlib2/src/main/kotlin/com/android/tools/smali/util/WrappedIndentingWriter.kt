@@ -45,12 +45,12 @@ class WrappedIndentingWriter(
 
     @Throws(IOException::class)
     private fun writeIndent() {
-        for (i in 0 until getIndent()) {
+        for (i in 0 until indent) {
             write(' '.code)
         }
     }
 
-    private fun getIndent(): Int {
+    private val indent: Int get() {
         if (currentIndent < 0) {
             return 0
         }

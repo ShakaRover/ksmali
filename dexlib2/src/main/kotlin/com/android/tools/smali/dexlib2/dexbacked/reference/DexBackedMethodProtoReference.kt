@@ -77,7 +77,7 @@ class DexBackedMethodProtoReference(
      *
      * @return size in bytes
      */
-    fun getSize(): Int {
+    val size: Int get() {
         var size = ProtoIdItem.ITEM_SIZE //3 * uint
         val parameters = parameterTypes
         if (parameters.isNotEmpty()) {

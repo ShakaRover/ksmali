@@ -338,7 +338,7 @@ class SparseArray<E> {
      * associated key
      */
     @Suppress("UNCHECKED_CAST")
-    fun getValues(): List<E> {
+    val values: List<E> get() {
         return Collections.unmodifiableList(listOf(*(mValues as Array<E>)))
     }
 }

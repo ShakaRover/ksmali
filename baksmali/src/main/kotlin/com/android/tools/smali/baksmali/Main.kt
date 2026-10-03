@@ -77,7 +77,7 @@ open class Main : Command(mutableListOf()) {
             val jc = JCommander(main)
             main.jc = jc
             jc.programName = "baksmali"
-            val commandHierarchy = main.getCommandHierarchy()
+            val commandHierarchy = main.commandHierarchy
 
             addExtendedCommand(jc, DisassembleCommand(commandHierarchy))
             addExtendedCommand(jc, DeodexCommand(commandHierarchy))

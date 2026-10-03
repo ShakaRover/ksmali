@@ -69,7 +69,7 @@ open class Main : Command(mutableListOf()) {
             val jc = JCommander(main)
             main.jc = jc
             jc.programName = "smali"
-            val commandHierarchy = main.getCommandHierarchy()
+            val commandHierarchy = main.commandHierarchy
 
             addExtendedCommand(jc, AssembleCommand(commandHierarchy))
             addExtendedCommand(jc, PrintTokensCommand(commandHierarchy))

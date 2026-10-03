@@ -51,9 +51,9 @@ object ReflectionUtils {
         primitiveMap = Collections.unmodifiableMap(temp)
     }
 
-    private val primitiveMapInverse: Map<String, String> = getInverse()
+    private val primitiveMapInverse: Map<String, String> = inverse
 
-    private fun getInverse(): Map<String, String> {
+    private val inverse: Map<String, String> get() {
         val temp = HashMap<String, String>()
         for ((key, value) in primitiveMap) {
             temp[value] = key

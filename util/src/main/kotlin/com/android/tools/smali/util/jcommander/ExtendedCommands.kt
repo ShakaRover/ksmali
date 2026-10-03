@@ -71,7 +71,7 @@ fun postfixDescription(command: Any): String =
 
 fun addExtendedCommand(jc: JCommander, command: Command) {
     jc.addCommand(commandName(command), command, *commandAliases(command))
-    command.setupCommandInternal(command.getJCommanderInternal())
+    command.setupCommandInternal(command.jCommanderInternal)
 }
 
 fun parameterArgumentNames(parameterDescription: ParameterDescription): Array<String> {

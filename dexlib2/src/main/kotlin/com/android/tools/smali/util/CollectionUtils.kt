@@ -165,7 +165,6 @@ class CollectionUtils private constructor() {
             return false
         }
 
-        @Suppress("UNCHECKED_CAST")
         private fun <T> toNaturalSortedSet(collection: Collection<T>): SortedSet<T> {
             if (isNaturalSortedSet(collection)) {
                 return collection as SortedSet<T>
@@ -181,7 +180,6 @@ class CollectionUtils private constructor() {
             if (collection is SortedSet<*>) {
                 val comparator = collection.comparator()
                 if (comparator != null && comparator == elementComparator) {
-                    @Suppress("UNCHECKED_CAST")
                     return collection as SortedSet<T>
                 }
             }

@@ -135,7 +135,7 @@ class DexBackedClassDef(
         }
 
     override val annotations: Set<DexBackedAnnotation>
-        get() = getAnnotationsDirectory().getClassAnnotations()
+        get() = getAnnotationsDirectory().classAnnotations
 
     override val staticFields: Iterable<DexBackedField>
         get() = getStaticFields(true)
@@ -151,11 +151,11 @@ class DexBackedClassDef(
             val fieldsStartOffset = reader.offset
 
             val hiddenApiRestrictionIterator: MutableIterator<Int>? =
-                hiddenApiRestrictionsReader?.getRestrictionsForStaticFields()
+                hiddenApiRestrictionsReader?.restrictionsForStaticFields
 
             return object : Iterable<DexBackedField> {
                 override fun iterator(): MutableIterator<DexBackedField> {
-                    val annotationIterator = annotationsDirectory.getFieldAnnotationIterator()
+                    val annotationIterator = annotationsDirectory.fieldAnnotationIterator
                     val staticInitialValueIterator =
                         EncodedArrayItemIterator.newOrEmpty(dexFile, staticInitialValuesOffset)
 
@@ -221,11 +221,11 @@ class DexBackedClassDef(
             val fieldsStartOffset = reader.offset
 
             val hiddenApiRestrictionIterator: MutableIterator<Int>? =
-                hiddenApiRestrictionsReader?.getRestrictionsForInstanceFields()
+                hiddenApiRestrictionsReader?.restrictionsForInstanceFields
 
             return object : Iterable<DexBackedField> {
                 override fun iterator(): MutableIterator<DexBackedField> {
-                    val annotationIterator = annotationsDirectory.getFieldAnnotationIterator()
+                    val annotationIterator = annotationsDirectory.fieldAnnotationIterator
 
                     return object : VariableSizeLookaheadIterator<DexBackedField>(
                         dexFile.dataBuffer, fieldsStartOffset
@@ -293,13 +293,13 @@ class DexBackedClassDef(
             val methodsStartOffset = reader.offset
 
             val hiddenApiRestrictionIterator: MutableIterator<Int>? =
-                hiddenApiRestrictionsReader?.getRestrictionsForDirectMethods()
+                hiddenApiRestrictionsReader?.restrictionsForDirectMethods
 
             return object : Iterable<DexBackedMethod> {
                 override fun iterator(): MutableIterator<DexBackedMethod> {
-                    val methodAnnotationIterator = annotationsDirectory.getMethodAnnotationIterator()
+                    val methodAnnotationIterator = annotationsDirectory.methodAnnotationIterator
                     val parameterAnnotationIterator =
-                        annotationsDirectory.getParameterAnnotationIterator()
+                        annotationsDirectory.parameterAnnotationIterator
 
                     return object : VariableSizeLookaheadIterator<DexBackedMethod>(
                         dexFile.dataBuffer, methodsStartOffset
@@ -361,13 +361,13 @@ class DexBackedClassDef(
             val methodsStartOffset = reader.offset
 
             val hiddenApiRestrictionIterator: MutableIterator<Int>? =
-                hiddenApiRestrictionsReader?.getRestrictionsForVirtualMethods()
+                hiddenApiRestrictionsReader?.restrictionsForVirtualMethods
 
             return object : Iterable<DexBackedMethod> {
                 override fun iterator(): MutableIterator<DexBackedMethod> {
-                    val methodAnnotationIterator = annotationsDirectory.getMethodAnnotationIterator()
+                    val methodAnnotationIterator = annotationsDirectory.methodAnnotationIterator
                     val parameterAnnotationIterator =
-                        annotationsDirectory.getParameterAnnotationIterator()
+                        annotationsDirectory.parameterAnnotationIterator
 
                     return object : VariableSizeLookaheadIterator<DexBackedMethod>(
                         dexFile.dataBuffer, methodsStartOffset
@@ -474,7 +474,7 @@ class DexBackedClassDef(
      *
      * @return size in bytes
      */
-    fun getSize(): Int {
+    val size: Int get() {
         var size = 8 * 4 //class_def_item has 8 uint fields in dex files
         size += TypeIdItem.ITEM_SIZE //type_ids size
 
@@ -490,11 +490,11 @@ class DexBackedClassDef(
         val directory = getAnnotationsDirectory()
         if (AnnotationsDirectory.EMPTY != directory) {
             size += 4 * 4 //4 uints in annotations_directory_item
-            val classAnnotations = directory.getClassAnnotations()
+            val classAnnotations = directory.classAnnotations
             if (classAnnotations.isNotEmpty()) {
                 size += 4 //uint for size
                 size += classAnnotations.size * 4 //uint per annotation_off
-                //TODO: should we add annotation_item size? what if it's shared?
+                // TODO: this omits annotation_item size; shared annotation_item entries would be counted more than once.
             }
         }
 
@@ -522,11 +522,11 @@ class DexBackedClassDef(
         }
 
         for (dexBackedField in fields) {
-            size += dexBackedField.getSize()
+            size += dexBackedField.size
         }
 
         for (dexBackedMethod in methods) {
-            size += dexBackedMethod.getSize()
+            size += dexBackedMethod.size
         }
         return size
     }
@@ -536,7 +536,7 @@ class DexBackedClassDef(
         private var directMethodsStartOffset = 0
         private var virtualMethodsStartOffset = 0
 
-        fun getRestrictionsForStaticFields(): VariableSizeListIterator<Int> {
+        val restrictionsForStaticFields: VariableSizeListIterator<Int> get() {
             return object : VariableSizeListIterator<Int>(
                 dexFile.dataBuffer, startOffset, staticFieldCount
             ) {
@@ -547,7 +547,7 @@ class DexBackedClassDef(
 
                 override fun next(): Int {
                     if (nextIndex() == staticFieldCount) {
-                        instanceFieldsStartOffset = getReaderOffset()
+                        instanceFieldsStartOffset = readerOffset
                     }
                     return super.next()
                 }
@@ -565,7 +565,7 @@ class DexBackedClassDef(
             return instanceFieldsStartOffset
         }
 
-        fun getRestrictionsForInstanceFields(): VariableSizeListIterator<Int> {
+        val restrictionsForInstanceFields: VariableSizeListIterator<Int> get() {
             return object : VariableSizeListIterator<Int>(
                 dexFile.dataBuffer, getInstanceFieldsStartOffset(), instanceFieldCount
             ) {
@@ -576,7 +576,7 @@ class DexBackedClassDef(
 
                 override fun next(): Int {
                     if (nextIndex() == instanceFieldCount) {
-                        directMethodsStartOffset = getReaderOffset()
+                        directMethodsStartOffset = readerOffset
                     }
                     return super.next()
                 }
@@ -595,7 +595,7 @@ class DexBackedClassDef(
             return directMethodsStartOffset
         }
 
-        fun getRestrictionsForDirectMethods(): VariableSizeListIterator<Int> {
+        val restrictionsForDirectMethods: VariableSizeListIterator<Int> get() {
             return object : VariableSizeListIterator<Int>(
                 dexFile.dataBuffer, getDirectMethodsStartOffset(), directMethodCount
             ) {
@@ -606,7 +606,7 @@ class DexBackedClassDef(
 
                 override fun next(): Int {
                     if (nextIndex() == directMethodCount) {
-                        virtualMethodsStartOffset = getReaderOffset()
+                        virtualMethodsStartOffset = readerOffset
                     }
                     return super.next()
                 }
@@ -625,7 +625,7 @@ class DexBackedClassDef(
             return virtualMethodsStartOffset
         }
 
-        fun getRestrictionsForVirtualMethods(): VariableSizeListIterator<Int> {
+        val restrictionsForVirtualMethods: VariableSizeListIterator<Int> get() {
             return object : VariableSizeListIterator<Int>(
                 dexFile.dataBuffer, getVirtualMethodsStartOffset(), virtualMethodCount
             ) {

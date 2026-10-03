@@ -58,7 +58,7 @@ class JumboStringConversionTest {
     @Test
     @Throws(IOException::class)
     fun testJumboStringConversion() {
-        val dexBuilder = DexBuilder(Opcodes.getDefault())
+        val dexBuilder = DexBuilder(Opcodes.default)
 
         val methodBuilder = MethodImplementationBuilder(1)
         for (i in 0 until 66000) {
@@ -94,7 +94,7 @@ class JumboStringConversionTest {
         val dexStore = MemoryDataStore()
         dexBuilder.writeTo(dexStore)
 
-        val dexFile = DexBackedDexFile(Opcodes.getDefault(), dexStore.buffer)
+        val dexFile = DexBackedDexFile(Opcodes.default, dexStore.buffer)
 
         val classDef = dexFile.classes.firstOrNull()
         Assert.assertNotNull(classDef)
@@ -124,7 +124,7 @@ class JumboStringConversionTest {
     @Test
     @Throws(IOException::class)
     fun testJumboStringConversion_NonMethodBuilder() {
-        val dexBuilder = DexBuilder(Opcodes.getDefault())
+        val dexBuilder = DexBuilder(Opcodes.default)
 
         val instructions = mutableListOf<Instruction>()
         for (i in 0 until 66000) {
@@ -188,7 +188,7 @@ class JumboStringConversionTest {
         val dexStore = MemoryDataStore()
         dexBuilder.writeTo(dexStore)
 
-        val dexFile = DexBackedDexFile(Opcodes.getDefault(), dexStore.buffer)
+        val dexFile = DexBackedDexFile(Opcodes.default, dexStore.buffer)
 
         val classDef = dexFile.classes.firstOrNull()
         Assert.assertNotNull(classDef)

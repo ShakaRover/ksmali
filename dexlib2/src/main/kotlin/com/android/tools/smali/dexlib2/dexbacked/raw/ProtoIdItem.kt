@@ -43,7 +43,7 @@ object ProtoIdItem {
 
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
-            override fun getItemName(): String {
+            override val itemName: String get() {
                 return "proto_id_item"
             }
 

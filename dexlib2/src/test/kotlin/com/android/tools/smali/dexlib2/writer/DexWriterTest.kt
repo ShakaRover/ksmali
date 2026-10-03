@@ -65,12 +65,12 @@ class DexWriterTest {
         val dataStore = MemoryDataStore()
 
         try {
-            DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
+            DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.default, setOf(classDef)))
         } catch (ex: IOException) {
             throw RuntimeException(ex)
         }
 
-        val dexFile = DexBackedDexFile(Opcodes.getDefault(), dataStore.buffer)
+        val dexFile = DexBackedDexFile(Opcodes.default, dataStore.buffer)
         val dbClassDef = dexFile.classes.firstOrNull()
         Assert.assertNotNull(dbClassDef)
         val dbAnnotation = dbClassDef!!.annotations.firstOrNull()
@@ -106,12 +106,12 @@ class DexWriterTest {
         val dataStore = MemoryDataStore()
 
         try {
-            DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
+            DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.default, setOf(classDef)))
         } catch (ex: IOException) {
             throw RuntimeException(ex)
         }
 
-        val dexFile = DexBackedDexFile(Opcodes.getDefault(), dataStore.buffer)
+        val dexFile = DexBackedDexFile(Opcodes.default, dataStore.buffer)
         val dbClassDef = dexFile.classes.firstOrNull()
         Assert.assertNotNull(dbClassDef)
         val dbAnnotation = dbClassDef!!.annotations.firstOrNull()

@@ -54,7 +54,7 @@ class ZipDexContainerTest {
         val classDef = makeClassDef()
 
         val dataStore = MemoryDataStore()
-        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
+        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.default, setOf(classDef)))
         val dexBytes = dataStore.data
 
         val crc32 = CRC32()
@@ -71,7 +71,7 @@ class ZipDexContainerTest {
             zos.closeEntry()
         }
 
-        val container = ZipDexContainer(tempZip, Opcodes.getDefault())
+        val container = ZipDexContainer(tempZip, Opcodes.default)
         val entries = container.dexEntryNames
         Assert.assertEquals(1, entries.size)
         Assert.assertEquals("classes.dex", entries[0])
@@ -88,7 +88,7 @@ class ZipDexContainerTest {
         val classDef = makeClassDef()
 
         val dataStore = MemoryDataStore()
-        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
+        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.default, setOf(classDef)))
         val dexBytes = dataStore.data
 
         val tempZip = File.createTempFile("test_order", ".apk")
@@ -104,7 +104,7 @@ class ZipDexContainerTest {
             }
         }
 
-        val container = ZipDexContainer(tempZip, Opcodes.getDefault())
+        val container = ZipDexContainer(tempZip, Opcodes.default)
         val entries = container.dexEntryNames
 
         // Expected order: classes.dex, classes2.dex (classes3 missing), then a, classes4, z.dex
@@ -123,7 +123,7 @@ class ZipDexContainerTest {
         val classDef = makeClassDef()
 
         val dataStore = MemoryDataStore()
-        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
+        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.default, setOf(classDef)))
         val dexBytes = dataStore.data
 
         val containerBytes = ByteArray(dexBytes.size * 2)
@@ -164,7 +164,7 @@ class ZipDexContainerTest {
         val classDef = makeClassDef()
 
         val dataStore = MemoryDataStore()
-        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
+        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.default, setOf(classDef)))
         val dexBytes = dataStore.data
 
         val containerBytesWithGarbage = ByteArray(dexBytes.size * 2 + 50)
@@ -203,7 +203,7 @@ class ZipDexContainerTest {
         val classDef = makeClassDef()
 
         val dataStore = MemoryDataStore()
-        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.getDefault(), setOf(classDef)))
+        DexPool.writeTo(dataStore, ImmutableDexFile(Opcodes.default, setOf(classDef)))
         val dexBytes = dataStore.data
 
         val containerBytes = ByteArray(dexBytes.size)

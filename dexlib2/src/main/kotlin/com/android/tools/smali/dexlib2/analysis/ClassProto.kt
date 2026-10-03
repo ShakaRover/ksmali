@@ -80,7 +80,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
 
     override fun toString(): String = type
 
-    fun getClassDef(): ClassDef {
+    val classDef: ClassDef get() {
         return classDefSupplier.get()
     }
 
@@ -92,7 +92,6 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
      * @return True if this class is an interface
      */
     override fun isInterface(): Boolean {
-        val classDef = getClassDef()
         return (classDef.accessFlags and AccessFlags.INTERFACE.value) != 0
     }
 
@@ -110,8 +109,8 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
      *
      * @return the set of interfaces that this class implements as a Map<String, ClassDef>.
      */
-    private fun getInterfaces(): LinkedHashMap<String, ClassDef?> {
-        if (!classPath.isArt() || classPath.oatVersion < 72) {
+    private val interfaces: LinkedHashMap<String, ClassDef?> get() {
+        if (!classPath.isArt || classPath.oatVersion < 72) {
             return preDefaultMethodInterfaceSupplier.get()
         } else {
             return postDefaultMethodInterfaceSupplier.get()
@@ -129,7 +128,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         val interfaces = LinkedHashMap<String, ClassDef?>()
 
         try {
-            for (interfaceType in getClassDef().interfaces) {
+            for (interfaceType in classDef.interfaces) {
                 if (!interfaces.containsKey(interfaceType)) {
                     try {
                         val interfaceDef = classPath.getClassDef(interfaceType)
@@ -141,14 +140,14 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
                     }
 
                     val interfaceProto = classPath.getClass(interfaceType) as ClassProto
-                    for (superInterface in interfaceProto.getInterfaces().keys) {
+                    for (superInterface in interfaceProto.interfaces.keys) {
                         if (!interfaces.containsKey(superInterface)) {
                             interfaces[superInterface] =
-                                interfaceProto.getInterfaces()[superInterface]
+                                interfaceProto.interfaces[superInterface]
                         }
                     }
                     if (!interfaceProto.interfacesFullyResolved) {
-                        unresolvedInterfaces.addAll(interfaceProto.getUnresolvedInterfacesOrEmpty())
+                        unresolvedInterfaces.addAll(interfaceProto.unresolvedInterfacesOrEmpty)
                         interfacesFullyResolved = false
                     }
                 }
@@ -170,13 +169,13 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         try {
             if (superclass != null) {
                 val superclassProto = classPath.getClass(superclass) as ClassProto
-                for (superclassInterface in superclassProto.getInterfaces().keys) {
+                for (superclassInterface in superclassProto.interfaces.keys) {
                     if (!interfaces.containsKey(superclassInterface)) {
                         interfaces[superclassInterface] = null
                     }
                 }
                 if (!superclassProto.interfacesFullyResolved) {
-                    unresolvedInterfaces.addAll(superclassProto.getUnresolvedInterfacesOrEmpty())
+                    unresolvedInterfaces.addAll(superclassProto.unresolvedInterfacesOrEmpty)
                     interfacesFullyResolved = false
                 }
             }
@@ -205,21 +204,21 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         val superclass = this.superclass
         if (superclass != null) {
             val superclassProto = classPath.getClass(superclass) as ClassProto
-            for (superclassInterface in superclassProto.getInterfaces().keys) {
+            for (superclassInterface in superclassProto.interfaces.keys) {
                 interfaces[superclassInterface] = null
             }
             if (!superclassProto.interfacesFullyResolved) {
-                unresolvedInterfaces.addAll(superclassProto.getUnresolvedInterfacesOrEmpty())
+                unresolvedInterfaces.addAll(superclassProto.unresolvedInterfacesOrEmpty)
                 interfacesFullyResolved = false
             }
         }
 
         try {
-            for (interfaceType in getClassDef().interfaces) {
+            for (interfaceType in classDef.interfaces) {
                 if (!interfaces.containsKey(interfaceType)) {
                     val interfaceProto = classPath.getClass(interfaceType) as ClassProto
                     try {
-                        for ((key, value) in interfaceProto.getInterfaces()) {
+                        for ((key, value) in interfaceProto.interfaces) {
                             if (!interfaces.containsKey(key)) {
                                 interfaces[key] = value
                             }
@@ -230,7 +229,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
                         interfacesFullyResolved = false
                     }
                     if (!interfaceProto.interfacesFullyResolved) {
-                        unresolvedInterfaces.addAll(interfaceProto.getUnresolvedInterfacesOrEmpty())
+                        unresolvedInterfaces.addAll(interfaceProto.unresolvedInterfacesOrEmpty)
                         interfacesFullyResolved = false
                     }
                     try {
@@ -256,7 +255,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         return interfaces
     }
 
-    private fun getUnresolvedInterfacesOrEmpty(): Set<String> {
+    private val unresolvedInterfacesOrEmpty: Set<String> get() {
         return unresolvedInterfaces ?: Collections.emptySet()
     }
 
@@ -268,13 +267,13 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
      * @return An iterables of ClassDefs representing the directly or transitively implemented interfaces
      * @throws UnresolvedClassException if interfaces could not be fully resolved
      */
-    private fun getDirectInterfaces(): Iterable<ClassDef> {
-        val directInterfaces: Iterable<ClassDef> = getInterfaces().values.filterNotNull()
+    private val directInterfaces: Iterable<ClassDef> get() {
+        val directInterfaces: Iterable<ClassDef> = interfaces.values.filterNotNull()
 
         if (!interfacesFullyResolved) {
             throw UnresolvedClassException(
                 "Interfaces for class %s not fully resolved: %s", type,
-                StringUtils.join(getUnresolvedInterfacesOrEmpty(), ",")
+                StringUtils.join(unresolvedInterfacesOrEmpty, ",")
             )
         }
 
@@ -293,7 +292,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
      * is not one of the interfaces that were successfully resolved
      */
     override fun implementsInterface(iface: String): Boolean {
-        if (getInterfaces().containsKey(iface)) {
+        if (interfaces.containsKey(iface)) {
             return true
         }
         if (!interfacesFullyResolved) {
@@ -303,7 +302,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
     }
 
     override val superclass: String?
-        get() = getClassDef().superclass
+        get() = classDef.superclass
 
     /**
      * This is a helper method for getCommonSuperclass
@@ -386,7 +385,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
             gotException = true
         }
         if (gotException) {
-            return classPath.getUnknownClass()
+            return classPath.unknownClass
         }
 
         val thisChain = ArrayList<TypeProto>()
@@ -410,7 +409,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
             i--
         }
 
-        return classPath.getUnknownClass()
+        return classPath.unknownClass
     }
 
     override fun getFieldByOffset(fieldOffset: Int): FieldReference? {
@@ -465,7 +464,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
 
     val instanceFields: SparseArray<FieldReference>
         get() {
-            if (classPath.isArt()) {
+            if (classPath.isArt) {
                 return artInstanceFieldsSupplier.get()
             } else {
                 return dalvikInstanceFieldsSupplier.get()
@@ -480,7 +479,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         //arrange fields, so that we end up with the same field offsets (which is needed for deodexing).
         //See mydroid/dalvik/vm/oo/Class.c - computeFieldOffsets()
 
-        val fields = getSortedInstanceFields(getClassDef())
+        val fields = getSortedInstanceFields(classDef)
         val fieldCount = fields.size
         //the "type" for each field in fields. 0=reference,1=wide,2=other
         val fieldTypes = ByteArray(fields.size)
@@ -514,7 +513,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         var superclass: ClassProto? = null
         if (superclassType != null) {
             superclass = classPath.getClass(superclassType) as ClassProto
-            startFieldOffset = superclass.getNextFieldOffset()
+            startFieldOffset = superclass.nextFieldOffset
         }
 
         val fieldIndexMod: Int
@@ -647,12 +646,12 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         val gaps = PriorityQueue<FieldGap>()
 
         val linkedFields = SparseArray<FieldReference>()
-        val fields = getSortedArtInstanceFields(getClassDef())
+        val fields = getSortedArtInstanceFields(classDef)
 
         var fieldOffset = 0
         val superclassType = superclass
         if (superclassType != null) {
-            // TODO: what to do if superclass doesn't exist?
+            // TODO: handle an unresolvable superclass instead of blindly casting it to ClassProto.
             val superclass = classPath.getClass(superclassType) as ClassProto
             val superFields = superclass.instanceFields
             var field: FieldReference? = null
@@ -756,17 +755,17 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         return getTypeSize(field.type[0])
     }
 
-    private fun getNextFieldOffset(): Int {
+    private val nextFieldOffset: Int get() {
         val fields = instanceFields
         if (fields.size() == 0) {
-            return if (classPath.isArt()) 0 else 8
+            return if (classPath.isArt) 0 else 8
         }
 
         val lastItemIndex = fields.size() - 1
         val fieldOffset = fields.keyAt(lastItemIndex)
         val lastField = fields.valueAt(lastItemIndex)
 
-        return if (classPath.isArt()) {
+        return if (classPath.isArt) {
             fieldOffset + getTypeSize(lastField.type[0])
         } else {
             when (lastField.type[0]) {
@@ -778,7 +777,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
 
     val vtable: List<Method>
         get() {
-            if (!classPath.isArt() || classPath.oatVersion < 72) {
+            if (!classPath.isArt || classPath.oatVersion < 72) {
                 return preDefaultMethodVtableSupplier.get()
             } else if (classPath.oatVersion < 87) {
                 return buggyPostDefaultMethodVtableSupplier.get()
@@ -787,7 +786,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
             }
         }
 
-    //TODO: check the case when we have a package private method that overrides an interface method
+    // TODO: handle a package-private method that overrides an interface method in the pre-default vtable.
     private val preDefaultMethodVtableSupplier: Supplier<List<Method>> =
         MemoizingSupplier.memoize(Supplier { computePreDefaultMethodVtable() })
 
@@ -819,11 +818,11 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         //iterate over the virtual methods in the current class, and only add them when we don't already have the
         //method (i.e. if it was implemented by the superclass)
         if (!isInterface()) {
-            addToVtable(getClassDef().virtualMethods, vtable, true, true)
+            addToVtable(classDef.virtualMethods, vtable, true, true)
 
             // We use the current class for any vtable method references that we add, rather than the interface, so
             // we don't end up trying to call invoke-virtual using an interface, which will fail verification
-            val interfaces = getDirectInterfaces()
+            val interfaces = directInterfaces
             for (interfaceDef in interfaces) {
                 val interfaceMethods = ArrayList<Method>()
                 for (interfaceMethod in interfaceDef.virtualMethods) {
@@ -871,9 +870,9 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         //iterate over the virtual methods in the current class, and only add them when we don't already have the
         //method (i.e. if it was implemented by the superclass)
         if (!isInterface()) {
-            addToVtable(getClassDef().virtualMethods, vtable, true, true)
+            addToVtable(classDef.virtualMethods, vtable, true, true)
 
-            val interfaces = ArrayList(getInterfaces().keys)
+            val interfaces = ArrayList(interfaces.keys)
 
             val defaultMethods = ArrayList<Method>()
             val defaultConflictMethods = ArrayList<Method>()
@@ -964,7 +963,7 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
                         defaultMethods.add(interfaceMethod)
                         methodOrder[interfaceMethod] = methodOrder.size
                     } else {
-                        // TODO: do we need to check interfaceMethodOverrides here?
+                        // TODO: determine whether interfaceMethodOverrides must be consulted before adding a miranda method.
                         if (oldVtableMethod == null) {
                             mirandaMethods.add(interfaceMethod)
                             methodOrder[interfaceMethod] = methodOrder.size
@@ -1023,9 +1022,9 @@ open class ClassProto(override val classPath: ClassPath, override val type: Stri
         //iterate over the virtual methods in the current class, and only add them when we don't already have the
         //method (i.e. if it was implemented by the superclass)
         if (!isInterface()) {
-            addToVtable(getClassDef().virtualMethods, vtable, true, true)
+            addToVtable(classDef.virtualMethods, vtable, true, true)
 
-            val interfaces = IteratorUtils.toList(getDirectInterfaces())
+            val interfaces = IteratorUtils.toList(directInterfaces)
             Collections.reverse(interfaces)
 
             val defaultMethods = ArrayList<Method>()

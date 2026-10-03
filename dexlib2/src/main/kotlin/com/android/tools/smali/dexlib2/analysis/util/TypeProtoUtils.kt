@@ -78,7 +78,7 @@ object TypeProtoUtils {
                 return null
             }
         } catch (ex: UnresolvedClassException) {
-            return type.classPath.getUnknownClass()
+            return type.classPath.unknownClass
         }
     }
 

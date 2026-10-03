@@ -64,7 +64,7 @@ class CustomMethodInlineTableTest {
         val classDef: ClassDef = ImmutableClassDef("Lblah;", AccessFlags.PUBLIC.value, "Ljava/lang/Object;", null,
             null, null, null, null, null, listOf(method))
 
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), listOf(classDef))
+        val dexFile = ImmutableDexFile(Opcodes.default, listOf(classDef))
 
         val container = ImmutableMultiDexContainer(mapOf("classes.dex" to dexFile))
 
@@ -75,7 +75,7 @@ class CustomMethodInlineTableTest {
         val inlineMethodResolver = CustomInlineMethodResolver(classPath, "Lblah;->blah()V")
         val methodAnalyzer = MethodAnalyzer(classPath, method, inlineMethodResolver, false)
 
-        val deodexedInstruction = methodAnalyzer.getInstructions()[0]
+        val deodexedInstruction = methodAnalyzer.instructions[0]
         Assert.assertEquals(Opcode.INVOKE_VIRTUAL, deodexedInstruction.opcode)
 
         val methodReference = (deodexedInstruction as Instruction35c).reference as MethodReference
@@ -97,7 +97,7 @@ class CustomMethodInlineTableTest {
         val classDef: ClassDef = ImmutableClassDef("Lblah;", AccessFlags.PUBLIC.value, "Ljava/lang/Object;", null,
             null, null, null, null, listOf(method), null)
 
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), listOf(classDef))
+        val dexFile = ImmutableDexFile(Opcodes.default, listOf(classDef))
 
         val container = ImmutableMultiDexContainer(mapOf("classes.dex" to dexFile))
 
@@ -108,7 +108,7 @@ class CustomMethodInlineTableTest {
         val inlineMethodResolver = CustomInlineMethodResolver(classPath, "Lblah;->blah()V")
         val methodAnalyzer = MethodAnalyzer(classPath, method, inlineMethodResolver, false)
 
-        val deodexedInstruction = methodAnalyzer.getInstructions()[0]
+        val deodexedInstruction = methodAnalyzer.instructions[0]
         Assert.assertEquals(Opcode.INVOKE_STATIC, deodexedInstruction.opcode)
 
         val methodReference = (deodexedInstruction as Instruction35c).reference as MethodReference
@@ -130,7 +130,7 @@ class CustomMethodInlineTableTest {
         val classDef: ClassDef = ImmutableClassDef("Lblah;", AccessFlags.PUBLIC.value, "Ljava/lang/Object;", null,
             null, null, null, null, listOf(method), null)
 
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), listOf(classDef))
+        val dexFile = ImmutableDexFile(Opcodes.default, listOf(classDef))
 
         val container = ImmutableMultiDexContainer(mapOf("classes.dex" to dexFile))
 
@@ -141,7 +141,7 @@ class CustomMethodInlineTableTest {
         val inlineMethodResolver = CustomInlineMethodResolver(classPath, "Lblah;->blah()V")
         val methodAnalyzer = MethodAnalyzer(classPath, method, inlineMethodResolver, false)
 
-        val deodexedInstruction = methodAnalyzer.getInstructions()[0]
+        val deodexedInstruction = methodAnalyzer.instructions[0]
         Assert.assertEquals(Opcode.INVOKE_DIRECT, deodexedInstruction.opcode)
 
         val methodReference = (deodexedInstruction as Instruction35c).reference as MethodReference

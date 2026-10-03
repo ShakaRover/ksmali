@@ -122,7 +122,7 @@ open class DexBackedMethodImplementation internal constructor(
     open val debugOffset: Int
         get() = dexFile.dataBuffer.readInt(codeOffset + CodeItem.DEBUG_INFO_OFFSET)
 
-    private fun getDebugInfo(): DebugInfo {
+    private val debugInfo: DebugInfo get() {
         val debugOffset = this.debugOffset
 
         if (debugOffset == -1 || debugOffset == 0) {
@@ -140,10 +140,10 @@ open class DexBackedMethodImplementation internal constructor(
     }
 
     override val debugItems: Iterable<DebugItem>
-        get() = getDebugInfo()
+        get() = debugInfo
 
     fun getParameterNames(dexReader: DexReader<out DexBuffer>?): MutableIterator<String?> {
-        return getDebugInfo().getParameterNames(dexReader)
+        return debugInfo.getParameterNames(dexReader)
     }
 
     /**
@@ -156,7 +156,7 @@ open class DexBackedMethodImplementation internal constructor(
      *
      * @return size in bytes
      */
-    fun getSize(): Int {
+    val size: Int get() {
         //set last offset just before bytecode instructions (after insns_size)
         var lastOffset = instructionsStartOffset
 
@@ -169,7 +169,7 @@ open class DexBackedMethodImplementation internal constructor(
             while (tryHandlerIter.hasNext()) {
                 tryHandlerIter.next()
             }
-            lastOffset = (tryHandlerIter as VariableSizeListIterator<*>).getReaderOffset()
+            lastOffset = (tryHandlerIter as VariableSizeListIterator<*>).readerOffset
         }
 
         //method impl size = code_item size

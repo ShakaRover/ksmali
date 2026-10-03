@@ -80,21 +80,21 @@ class RollbackTest {
 
         val dexFile1: DexBackedDexFile = run {
             val dataStore = MemoryDataStore()
-            val dexPool = DexPool(Opcodes.getDefault())
+            val dexPool = DexPool(Opcodes.default)
             dexPool.internClass(class1)
             dexPool.mark()
             dexPool.internClass(class2)
             dexPool.reset()
             dexPool.writeTo(dataStore)
-            DexBackedDexFile(Opcodes.getDefault(), dataStore.buffer)
+            DexBackedDexFile(Opcodes.default, dataStore.buffer)
         }
 
         val dexFile2: DexBackedDexFile = run {
             val dataStore = MemoryDataStore()
-            val dexPool = DexPool(Opcodes.getDefault())
+            val dexPool = DexPool(Opcodes.default)
             dexPool.internClass(class1)
             dexPool.writeTo(dataStore)
-            DexBackedDexFile(Opcodes.getDefault(), dataStore.buffer)
+            DexBackedDexFile(Opcodes.default, dataStore.buffer)
         }
 
         val mapItems1 = dexFile1.mapItems

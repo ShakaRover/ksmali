@@ -49,7 +49,7 @@ open class ClassPath(
     private val checkPackagePrivateAccess: Boolean,
     val oatVersion: Int
 ) {
-    private val unknownClass: TypeProto = UnknownClassProto(this)
+    val unknownClass: TypeProto = UnknownClassProto(this)
 
     private val loadedClasses: LruCache<String, TypeProto> = object : LruCache<String, TypeProto>(30000) {
         override fun create(key: String): TypeProto {
@@ -64,7 +64,7 @@ open class ClassPath(
     private var classProviders: MutableList<ClassProvider>
 
     private val fieldInstructionMapperSupplier: Supplier<OdexedFieldInstructionMapper> =
-        MemoizingSupplier.memoize(Supplier { OdexedFieldInstructionMapper(isArt()) })
+        MemoizingSupplier.memoize(Supplier { OdexedFieldInstructionMapper(isArt) })
 
     init {
         // add fallbacks for certain special classes that must be present
@@ -81,7 +81,7 @@ open class ClassPath(
         loadPrimitiveType("L")
 
         classProviders = IteratorUtils.toList(providers)
-        classProviders.add(getBasicClasses())
+        classProviders.add(basicClasses)
     }
 
     /**
@@ -108,7 +108,7 @@ open class ClassPath(
         loadedClasses.put(type, PrimitiveProto(this, type))
     }
 
-    fun isArt(): Boolean {
+    val isArt: Boolean get() {
         return oatVersion != NOT_ART
     }
 
@@ -126,15 +126,11 @@ open class ClassPath(
         throw UnresolvedClassException("Could not resolve class %s", type)
     }
 
-    fun getUnknownClass(): TypeProto {
-        return unknownClass
-    }
-
     fun shouldCheckPackagePrivateAccess(): Boolean {
         return checkPackagePrivateAccess
     }
 
-    fun getFieldInstructionMapper(): OdexedFieldInstructionMapper {
+    val fieldInstructionMapper: OdexedFieldInstructionMapper get() {
         return fieldInstructionMapperSupplier.get()
     }
 
@@ -143,11 +139,11 @@ open class ClassPath(
 
         val NOT_SPECIFIED: Int = -2
 
-        private fun getBasicClasses(): ClassProvider {
+        private val basicClasses: ClassProvider get() {
             // fallbacks for some special classes that we assume are present
             return DexClassProvider(
                 ImmutableDexFile(
-                    Opcodes.getDefault(),
+                    Opcodes.default,
                     Collections.unmodifiableSet(
                         HashSet(
                             listOf(

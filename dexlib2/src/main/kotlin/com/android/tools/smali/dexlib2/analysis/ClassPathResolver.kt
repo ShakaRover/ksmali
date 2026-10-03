@@ -150,7 +150,7 @@ open class ClassPathResolver @Throws(IOException::class) constructor(
     ) : this(bootClassPathDirs, null, extraClassPathEntries, dexEntry)
 
     val resolvedClassProviders: List<ClassProvider>
-        get() = pathEntryLoader.getResolvedClassProviders()
+        get() = pathEntryLoader.resolvedClassProviders
 
     @Throws(PathEntryLoader.NoDexException::class, IOException::class)
     private fun loadLocalClassPathEntry(entry: String): Boolean {

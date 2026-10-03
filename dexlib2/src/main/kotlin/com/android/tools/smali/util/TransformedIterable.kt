@@ -77,7 +77,6 @@ class TransformedIterable<F, T>(
             return transformFunction.apply(backingIterator.next())
         }
 
-        @Suppress("UNCHECKED_CAST")
         final override fun remove() {
             (backingIterator as MutableIterator<G>).remove()
         }

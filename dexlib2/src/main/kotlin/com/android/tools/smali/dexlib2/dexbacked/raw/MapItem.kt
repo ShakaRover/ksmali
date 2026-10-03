@@ -36,20 +36,19 @@ import com.android.tools.smali.dexlib2.util.AnnotatedBytes
 
 class MapItem(
     private val dexFile: DexBackedDexFile,
-    private val offset: Int
+    private val mapItemOffset: Int
 ) {
     val type: Int
-        get() = dexFile.dataBuffer.readUshort(offset + TYPE_OFFSET)
+        get() = dexFile.dataBuffer.readUshort(mapItemOffset + TYPE_OFFSET)
 
     val name: String
         get() = ItemType.getItemTypeName(type)
 
     val itemCount: Int
-        get() = dexFile.dataBuffer.readSmallUint(offset + SIZE_OFFSET)
+        get() = dexFile.dataBuffer.readSmallUint(mapItemOffset + SIZE_OFFSET)
 
-    fun getOffset(): Int {
-        return dexFile.dataBuffer.readSmallUint(offset + OFFSET_OFFSET)
-    }
+    val offset: Int
+        get() = dexFile.dataBuffer.readSmallUint(mapItemOffset + OFFSET_OFFSET)
 
     companion object {
         const val ITEM_SIZE = 12
@@ -60,7 +59,7 @@ class MapItem(
 
         fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
             return object : SectionAnnotator(annotator, mapItem) {
-                override fun getItemName(): String {
+                override val itemName: String get() {
                     return "map_item"
                 }
 

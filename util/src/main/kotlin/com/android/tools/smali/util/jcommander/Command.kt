@@ -30,7 +30,7 @@
 
 package com.android.tools.smali.util.jcommander
 
-import com.android.tools.smali.util.getConsoleWidth
+import com.android.tools.smali.util.consoleWidth
 import com.beust.jcommander.JCommander
 
 abstract class Command(
@@ -39,8 +39,8 @@ abstract class Command(
     open fun usage() {
         System.out.println(
             HelpFormatter()
-                .width(getConsoleWidth())
-                .format(getCommandHierarchy())
+                .width(consoleWidth)
+                .format(commandHierarchy)
         )
     }
 
@@ -58,9 +58,9 @@ abstract class Command(
         setupCommand(jc)
     }
 
-    internal fun getJCommanderInternal(): JCommander = getJCommander()
+    internal val jCommanderInternal: JCommander get() = getJCommander()
 
-    open fun getCommandHierarchy(): List<JCommander> {
+    open val commandHierarchy: List<JCommander> get() {
         val commandHierarchy: MutableList<JCommander> = commandAncestors.toMutableList()
         commandHierarchy.add(getJCommander())
         return commandHierarchy

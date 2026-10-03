@@ -107,7 +107,7 @@ abstract class VariableSizeLookaheadIterator<T> : MutableIterator<T> {
         return readNextItem(reader)
     }
 
-    fun getReaderOffset(): Int {
+    val readerOffset: Int get() {
         return reader.offset
     }
 }

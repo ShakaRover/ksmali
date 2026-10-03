@@ -62,7 +62,7 @@ class DexDataWriterTest {
         Assert.assertEquals(startPosition+bytes.size, writer.position)
 
         writer.flush()
-        val writtenData = output.getBuffer()
+        val writtenData = output.buffer
 
         for (i in 0 until bytes.size) {
             Assert.assertEquals("Values not equal at index ${i}", bytes[i].toByte(), writtenData[i])
@@ -73,7 +73,7 @@ class DexDataWriterTest {
         Assert.assertEquals(startPosition+bytes.size, writer.position)
 
         writer.flush()
-        val writtenData = output.getBuffer()
+        val writtenData = output.buffer
 
         for (i in 0 until bytes.size) {
             Assert.assertEquals("Values not equal at index ${i}", bytes[i], writtenData[i])

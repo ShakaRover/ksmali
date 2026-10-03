@@ -71,7 +71,7 @@ open class ArrayProto(override val classPath: ClassPath, type: String) : TypePro
     /**
      * @return The base element type of this array. E.g. This would return Ljava/lang/String; for [[Ljava/lang/String;
      */
-    fun getImmediateElementType(): String {
+    val immediateElementType: String get() {
         if (dimensions > 1) {
             return makeArrayType(elementType, dimensions - 1)
         }

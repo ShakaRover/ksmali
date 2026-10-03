@@ -195,7 +195,7 @@ class DexBackedMethod(
      *
      * @return size in bytes
      */
-    fun getSize(): Int {
+    val size: Int get() {
         var size = 0
 
         val reader: DexReader<out DexBuffer> = dexFile.dataBuffer.readerAt(startOffset)
@@ -206,11 +206,11 @@ class DexBackedMethod(
 
         val impl = implementation
         if (impl != null) {
-            size += impl.getSize()
+            size += impl.size
         }
 
         val methodRef = DexBackedMethodReference(dexFile, methodIndex)
-        size += methodRef.getSize()
+        size += methodRef.size
 
         return size
     }

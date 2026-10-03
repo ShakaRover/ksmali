@@ -58,7 +58,7 @@ class FileDeferredOutputStream : DeferredOutputStream {
 
     @Throws(IOException::class)
     override fun writeTo(dest: OutputStream) {
-        val outBuf = output.getBuffer()
+        val outBuf = output.buffer
         val count = output.getCount()
         output.resetBuffer()
         output.close()
@@ -114,7 +114,7 @@ class FileDeferredOutputStream : DeferredOutputStream {
             count = 0
         }
 
-        fun getBuffer(): ByteArray {
+        val buffer: ByteArray get() {
             return buf
         }
     }

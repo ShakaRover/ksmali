@@ -36,7 +36,7 @@ import com.beust.jcommander.Parameters
 import com.beust.jcommander.ParametersDelegate
 import com.beust.jcommander.validators.PositiveInteger
 import com.android.tools.smali.dexlib2.util.SyntheticAccessorResolver
-import com.android.tools.smali.util.getConsoleWidth
+import com.android.tools.smali.util.consoleWidth
 import com.android.tools.smali.util.StringWrapper
 import com.android.tools.smali.util.jcommander.ExtendedParameter
 import com.android.tools.smali.util.jcommander.ExtendedParameters
@@ -186,7 +186,7 @@ open class DisassembleCommand(commandAncestors: List<JCommander>) : DexInputComm
                 System.err,
                 "Warning: You are disassembling an odex/oat file without deodexing it. You won't be able to " +
                     "re-assemble the results unless you deodex it. See \"baksmali help deodex\"",
-                getConsoleWidth()
+                consoleWidth
             )
         }
 

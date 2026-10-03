@@ -74,8 +74,8 @@ class DexBackedField(
 
         this.annotationSetOffset = annotationIterator.seekTo(fieldIndex)
         if (staticInitialValueIterator != null) {
-            initialValueOffset = staticInitialValueIterator.getReaderOffset()
-            this.initialValue = staticInitialValueIterator.getNextOrNull()
+            initialValueOffset = staticInitialValueIterator.readerOffset
+            this.initialValue = staticInitialValueIterator.nextOrNull
         } else {
             initialValueOffset = 0
             this.initialValue = null
@@ -128,7 +128,7 @@ class DexBackedField(
      *
      * @return size in bytes
      */
-    fun getSize(): Int {
+    val size: Int get() {
         var size = 0
         val reader: DexReader<out DexBuffer> = dexFile.buffer.readerAt(startOffset)
         reader.readLargeUleb128() //field_idx_diff
@@ -149,7 +149,7 @@ class DexBackedField(
         }
 
         val fieldRef = DexBackedFieldReference(dexFile, fieldIndex)
-        size += fieldRef.getSize()
+        size += fieldRef.size
 
         return size
     }

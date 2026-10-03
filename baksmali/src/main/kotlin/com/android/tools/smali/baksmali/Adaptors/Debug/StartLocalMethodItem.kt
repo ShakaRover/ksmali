@@ -36,7 +36,6 @@ import com.android.tools.smali.baksmali.formatter.BaksmaliWriter
 import com.android.tools.smali.dexlib2.iface.debug.StartLocal
 import java.io.IOException
 
-@Suppress("unused")
 class StartLocalMethodItem(
     private val classDef: ClassDefinition, codeAddress: Int, sortOrder: Int,
     private val registerFormatter: RegisterFormatter, private val startLocal: StartLocal

@@ -48,7 +48,7 @@ object ClassDataItem {
                 super.annotateSection(out)
             }
 
-            override fun getItemName(): String {
+            override val itemName: String get() {
                 return "class_data_item"
             }
 

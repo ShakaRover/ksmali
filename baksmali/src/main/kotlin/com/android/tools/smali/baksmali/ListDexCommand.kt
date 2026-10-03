@@ -80,7 +80,7 @@ open class ListDexCommand(commandAncestors: List<JCommander>) : Command(commandA
 
         val entries: List<String>
         try {
-            val container = DexFileFactory.loadDexContainer(file, Opcodes.getDefault())
+            val container = DexFileFactory.loadDexContainer(file, Opcodes.default)
             entries = container.dexEntryNames
         } catch (ex: IOException) {
             throw RuntimeException(ex)

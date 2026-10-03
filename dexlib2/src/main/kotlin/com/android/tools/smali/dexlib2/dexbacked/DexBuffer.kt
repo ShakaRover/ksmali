@@ -33,8 +33,8 @@ package com.android.tools.smali.dexlib2.dexbacked
 import com.android.tools.smali.util.ExceptionWithContext
 
 open class DexBuffer constructor(
-    internal val buf: ByteArray,
-    internal val baseOffset: Int = 0
+    val buf: ByteArray,
+    val baseOffset: Int = 0
 ) {
     fun readSmallUint(offset: Int): Int {
         val buf = this.buf
@@ -133,13 +133,5 @@ open class DexBuffer constructor(
 
     fun readerAt(offset: Int): DexReader<DexBuffer> {
         return DexReader(this, offset)
-    }
-
-    fun getBuf(): ByteArray {
-        return buf
-    }
-
-    fun getBaseOffset(): Int {
-        return baseOffset
     }
 }

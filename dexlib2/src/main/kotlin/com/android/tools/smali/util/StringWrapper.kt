@@ -43,7 +43,7 @@ object StringWrapper {
      * @return An iterable of Strings containing the wrapped lines
      */
     fun wrapStringOnBreaks(string: String, maxWidth: Int): Iterable<String> {
-        // TODO: should we strip any trailing newlines?
+        // TODO: decide whether trailing newlines should be stripped from the wrapped output.
         val breakIterator = BreakIterator.getLineInstance()
         breakIterator.setText(string)
 

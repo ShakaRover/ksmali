@@ -98,7 +98,7 @@ class AnalysisTest {
     fun runTest(test: String, registerInfo: Boolean, isArt: Boolean) {
         val dexFilePath = "$test${File.separatorChar}classes.dex"
 
-        val dexFile: DexFile = DexFileFactory.loadDexFile(findResource(dexFilePath), Opcodes.getDefault())
+        val dexFile: DexFile = DexFileFactory.loadDexFile(findResource(dexFilePath), Opcodes.default)
 
         val options = BaksmaliOptions()
         if (registerInfo) {

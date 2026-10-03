@@ -43,7 +43,7 @@ open class ImmutableMethodParameter(
 ) : BaseMethodParameter() {
     override val annotations: Set<Annotation> = ImmutableAnnotation.immutableSetOf(annotations)
 
-    // TODO: iterate over the annotations to get the signature
+    // TODO: derive the generic signature from the annotations, which are currently ignored.
     override val signature: String?
         get() = null
 

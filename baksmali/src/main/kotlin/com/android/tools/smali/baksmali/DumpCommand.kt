@@ -35,7 +35,7 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.android.tools.smali.dexlib2.dexbacked.raw.util.DexAnnotator
-import com.android.tools.smali.util.getConsoleWidth
+import com.android.tools.smali.util.consoleWidth
 import com.android.tools.smali.util.jcommander.ExtendedParameters
 import java.io.BufferedWriter
 import java.io.IOException
@@ -91,12 +91,12 @@ open class DumpCommand(commandAncestors: List<JCommander>) : DexInputCommand(com
         @Throws(IOException::class)
         fun dump(dexFile: DexBackedDexFile, output: OutputStream) {
             BufferedWriter(OutputStreamWriter(output)).use { writer ->
-                var consoleWidth = getConsoleWidth()
-                if (consoleWidth <= 0) {
-                    consoleWidth = 120
+                var width = consoleWidth
+                if (width <= 0) {
+                    width = 120
                 }
 
-                val annotator = DexAnnotator(dexFile, consoleWidth)
+                val annotator = DexAnnotator(dexFile, width)
                 annotator.writeAnnotations(writer)
             }
         }

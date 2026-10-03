@@ -39,7 +39,7 @@ import com.android.tools.smali.util.StringUtils
 object StringDataItem {
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
-            override fun getItemName(): String {
+            override val itemName: String get() {
                 return "string_data_item"
             }
 

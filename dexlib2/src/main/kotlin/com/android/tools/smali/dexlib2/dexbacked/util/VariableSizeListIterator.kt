@@ -56,7 +56,7 @@ abstract class VariableSizeListIterator<T> : MutableListIterator<T> {
      */
     protected abstract fun readNextItem(reader: DexReader<out DexBuffer>, index: Int): T
 
-    fun getReaderOffset(): Int {
+    val readerOffset: Int get() {
         return reader.offset
     }
 

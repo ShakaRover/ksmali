@@ -77,7 +77,11 @@ open class DexBackedDexFile internal constructor(
     override val opcodes: Opcodes
         get() = opcodesField
 
-    private val fileSize: Int
+    /**
+     * Size of single dex file (out of potentially several dex files within a container).
+     */
+    val fileSize: Int
+
     private val stringCount: Int
     private val stringStartOffset: Int
     private val typeCount: Int
@@ -222,23 +226,16 @@ open class DexBackedDexFile internal constructor(
         get() = 0
 
     /**
-     * @return Size of single dex file (out of potentially several dex files within a container).
-     */
-    fun getFileSize(): Int {
-        return fileSize
-    }
-
-    /**
      * @return True if this is the first entry in a DEX container (or classic DEX).
      */
-    fun isDexContainerFirstEntry(): Boolean {
+    val isDexContainerFirstEntry: Boolean get() {
         return headerOffset == 0
     }
 
     /**
      * @return True if this is the last entry in a DEX container, ignoring trailing garbage.
      */
-    fun isDexContainerLastEntry(): Boolean {
+    val isDexContainerLastEntry: Boolean get() {
         return headerOffset + fileSize >= containerSize
     }
 
@@ -518,7 +515,7 @@ open class DexBackedDexFile internal constructor(
                         "Invalid callsite index ${index}, not in [0, ${size})"
                     )
                 }
-                return mapItem!!.getOffset() + index * CallSiteIdItem.ITEM_SIZE
+                return mapItem!!.offset + index * CallSiteIdItem.ITEM_SIZE
             }
         }
 
@@ -542,7 +539,7 @@ open class DexBackedDexFile internal constructor(
                         "Invalid method handle index ${index}, not in [0, ${size})"
                     )
                 }
-                return mapItem!!.getOffset() + index * MethodHandleItem.ITEM_SIZE
+                return mapItem!!.offset + index * MethodHandleItem.ITEM_SIZE
             }
         }
 
@@ -558,7 +555,7 @@ open class DexBackedDexFile internal constructor(
         if (hiddenApiRestrictionsOffset == -1) {
             val mapItem = getMapItemForSection(ItemType.HIDDENAPI_CLASS_DATA_ITEM)
             if (mapItem != null) {
-                hiddenApiRestrictionsOffset = mapItem.getOffset()
+                hiddenApiRestrictionsOffset = mapItem.offset
             } else {
                 hiddenApiRestrictionsOffset = DexWriter.NO_OFFSET
             }

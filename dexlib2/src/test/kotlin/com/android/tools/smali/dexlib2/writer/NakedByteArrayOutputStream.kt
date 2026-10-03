@@ -37,8 +37,8 @@ import java.io.IOException
  * A ByteArrayOutputStream that lets you grab its protected bits.
  */
 class NakedByteArrayOutputStream : ByteArrayOutputStream() {
-    @Throws(IOException::class)
-    fun getBuffer(): ByteArray {
+    @get:Throws(IOException::class)
+    val buffer: ByteArray get() {
         return buf
     }
 }

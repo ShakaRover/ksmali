@@ -195,7 +195,6 @@ class ArraySortedSet<T> private constructor(
         }
 
         /* Copies without duplicates and sorts the given collection to create an ArraySortedSet from it */
-        @Suppress("UNCHECKED_CAST")
         fun <T> copyOf(
             comparator: Comparator<in T>,
             collection: Collection<T>

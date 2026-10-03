@@ -91,7 +91,7 @@ class DexPool(opcodes: Opcodes) : DexWriter<CharSequence, StringReference, CharS
         annotationSetSection,
         encodedArraySection,
     )
-    override fun getSectionProvider(): SectionProvider {
+    override val sectionProvider: SectionProvider get() {
         return DexPoolSectionProvider()
     }
 
@@ -179,51 +179,51 @@ class DexPool(opcodes: Opcodes) : DexWriter<CharSequence, StringReference, CharS
         }
     }
     protected inner class DexPoolSectionProvider : SectionProvider() {
-        override fun getStringSection(): StringPool {
+        override val stringSection: StringPool get() {
             return StringPool(this@DexPool)
         }
 
-        override fun getTypeSection(): TypePool {
+        override val typeSection: TypePool get() {
             return TypePool(this@DexPool)
         }
 
-        override fun getProtoSection(): ProtoPool {
+        override val protoSection: ProtoPool get() {
             return ProtoPool(this@DexPool)
         }
 
-        override fun getFieldSection(): FieldPool {
+        override val fieldSection: FieldPool get() {
             return FieldPool(this@DexPool)
         }
 
-        override fun getMethodSection(): MethodPool {
+        override val methodSection: MethodPool get() {
             return MethodPool(this@DexPool)
         }
 
-        override fun getClassSection(): ClassPool {
+        override val classSection: ClassPool get() {
             return ClassPool(this@DexPool)
         }
 
-        override fun getCallSiteSection(): CallSitePool {
+        override val callSiteSection: CallSitePool get() {
             return CallSitePool(this@DexPool)
         }
 
-        override fun getMethodHandleSection(): MethodHandlePool {
+        override val methodHandleSection: MethodHandlePool get() {
             return MethodHandlePool(this@DexPool)
         }
 
-        override fun getTypeListSection(): TypeListPool {
+        override val typeListSection: TypeListPool get() {
             return TypeListPool(this@DexPool)
         }
 
-        override fun getAnnotationSection(): AnnotationPool {
+        override val annotationSection: AnnotationPool get() {
             return AnnotationPool(this@DexPool)
         }
 
-        override fun getAnnotationSetSection(): AnnotationSetPool {
+        override val annotationSetSection: AnnotationSetPool get() {
             return AnnotationSetPool(this@DexPool)
         }
 
-        override fun getEncodedArraySection(): EncodedArrayPool {
+        override val encodedArraySection: EncodedArrayPool get() {
             return EncodedArrayPool(this@DexPool)
         }
     }

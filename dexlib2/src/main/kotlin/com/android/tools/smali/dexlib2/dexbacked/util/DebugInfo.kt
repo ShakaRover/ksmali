@@ -67,7 +67,7 @@ abstract class DebugInfo : Iterable<DebugItem> {
      *
      * @return size in bytes
      */
-    abstract fun getSize(): Int
+    abstract val size: Int
 
     private class EmptyDebugInfo : DebugInfo() {
         override fun iterator(): MutableIterator<DebugItem> = Collections.emptyIterator()
@@ -76,7 +76,7 @@ abstract class DebugInfo : Iterable<DebugItem> {
             reader: DexReader<out DexBuffer>?
         ): MutableIterator<String?> = Collections.emptyIterator()
 
-        override fun getSize(): Int = 0
+        override val size: Int get() = 0
 
         companion object {
             val INSTANCE = EmptyDebugInfo()
@@ -98,7 +98,7 @@ abstract class DebugInfo : Iterable<DebugItem> {
                 methodImpl.instructionsSize -
                     IteratorUtils.getLast(methodImpl.instructions.iterator()).codeUnits
 
-            //TODO: does dalvik allow references to invalid registers?
+            // TODO: check whether dalvik allows debug info to reference registers outside [0, registerCount).
             val locals = arrayOfNulls<LocalInfo>(registerCount)
             Arrays.fill(locals, EMPTY_LOCAL_INFO)
 
@@ -285,7 +285,7 @@ abstract class DebugInfo : Iterable<DebugItem> {
                 r = dexFile.dataBuffer.readerAt(debugInfoOffset)
                 r.skipUleb128()
             }
-            //TODO: make sure dalvik doesn't allow more parameter names than we have parameters
+            // TODO: guard against a parameter-name list longer than the method's parameter list.
             val parameterNameCount = r.readSmallUleb128()
             return object : VariableSizeIterator<String?>(r, parameterNameCount) {
                 override fun readNextItem(
@@ -295,12 +295,12 @@ abstract class DebugInfo : Iterable<DebugItem> {
             }
         }
 
-        override fun getSize(): Int {
+        override val size: Int get() {
             val iter = iterator()
             while (iter.hasNext()) {
                 iter.next()
             }
-            return iter.getReaderOffset() - debugInfoOffset
+            return iter.readerOffset - debugInfoOffset
         }
 
         companion object {

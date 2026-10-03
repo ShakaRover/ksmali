@@ -56,7 +56,7 @@ class DexFormattedWriterTest {
     fun testWriteMethodDescriptor() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeMethodDescriptor(getMethodReference())
+        writer.writeMethodDescriptor(methodReference)
 
         Assert.assertEquals("Ldefining/class;->methodName(Lparam1;Lparam2;)Lreturn/type;", output.toString())
     }
@@ -66,7 +66,7 @@ class DexFormattedWriterTest {
     fun testWriteShortMethodDescriptor() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeShortMethodDescriptor(getMethodReference())
+        writer.writeShortMethodDescriptor(methodReference)
 
         Assert.assertEquals("methodName(Lparam1;Lparam2;)Lreturn/type;", output.toString())
     }
@@ -76,7 +76,7 @@ class DexFormattedWriterTest {
     fun testWriteMethodProtoDescriptor() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeMethodProtoDescriptor(getMethodProtoReference())
+        writer.writeMethodProtoDescriptor(methodProtoReference)
 
         Assert.assertEquals("(Lparam1;Lparam2;)Lreturn/type;", output.toString())
     }
@@ -86,7 +86,7 @@ class DexFormattedWriterTest {
     fun testWriteFieldDescriptor() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeFieldDescriptor(getFieldReference())
+        writer.writeFieldDescriptor(fieldReference)
 
         Assert.assertEquals("Ldefining/class;->fieldName:Lfield/type;", output.toString())
     }
@@ -96,7 +96,7 @@ class DexFormattedWriterTest {
     fun testWriteShortFieldDescriptor() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeShortFieldDescriptor(getFieldReference())
+        writer.writeShortFieldDescriptor(fieldReference)
 
         Assert.assertEquals("fieldName:Lfield/type;", output.toString())
     }
@@ -106,7 +106,7 @@ class DexFormattedWriterTest {
     fun testWriteMethodHandle_fieldAccess() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeMethodHandle(getMethodHandleReferenceForField())
+        writer.writeMethodHandle(methodHandleReferenceForField)
 
         Assert.assertEquals("instance-get@Ldefining/class;->fieldName:Lfield/type;", output.toString())
     }
@@ -116,7 +116,7 @@ class DexFormattedWriterTest {
     fun testWriteMethodHandle_methodAccess() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeMethodHandle(getMethodHandleReferenceForMethod())
+        writer.writeMethodHandle(methodHandleReferenceForMethod)
 
         Assert.assertEquals("invoke-instance@Ldefining/class;->methodName(Lparam1;Lparam2;)Lreturn/type;",
                 output.toString())
@@ -127,7 +127,7 @@ class DexFormattedWriterTest {
     fun testWriteCallsite() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeCallSite(getCallSiteReference())
+        writer.writeCallSite(callSiteReference)
 
         Assert.assertEquals(
                 "callsiteName(\"callSiteMethodName\", " +
@@ -235,8 +235,8 @@ class DexFormattedWriterTest {
         writer.writeEncodedValue(ImmutableAnnotationEncodedValue(
                 "Lannotation/type;",
                 setOf(
-                        ImmutableAnnotationElement("element1", ImmutableFieldEncodedValue(getFieldReference())),
-                        ImmutableAnnotationElement("element2", ImmutableMethodEncodedValue(getMethodReference()))
+                        ImmutableAnnotationElement("element1", ImmutableFieldEncodedValue(fieldReference)),
+                        ImmutableAnnotationElement("element2", ImmutableMethodEncodedValue(methodReference))
                 )))
 
         Assert.assertEquals(
@@ -252,8 +252,8 @@ class DexFormattedWriterTest {
         val writer = DexFormattedWriter(output)
 
         writer.writeEncodedValue(ImmutableArrayEncodedValue(listOf(
-                ImmutableFieldEncodedValue(getFieldReference()),
-                ImmutableMethodEncodedValue(getMethodReference()))))
+                ImmutableFieldEncodedValue(fieldReference),
+                ImmutableMethodEncodedValue(methodReference))))
 
         Assert.assertEquals(
                 "Array[Ldefining/class;->fieldName:Lfield/type;, " +
@@ -278,7 +278,7 @@ class DexFormattedWriterTest {
     fun testWriteEncodedValue_field() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeEncodedValue(ImmutableFieldEncodedValue(getFieldReference()))
+        writer.writeEncodedValue(ImmutableFieldEncodedValue(fieldReference))
 
         Assert.assertEquals(
                 "Ldefining/class;->fieldName:Lfield/type;",
@@ -290,7 +290,7 @@ class DexFormattedWriterTest {
     fun testWriteEncodedValue_enum() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeEncodedValue(ImmutableEnumEncodedValue(getFieldReference()))
+        writer.writeEncodedValue(ImmutableEnumEncodedValue(fieldReference))
 
         Assert.assertEquals(
                 "Ldefining/class;->fieldName:Lfield/type;",
@@ -302,7 +302,7 @@ class DexFormattedWriterTest {
     fun testWriteEncodedValue_method() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeEncodedValue(ImmutableMethodEncodedValue(getMethodReference()))
+        writer.writeEncodedValue(ImmutableMethodEncodedValue(methodReference))
 
         Assert.assertEquals(
                 "Ldefining/class;->methodName(Lparam1;Lparam2;)Lreturn/type;",
@@ -326,7 +326,7 @@ class DexFormattedWriterTest {
     fun testWriteEncodedValue_methodType() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeEncodedValue(ImmutableMethodTypeEncodedValue(getMethodProtoReference()))
+        writer.writeEncodedValue(ImmutableMethodTypeEncodedValue(methodProtoReference))
 
         Assert.assertEquals(
                 "(Lparam1;Lparam2;)Lreturn/type;",
@@ -338,7 +338,7 @@ class DexFormattedWriterTest {
     fun testWriteEncodedValue_methodHandle() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeEncodedValue(ImmutableMethodHandleEncodedValue(getMethodHandleReferenceForField()))
+        writer.writeEncodedValue(ImmutableMethodHandleEncodedValue(methodHandleReferenceForField))
 
         Assert.assertEquals(
                 "instance-get@Ldefining/class;->fieldName:Lfield/type;",
@@ -386,7 +386,7 @@ class DexFormattedWriterTest {
     fun testWriteReference_field() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeReference(getFieldReference())
+        writer.writeReference(fieldReference)
 
         Assert.assertEquals(
                 "Ldefining/class;->fieldName:Lfield/type;",
@@ -398,7 +398,7 @@ class DexFormattedWriterTest {
     fun testWriteReference_method() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeReference(getMethodReference())
+        writer.writeReference(methodReference)
 
         Assert.assertEquals(
                 "Ldefining/class;->methodName(Lparam1;Lparam2;)Lreturn/type;",
@@ -410,7 +410,7 @@ class DexFormattedWriterTest {
     fun testWriteReference_methodProto() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeReference(getMethodProtoReference())
+        writer.writeReference(methodProtoReference)
 
         Assert.assertEquals(
                 "(Lparam1;Lparam2;)Lreturn/type;",
@@ -422,7 +422,7 @@ class DexFormattedWriterTest {
     fun testWriteReference_methodHandle() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeReference(getMethodHandleReferenceForMethod())
+        writer.writeReference(methodHandleReferenceForMethod)
 
         Assert.assertEquals(
                 "invoke-instance@Ldefining/class;->methodName(Lparam1;Lparam2;)Lreturn/type;",
@@ -434,7 +434,7 @@ class DexFormattedWriterTest {
     fun testWriteReference_callSite() {
         val writer = DexFormattedWriter(output)
 
-        writer.writeReference(getCallSiteReference())
+        writer.writeReference(callSiteReference)
 
         Assert.assertEquals(
                 "callsiteName(\"callSiteMethodName\", " +
@@ -444,7 +444,7 @@ class DexFormattedWriterTest {
                 output.toString())
     }
 
-    private fun getMethodReference(): ImmutableMethodReference {
+    private val methodReference: ImmutableMethodReference get() {
         return ImmutableMethodReference(
                 "Ldefining/class;",
                 "methodName",
@@ -452,45 +452,45 @@ class DexFormattedWriterTest {
                 "Lreturn/type;")
     }
 
-    private fun getMethodProtoReference(): ImmutableMethodProtoReference {
+    private val methodProtoReference: ImmutableMethodProtoReference get() {
         return ImmutableMethodProtoReference(
                 listOf("Lparam1;", "Lparam2;"),
                 "Lreturn/type;")
     }
 
-    private fun getFieldReference(): ImmutableFieldReference {
+    private val fieldReference: ImmutableFieldReference get() {
         return ImmutableFieldReference(
                 "Ldefining/class;",
                 "fieldName",
                 "Lfield/type;")
     }
 
-    private fun getMethodHandleReferenceForField(): ImmutableMethodHandleReference {
+    private val methodHandleReferenceForField: ImmutableMethodHandleReference get() {
         return ImmutableMethodHandleReference(
                 MethodHandleType.INSTANCE_GET,
-                getFieldReference())
+                fieldReference)
     }
 
-    private fun getMethodHandleReferenceForMethod(): MethodHandleReference {
+    private val methodHandleReferenceForMethod: MethodHandleReference get() {
         return ImmutableMethodHandleReference(
                 MethodHandleType.INVOKE_INSTANCE,
-                getMethodReference())
+                methodReference)
     }
 
-    private fun getInvokeStaticMethodHandleReferenceForMethod(): MethodHandleReference {
+    private val invokeStaticMethodHandleReferenceForMethod: MethodHandleReference get() {
         return ImmutableMethodHandleReference(
                 MethodHandleType.INVOKE_STATIC,
-                getMethodReference())
+                methodReference)
     }
 
-    private fun getCallSiteReference(): CallSiteReference {
+    private val callSiteReference: CallSiteReference get() {
         return ImmutableCallSiteReference(
                 "callsiteName",
-                getInvokeStaticMethodHandleReferenceForMethod(),
+                invokeStaticMethodHandleReferenceForMethod,
                 "callSiteMethodName",
-                getMethodProtoReference(),
+                methodProtoReference,
                 listOf(
-                        ImmutableFieldEncodedValue(getFieldReference()),
-                        ImmutableMethodEncodedValue(getMethodReference())))
+                        ImmutableFieldEncodedValue(fieldReference),
+                        ImmutableMethodEncodedValue(methodReference)))
     }
 }

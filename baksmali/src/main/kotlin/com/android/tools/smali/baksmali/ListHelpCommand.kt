@@ -30,7 +30,7 @@
 
 package com.android.tools.smali.baksmali
 
-import com.android.tools.smali.util.getConsoleWidth
+import com.android.tools.smali.util.consoleWidth
 import com.android.tools.smali.util.jcommander.Command
 import com.android.tools.smali.util.jcommander.ExtendedParameter
 import com.android.tools.smali.util.jcommander.ExtendedParameters
@@ -56,7 +56,7 @@ open class ListHelpCommand(commandAncestors: List<JCommander>) : Command(command
         if (cmds.isNullOrEmpty()) {
             System.out.println(
                 HelpFormatter()
-                    .width(getConsoleWidth())
+                    .width(consoleWidth)
                     .format(commandAncestors)
             )
         } else {
@@ -70,15 +70,15 @@ open class ListHelpCommand(commandAncestors: List<JCommander>) : Command(command
                     printedHelp = true
                     System.out.println(
                         HelpFormatter()
-                            .width(getConsoleWidth())
-                            .format((command.objects[0] as Command).getCommandHierarchy())
+                            .width(consoleWidth)
+                            .format((command.objects[0] as Command).commandHierarchy)
                     )
                 }
             }
             if (!printedHelp) {
                 System.out.println(
                     HelpFormatter()
-                        .width(getConsoleWidth())
+                        .width(consoleWidth)
                         .format(commandAncestors)
                 )
             }

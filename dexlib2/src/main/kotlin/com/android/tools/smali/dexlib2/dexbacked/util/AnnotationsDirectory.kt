@@ -34,15 +34,15 @@ import com.android.tools.smali.dexlib2.dexbacked.DexBackedAnnotation
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 
 abstract class AnnotationsDirectory {
-    abstract fun getFieldAnnotationCount(): Int
+    abstract val fieldAnnotationCount: Int
 
-    abstract fun getClassAnnotations(): Set<DexBackedAnnotation>
+    abstract val classAnnotations: Set<DexBackedAnnotation>
 
-    abstract fun getFieldAnnotationIterator(): AnnotationIterator
+    abstract val fieldAnnotationIterator: AnnotationIterator
 
-    abstract fun getMethodAnnotationIterator(): AnnotationIterator
+    abstract val methodAnnotationIterator: AnnotationIterator
 
-    abstract fun getParameterAnnotationIterator(): AnnotationIterator
+    abstract val parameterAnnotationIterator: AnnotationIterator
 
     /**
      * This provides a forward-only, skipable iteration over the field_annotation, method_annotation or
@@ -81,17 +81,17 @@ abstract class AnnotationsDirectory {
 
     companion object {
         val EMPTY: AnnotationsDirectory = object : AnnotationsDirectory() {
-            override fun getFieldAnnotationCount(): Int = 0
+            override val fieldAnnotationCount: Int get() = 0
 
-            override fun getClassAnnotations(): Set<DexBackedAnnotation> = emptySet()
+            override val classAnnotations: Set<DexBackedAnnotation> get() = emptySet()
 
-            override fun getFieldAnnotationIterator(): AnnotationIterator =
+            override val fieldAnnotationIterator: AnnotationIterator get() = 
                 AnnotationIterator.EMPTY
 
-            override fun getMethodAnnotationIterator(): AnnotationIterator =
+            override val methodAnnotationIterator: AnnotationIterator get() = 
                 AnnotationIterator.EMPTY
 
-            override fun getParameterAnnotationIterator(): AnnotationIterator =
+            override val parameterAnnotationIterator: AnnotationIterator get() = 
                 AnnotationIterator.EMPTY
         }
 
@@ -154,54 +154,54 @@ abstract class AnnotationsDirectory {
         val dexFile: DexBackedDexFile,
         private val directoryOffset: Int
     ) : AnnotationsDirectory() {
-        override fun getFieldAnnotationCount(): Int {
+        override val fieldAnnotationCount: Int get() {
             return dexFile.dataBuffer.readSmallUint(directoryOffset + FIELD_COUNT_OFFSET)
         }
 
-        fun getMethodAnnotationCount(): Int {
+        val methodAnnotationCount: Int get() {
             return dexFile.dataBuffer.readSmallUint(directoryOffset + METHOD_COUNT_OFFSET)
         }
 
-        fun getParameterAnnotationCount(): Int {
+        val parameterAnnotationCount: Int get() {
             return dexFile.dataBuffer.readSmallUint(directoryOffset + PARAMETER_COUNT_OFFSET)
         }
 
-        override fun getClassAnnotations(): Set<DexBackedAnnotation> {
+        override val classAnnotations: Set<DexBackedAnnotation> get() {
             return getAnnotations(dexFile, dexFile.dataBuffer.readSmallUint(directoryOffset))
         }
 
-        override fun getFieldAnnotationIterator(): AnnotationIterator {
-            val fieldAnnotationCount = getFieldAnnotationCount()
-            if (fieldAnnotationCount == 0) {
+        override val fieldAnnotationIterator: AnnotationIterator get() {
+            val fieldCount = fieldAnnotationCount
+            if (fieldCount == 0) {
                 return AnnotationIterator.EMPTY
             }
             return AnnotationIteratorImpl(
-                directoryOffset + ANNOTATIONS_START_OFFSET, fieldAnnotationCount
+                directoryOffset + ANNOTATIONS_START_OFFSET, fieldCount
             )
         }
 
-        override fun getMethodAnnotationIterator(): AnnotationIterator {
-            val methodCount = getMethodAnnotationCount()
+        override val methodAnnotationIterator: AnnotationIterator get() {
+            val methodCount = methodAnnotationCount
             if (methodCount == 0) {
                 return AnnotationIterator.EMPTY
             }
-            val fieldCount = getFieldAnnotationCount()
+            val fieldCount = fieldAnnotationCount
             val methodAnnotationsOffset = directoryOffset + ANNOTATIONS_START_OFFSET +
                 fieldCount * FIELD_ANNOTATION_SIZE
             return AnnotationIteratorImpl(methodAnnotationsOffset, methodCount)
         }
 
-        override fun getParameterAnnotationIterator(): AnnotationIterator {
-            val parameterAnnotationCount = getParameterAnnotationCount()
-            if (parameterAnnotationCount == 0) {
+        override val parameterAnnotationIterator: AnnotationIterator get() {
+            val parameterCount = parameterAnnotationCount
+            if (parameterCount == 0) {
                 return AnnotationIterator.EMPTY
             }
-            val fieldCount = getFieldAnnotationCount()
-            val methodCount = getMethodAnnotationCount()
+            val fieldCount = fieldAnnotationCount
+            val methodCount = methodAnnotationCount
             val parameterAnnotationsOffset = directoryOffset + ANNOTATIONS_START_OFFSET +
                 fieldCount * FIELD_ANNOTATION_SIZE +
                 methodCount * METHOD_ANNOTATION_SIZE
-            return AnnotationIteratorImpl(parameterAnnotationsOffset, parameterAnnotationCount)
+            return AnnotationIteratorImpl(parameterAnnotationsOffset, parameterCount)
         }
 
         private inner class AnnotationIteratorImpl(

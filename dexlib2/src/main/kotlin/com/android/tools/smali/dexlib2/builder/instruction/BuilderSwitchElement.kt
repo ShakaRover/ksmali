@@ -38,10 +38,8 @@ import com.android.tools.smali.dexlib2.iface.instruction.SwitchElement
 open class BuilderSwitchElement(
     private val parent: BuilderSwitchPayload,
     override val key: Int,
-    private val target: Label
+    val target: Label
 ) : SwitchElement {
     override val offset: Int
         get() = target.codeAddress - parent.requireReferrer().codeAddress
-
-    fun getTarget(): Label = target
 }

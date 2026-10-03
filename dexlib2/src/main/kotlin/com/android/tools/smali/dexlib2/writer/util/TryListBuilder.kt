@@ -175,7 +175,7 @@ open class TryListBuilder<EH : ExceptionHandler> {
         } while (tryBlock.prev !== endBlock)
     }
 
-    fun getTryBlocks(): List<TryBlock<EH>> {
+    val tryBlocks: List<TryBlock<EH>> get() {
         return IteratorUtils.toList(object : MutableIterator<TryBlock<EH>> {
             // The next TryBlock to return. This has already been merged, if needed.
             private var next: MutableTryBlock<EH>? = null
@@ -330,7 +330,7 @@ open class TryListBuilder<EH : ExceptionHandler> {
                     tlb.addHandler(startAddress, endAddress, exceptionHandler)
                 }
             }
-            return tlb.getTryBlocks()
+            return tlb.tryBlocks
         }
     }
 }

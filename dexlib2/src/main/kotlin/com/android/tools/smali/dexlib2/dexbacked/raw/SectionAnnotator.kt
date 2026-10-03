@@ -55,15 +55,15 @@ abstract class SectionAnnotator(
         this.itemType = mapItem.type
 
         if (mapItem.type >= ItemType.MAP_LIST) {
-            this.sectionOffset = mapItem.getOffset() + dexFile.baseDataOffset
+            this.sectionOffset = mapItem.offset + dexFile.baseDataOffset
         } else {
-            this.sectionOffset = mapItem.getOffset()
+            this.sectionOffset = mapItem.offset
         }
 
         this.itemCount = mapItem.itemCount
     }
 
-    abstract fun getItemName(): String
+    abstract val itemName: String
 
     protected abstract fun annotateItem(
         out: AnnotatedBytes,
@@ -82,15 +82,15 @@ abstract class SectionAnnotator(
     }
 
     protected open fun getItemOffset(itemIndex: Int, currentOffset: Int): Int {
-        return alignOffset(currentOffset, getItemAlignment())
+        return alignOffset(currentOffset, itemAlignment)
     }
 
     protected fun annotateSectionInner(out: AnnotatedBytes, itemCount: Int) {
-        val itemName = getItemName()
+        val name = itemName
         if (itemCount > 0) {
             out.annotate(0, "")
             out.annotate(0, "-----------------------------")
-            out.annotate(0, "%s section", itemName)
+            out.annotate(0, "%s section", name)
             out.annotate(0, "-----------------------------")
             out.annotate(0, "")
 
@@ -99,9 +99,9 @@ abstract class SectionAnnotator(
 
                 val itemIdentity = getItemIdentity(out.cursor)
                 if (itemIdentity != null) {
-                    out.annotate(0, "[%d] %s: %s", i, itemName, itemIdentity)
+                    out.annotate(0, "[%d] %s: %s", i, name, itemIdentity)
                 } else {
-                    out.annotate(0, "[%d] %s", i, itemName)
+                    out.annotate(0, "[%d] %s", i, name)
                 }
                 out.indent()
                 annotateItem(out, i, itemIdentity)
@@ -118,7 +118,7 @@ abstract class SectionAnnotator(
         itemIdentities[itemOffset + dexFile.baseDataOffset] = identity
     }
 
-    open fun getItemAlignment(): Int {
+    open val itemAlignment: Int get() {
         return 1
     }
 }

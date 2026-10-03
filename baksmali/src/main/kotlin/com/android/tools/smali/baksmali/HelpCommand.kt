@@ -35,7 +35,7 @@ import com.android.tools.smali.util.jcommander.ExtendedParameter
 import com.android.tools.smali.util.jcommander.ExtendedParameters
 import com.android.tools.smali.util.jcommander.HelpFormatter
 import com.android.tools.smali.util.jcommander.getSubcommand
-import com.android.tools.smali.util.getConsoleWidth
+import com.android.tools.smali.util.consoleWidth
 import com.android.tools.smali.util.StringWrapper
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
@@ -80,7 +80,7 @@ open class HelpCommand(commandAncestors: List<JCommander>) : Command(commandAnce
                             System.err.println("No such command: $cmd")
                         } else {
                             printedHelp = true
-                            printCommandUsage((command.objects[0] as Command).getCommandHierarchy())
+                            printCommandUsage((command.objects[0] as Command).commandHierarchy)
                         }
                     }
                 }
@@ -92,11 +92,11 @@ open class HelpCommand(commandAncestors: List<JCommander>) : Command(commandAnce
     }
 
     private fun printCommandUsage(commandHierarchy: List<JCommander>) {
-        System.out.println(HelpFormatter().width(getConsoleWidth()).format(commandHierarchy))
+        System.out.println(HelpFormatter().width(consoleWidth).format(commandHierarchy))
     }
 
     private fun printWrapped(message: String) {
-        val lines = StringWrapper.wrapStringOnBreaks(message, getConsoleWidth())
+        val lines = StringWrapper.wrapStringOnBreaks(message, consoleWidth)
         for (line in lines) {
             System.out.println(line)
         }

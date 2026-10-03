@@ -339,7 +339,7 @@ open class MutableMethodImplementation : MethodImplementation {
         old!!.location = null
         replaceLocation.instruction = replacementInstruction
 
-        // TODO: factor out index/address fix up loop
+        // TODO: factor the index/address fix-up loop out of this method.
         var codeAddress = replaceLocation.codeAddress + replaceLocation.instruction!!.codeUnits
         for (i in index + 1 until instructionList.size) {
             val location = instructionList[i]
@@ -1206,7 +1206,7 @@ open class MutableMethodImplementation : MethodImplementation {
             // instruction.
             // We need to search for all occurrences of a switch reference, so we can detect when multiple switch
             // statements refer to the same payload
-            // TODO: confirm that it could refer to the first NOP in a series of NOPs preceding the payload
+            // TODO: confirm the target may be the first NOP in a run of NOPs preceding the payload, not just the payload's own NOP.
             if (location.index == 0) {
                 return switchLocation
             }

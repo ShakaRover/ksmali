@@ -73,7 +73,7 @@ open class InstructionMethodItem<T : Instruction>(
             return false
         }
 
-        return opcode.isVolatileFieldAccessor() || opcode == Opcode.THROW_VERIFICATION_ERROR
+        return opcode.isVolatileFieldAccessor || opcode == Opcode.THROW_VERIFICATION_ERROR
     }
 
     private fun interface Writable {

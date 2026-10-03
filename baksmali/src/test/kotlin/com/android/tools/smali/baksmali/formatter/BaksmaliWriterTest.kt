@@ -67,7 +67,7 @@ class BaksmaliWriterTest {
     fun testWriteMethodDescriptor_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeMethodDescriptor(getMethodReferenceWithSpaces())
+        writer.writeMethodDescriptor(methodReferenceWithSpaces)
 
         Assert.assertEquals(
             "Ldefining/class/`with spaces`;->`methodName with spaces`(L`param with spaces 1`;L`param with spaces 2`;)" +
@@ -80,7 +80,7 @@ class BaksmaliWriterTest {
     fun testWriteShortMethodDescriptor_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeShortMethodDescriptor(getMethodReferenceWithSpaces())
+        writer.writeShortMethodDescriptor(methodReferenceWithSpaces)
 
         Assert.assertEquals(
             "`methodName with spaces`(L`param with spaces 1`;L`param with spaces 2`;)" +
@@ -93,7 +93,7 @@ class BaksmaliWriterTest {
     fun testWriteMethodProtoDescriptor_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeMethodProtoDescriptor(getMethodProtoReferenceWithSpaces())
+        writer.writeMethodProtoDescriptor(methodProtoReferenceWithSpaces)
 
         Assert.assertEquals(
             "(L`param with spaces 1`;L`param with spaces 2`;)Lreturn/type/`with spaces`;",
@@ -105,7 +105,7 @@ class BaksmaliWriterTest {
     fun testWriteFieldDescriptor_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeFieldDescriptor(getFieldReferenceWithSpaces())
+        writer.writeFieldDescriptor(fieldReferenceWithSpaces)
 
         Assert.assertEquals(
             "Ldefining/class/`with spaces`;->`fieldName with spaces`:Lfield/`type with spaces`;",
@@ -117,7 +117,7 @@ class BaksmaliWriterTest {
     fun testWriteShortFieldDescriptor_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeShortFieldDescriptor(getFieldReferenceWithSpaces())
+        writer.writeShortFieldDescriptor(fieldReferenceWithSpaces)
 
         Assert.assertEquals(
             "`fieldName with spaces`:Lfield/`type with spaces`;",
@@ -129,7 +129,7 @@ class BaksmaliWriterTest {
     fun testWriteMethodHandle_fieldAccess_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeMethodHandle(getMethodHandleReferenceForFieldWithSpaces())
+        writer.writeMethodHandle(methodHandleReferenceForFieldWithSpaces)
 
         Assert.assertEquals(
             "instance-get@Ldefining/class/`with spaces`;->`fieldName with spaces`:" +
@@ -141,7 +141,7 @@ class BaksmaliWriterTest {
     fun testWriteMethodHandle_methodAccess_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeMethodHandle(getMethodHandleReferenceForMethodWithSpaces())
+        writer.writeMethodHandle(methodHandleReferenceForMethodWithSpaces)
 
         Assert.assertEquals(
             "invoke-instance@Ldefining/class/`with spaces`;->`methodName with spaces`(" +
@@ -156,12 +156,12 @@ class BaksmaliWriterTest {
 
         writer.writeCallSite(ImmutableCallSiteReference(
             "callsiteName with spaces",
-            getInvokeStaticMethodHandleReferenceForMethodWithSpaces(),
+            invokeStaticMethodHandleReferenceForMethodWithSpaces,
             "callSiteMethodName with spaces",
-            getMethodProtoReferenceWithSpaces(),
+            methodProtoReferenceWithSpaces,
             listOf(
-                ImmutableFieldEncodedValue(getFieldReferenceWithSpaces()),
-                ImmutableMethodEncodedValue(getMethodReferenceWithSpaces()))))
+                ImmutableFieldEncodedValue(fieldReferenceWithSpaces),
+                ImmutableMethodEncodedValue(methodReferenceWithSpaces))))
 
         Assert.assertEquals(
             "`callsiteName with spaces`(\"callSiteMethodName with spaces\", " +
@@ -184,10 +184,10 @@ class BaksmaliWriterTest {
             setOf(
                 ImmutableAnnotationElement(
                     "element with spaces 1",
-                    ImmutableFieldEncodedValue(getFieldReferenceWithSpaces())),
+                    ImmutableFieldEncodedValue(fieldReferenceWithSpaces)),
                 ImmutableAnnotationElement(
                     "element with spaces 2",
-                    ImmutableMethodEncodedValue(getMethodReferenceWithSpaces()))
+                    ImmutableMethodEncodedValue(methodReferenceWithSpaces))
             )))
 
         Assert.assertEquals(
@@ -205,8 +205,8 @@ class BaksmaliWriterTest {
         val writer = BaksmaliWriter(output)
 
         writer.writeEncodedValue(ImmutableArrayEncodedValue(listOf(
-            ImmutableFieldEncodedValue(getFieldReferenceWithSpaces()),
-            ImmutableMethodEncodedValue(getMethodReferenceWithSpaces()))))
+            ImmutableFieldEncodedValue(fieldReferenceWithSpaces),
+            ImmutableMethodEncodedValue(methodReferenceWithSpaces))))
 
         Assert.assertEquals(
             "{" + System.lineSeparator() +
@@ -221,7 +221,7 @@ class BaksmaliWriterTest {
     fun testWriteEncodedValue_field_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeEncodedValue(ImmutableFieldEncodedValue(getFieldReferenceWithSpaces()))
+        writer.writeEncodedValue(ImmutableFieldEncodedValue(fieldReferenceWithSpaces))
 
         Assert.assertEquals(
             "Ldefining/class/`with spaces`;->`fieldName with spaces`:Lfield/`type with spaces`;",
@@ -233,7 +233,7 @@ class BaksmaliWriterTest {
     fun testWriteEncodedValue_enum_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeEncodedValue(ImmutableEnumEncodedValue(getFieldReferenceWithSpaces()))
+        writer.writeEncodedValue(ImmutableEnumEncodedValue(fieldReferenceWithSpaces))
 
         Assert.assertEquals(
             ".enum Ldefining/class/`with spaces`;->`fieldName with spaces`:Lfield/`type with spaces`;",
@@ -245,7 +245,7 @@ class BaksmaliWriterTest {
     fun testWriteEncodedValue_method_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeEncodedValue(ImmutableMethodEncodedValue(getMethodReferenceWithSpaces()))
+        writer.writeEncodedValue(ImmutableMethodEncodedValue(methodReferenceWithSpaces))
 
         Assert.assertEquals(
             "Ldefining/class/`with spaces`;->`methodName with spaces`(" +
@@ -270,7 +270,7 @@ class BaksmaliWriterTest {
     fun testWriteEncodedValue_methodType_withSpaces() {
         val writer = BaksmaliWriter(output)
 
-        writer.writeEncodedValue(ImmutableMethodTypeEncodedValue(getMethodProtoReferenceWithSpaces()))
+        writer.writeEncodedValue(ImmutableMethodTypeEncodedValue(methodProtoReferenceWithSpaces))
 
         Assert.assertEquals(
             "(L`param with spaces 1`;L`param with spaces 2`;)Lreturn/type/`with spaces`;",
@@ -283,7 +283,7 @@ class BaksmaliWriterTest {
         val writer = BaksmaliWriter(output)
 
         writer.writeEncodedValue(
-            ImmutableMethodHandleEncodedValue(getMethodHandleReferenceForMethodWithSpaces()))
+            ImmutableMethodHandleEncodedValue(methodHandleReferenceForMethodWithSpaces))
 
         Assert.assertEquals(
             "invoke-instance@Ldefining/class/`with spaces`;->`methodName with spaces`(" +
@@ -402,7 +402,7 @@ class BaksmaliWriterTest {
         return output.toString()
     }
 
-    private fun getMethodReferenceWithSpaces(): ImmutableMethodReference {
+    private val methodReferenceWithSpaces: ImmutableMethodReference get() {
         return ImmutableMethodReference(
             "Ldefining/class/with spaces;",
             "methodName with spaces",
@@ -410,34 +410,34 @@ class BaksmaliWriterTest {
             "Lreturn/type/with spaces;")
     }
 
-    private fun getMethodProtoReferenceWithSpaces(): ImmutableMethodProtoReference {
+    private val methodProtoReferenceWithSpaces: ImmutableMethodProtoReference get() {
         return ImmutableMethodProtoReference(
             listOf("Lparam with spaces 1;", "Lparam with spaces 2;"),
             "Lreturn/type/with spaces;")
     }
 
-    private fun getFieldReferenceWithSpaces(): ImmutableFieldReference {
+    private val fieldReferenceWithSpaces: ImmutableFieldReference get() {
         return ImmutableFieldReference(
             "Ldefining/class/with spaces;",
             "fieldName with spaces",
             "Lfield/type with spaces;")
     }
 
-    private fun getMethodHandleReferenceForFieldWithSpaces(): MethodHandleReference {
+    private val methodHandleReferenceForFieldWithSpaces: MethodHandleReference get() {
         return ImmutableMethodHandleReference(
             MethodHandleType.INSTANCE_GET,
-            getFieldReferenceWithSpaces())
+            fieldReferenceWithSpaces)
     }
 
-    private fun getMethodHandleReferenceForMethodWithSpaces(): ImmutableMethodHandleReference {
+    private val methodHandleReferenceForMethodWithSpaces: ImmutableMethodHandleReference get() {
         return ImmutableMethodHandleReference(
             MethodHandleType.INVOKE_INSTANCE,
-            getMethodReferenceWithSpaces())
+            methodReferenceWithSpaces)
     }
 
-    private fun getInvokeStaticMethodHandleReferenceForMethodWithSpaces(): MethodHandleReference {
+    private val invokeStaticMethodHandleReferenceForMethodWithSpaces: MethodHandleReference get() {
         return ImmutableMethodHandleReference(
             MethodHandleType.INVOKE_STATIC,
-            getMethodReferenceWithSpaces())
+            methodReferenceWithSpaces)
     }
 }

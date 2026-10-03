@@ -97,7 +97,7 @@ open class ListDependenciesCommand(commandAncestors: List<JCommander>) : Command
         }
 
         try {
-            val odexFile = DexBackedOdexFile.fromInputStream(Opcodes.getDefault(), requireNotNull(inputStream))
+            val odexFile = DexBackedOdexFile.fromInputStream(Opcodes.default, requireNotNull(inputStream))
             for (entry in odexFile.dependencies) {
                 System.out.println(entry)
             }

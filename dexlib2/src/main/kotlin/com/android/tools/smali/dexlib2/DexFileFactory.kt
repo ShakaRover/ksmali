@@ -113,7 +113,7 @@ object DexFileFactory {
             }
 
             if (oatFile != null) {
-                if (oatFile.isSupportedVersion() == OatFile.UNSUPPORTED) {
+                if (oatFile.isSupportedVersion == OatFile.UNSUPPORTED) {
                     throw UnsupportedOatVersionException(oatFile)
                 }
 
@@ -197,7 +197,7 @@ object DexFileFactory {
             }
 
             if (oatFile != null) {
-                if (oatFile.isSupportedVersion() == OatFile.UNSUPPORTED) {
+                if (oatFile.isSupportedVersion == OatFile.UNSUPPORTED) {
                     throw UnsupportedOatVersionException(oatFile)
                 }
 
@@ -263,8 +263,8 @@ object DexFileFactory {
             }
 
             if (oatFile != null) {
-                // TODO: we should support loading earlier oat files, just not deodexing them
-                if (oatFile.isSupportedVersion() == OatFile.UNSUPPORTED) {
+                // TODO: support loading earlier oat files here, even though they cannot be deodexed.
+                if (oatFile.isSupportedVersion == OatFile.UNSUPPORTED) {
                     throw UnsupportedOatVersionException(oatFile)
                 }
                 return oatFile

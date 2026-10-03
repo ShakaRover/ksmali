@@ -358,19 +358,19 @@ enum class Opcode(
         return (flags and SETS_WIDE_REGISTER) != 0
     }
 
-    fun isQuickFieldaccessor(): Boolean {
+    val isQuickFieldaccessor: Boolean get() {
         return (flags and QUICK_FIELD_ACCESSOR) != 0
     }
 
-    fun isVolatileFieldAccessor(): Boolean {
+    val isVolatileFieldAccessor: Boolean get() {
         return (flags and VOLATILE_FIELD_ACCESSOR) != 0
     }
 
-    fun isStaticFieldAccessor(): Boolean {
+    val isStaticFieldAccessor: Boolean get() {
         return (flags and STATIC_FIELD_ACCESSOR) != 0
     }
 
-    fun isJumboOpcode(): Boolean {
+    val isJumboOpcode: Boolean get() {
         return (flags and JUMBO_OPCODE) != 0
     }
 

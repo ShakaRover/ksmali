@@ -48,7 +48,7 @@ class AccessorTest {
     fun testAccessors() {
         val url = AccessorTest::class.java.classLoader.getResource("accessorTest.dex")
         Assert.assertNotNull(url)
-        val f = DexFileFactory.loadDexFile(url!!.file, Opcodes.getDefault())
+        val f = DexFileFactory.loadDexFile(url!!.file, Opcodes.default)
 
         val sar = SyntheticAccessorResolver(f.opcodes, f.classes)
 

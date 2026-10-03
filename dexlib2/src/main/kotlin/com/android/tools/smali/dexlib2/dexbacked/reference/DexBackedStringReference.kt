@@ -51,7 +51,7 @@ class DexBackedStringReference(
      *
      * @return size in bytes
      */
-    fun getSize(): Int {
+    val size: Int get() {
         var size = StringIdItem.ITEM_SIZE //uint for string_data_off
         //add the string data length:
         val stringOffset = dexFile.stringSection.getOffset(stringIndex)

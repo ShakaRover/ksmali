@@ -210,19 +210,19 @@ abstract class DexWriter<
     protected constructor(opcodes: Opcodes) {
         this.opcodes = opcodes
 
-        val sectionProvider = getSectionProvider()
-        this.stringSection = sectionProvider.getStringSection()
-        this.typeSection = sectionProvider.getTypeSection()
-        this.protoSection = sectionProvider.getProtoSection()
-        this.fieldSection = sectionProvider.getFieldSection()
-        this.methodSection = sectionProvider.getMethodSection()
-        this.classSection = sectionProvider.getClassSection()
-        this.callSiteSection = sectionProvider.getCallSiteSection()
-        this.methodHandleSection = sectionProvider.getMethodHandleSection()
-        this.typeListSection = sectionProvider.getTypeListSection()
-        this.annotationSection = sectionProvider.getAnnotationSection()
-        this.annotationSetSection = sectionProvider.getAnnotationSetSection()
-        this.encodedArraySection = sectionProvider.getEncodedArraySection()
+        val provider = sectionProvider
+        this.stringSection = provider.stringSection
+        this.typeSection = provider.typeSection
+        this.protoSection = provider.protoSection
+        this.fieldSection = provider.fieldSection
+        this.methodSection = provider.methodSection
+        this.classSection = provider.classSection
+        this.callSiteSection = provider.callSiteSection
+        this.methodHandleSection = provider.methodHandleSection
+        this.typeListSection = provider.typeListSection
+        this.annotationSection = provider.annotationSection
+        this.annotationSetSection = provider.annotationSetSection
+        this.encodedArraySection = provider.encodedArraySection
 
         overflowableSections = arrayOf(
             //stringSection,            // supports jumbo indexes
@@ -236,7 +236,7 @@ abstract class DexWriter<
         )
     }
 
-    protected abstract fun getSectionProvider(): SectionProvider
+    protected abstract val sectionProvider: SectionProvider
 
     @Throws(IOException::class)
     protected abstract fun writeEncodedValue(writer: InternalEncodedValueWriter, encodedValue: EncodedValue)
@@ -258,7 +258,7 @@ abstract class DexWriter<
             this@DexWriter.writeEncodedValue(this, encodedValue)
         }
     }
-    private fun getDataSectionOffset(): Int {
+    private val dataSectionOffset: Int get() {
         return HeaderItem.ITEM_SIZE +
             stringSection.itemCount * StringIdItem.ITEM_SIZE +
             typeSection.itemCount * TypeIdItem.ITEM_SIZE +
@@ -270,7 +270,7 @@ abstract class DexWriter<
             methodHandleSection.itemCount * MethodHandleItem.ITEM_SIZE
     }
 
-    fun getMethodReferences(): List<String> {
+    val methodReferences: List<String> get() {
         val methodReferences = ArrayList<String>()
         for (methodReference in methodSection.items) {
             methodReferences.add(DexFormatter.INSTANCE.getMethodDescriptor(methodReference.key))
@@ -278,7 +278,7 @@ abstract class DexWriter<
         return methodReferences
     }
 
-    fun getFieldReferences(): List<String> {
+    val fieldReferences: List<String> get() {
         val fieldReferences = ArrayList<String>()
         for (fieldReference in fieldSection.items) {
             fieldReferences.add(DexFormatter.INSTANCE.getFieldDescriptor(fieldReference.key))
@@ -286,7 +286,7 @@ abstract class DexWriter<
         return fieldReferences
     }
 
-    fun getTypeReferences(): List<String> {
+    val typeReferences: List<String> get() {
         val classReferences = ArrayList<String>()
         for (typeReference in typeSection.items) {
             classReferences.add(typeReference.key.toString())
@@ -322,8 +322,6 @@ abstract class DexWriter<
     @Throws(IOException::class)
     fun writeTo(dest: DexDataStore, tempFactory: DeferredOutputStreamFactory = MemoryDeferredOutputStream.factory) {
         try {
-            val dataSectionOffset = getDataSectionOffset()
-
             outputAt(dest, 0).use { headerWriter ->
                 outputAt(dest, HeaderItem.ITEM_SIZE).use { indexWriter ->
                     outputAt(dest, dataSectionOffset).use { offsetWriter ->
@@ -1546,18 +1544,18 @@ abstract class DexWriter<
     }
 
     abstract inner class SectionProvider {
-        abstract fun getStringSection(): StringSectionType
-        abstract fun getTypeSection(): TypeSectionType
-        abstract fun getProtoSection(): ProtoSectionType
-        abstract fun getFieldSection(): FieldSectionType
-        abstract fun getMethodSection(): MethodSectionType
-        abstract fun getClassSection(): ClassSectionType
-        abstract fun getCallSiteSection(): CallSiteSectionType
-        abstract fun getMethodHandleSection(): MethodHandleSectionType
-        abstract fun getTypeListSection(): TypeListSectionType
-        abstract fun getAnnotationSection(): AnnotationSectionType
-        abstract fun getAnnotationSetSection(): AnnotationSetSectionType
-        abstract fun getEncodedArraySection(): EncodedArraySectionType
+        abstract val stringSection: StringSectionType
+        abstract val typeSection: TypeSectionType
+        abstract val protoSection: ProtoSectionType
+        abstract val fieldSection: FieldSectionType
+        abstract val methodSection: MethodSectionType
+        abstract val classSection: ClassSectionType
+        abstract val callSiteSection: CallSiteSectionType
+        abstract val methodHandleSection: MethodHandleSectionType
+        abstract val typeListSection: TypeListSectionType
+        abstract val annotationSection: AnnotationSectionType
+        abstract val annotationSetSection: AnnotationSetSectionType
+        abstract val encodedArraySection: EncodedArraySectionType
     }
     companion object {
         const val NO_INDEX = -1

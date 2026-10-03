@@ -61,7 +61,7 @@ class Opcodes private constructor(api: Int, artVersion: Int) {
         }
 
         val version: Int
-        if (isArt()) {
+        if (isArt) {
             version = this.artVersion
         } else {
             version = this.api
@@ -69,7 +69,7 @@ class Opcodes private constructor(api: Int, artVersion: Int) {
 
         for (opcode in Opcode.values()) {
             val versionToValueMap: UnmodifiableRangeMap<Int, Short> =
-                if (isArt()) opcode.artVersionToValueMap else opcode.apiToValueMap
+                if (isArt) opcode.artVersionToValueMap else opcode.apiToValueMap
 
             val opcodeValue = versionToValueMap.get(version)
             if (opcodeValue != null) {
@@ -105,7 +105,7 @@ class Opcodes private constructor(api: Int, artVersion: Int) {
         return opcodeValues[opcode]
     }
 
-    fun isArt(): Boolean {
+    val isArt: Boolean get() {
         return artVersion != VersionMap.NO_VERSION
     }
 
@@ -130,7 +130,7 @@ class Opcodes private constructor(api: Int, artVersion: Int) {
         /**
          * @return a default Opcodes instance for when the exact Opcodes to use doesn't matter or isn't known
          */
-        fun getDefault(): Opcodes {
+        val default: Opcodes get() {
             // The last pre-art api
             return forApi(20)
         }

@@ -37,13 +37,13 @@ import com.android.tools.smali.dexlib2.dexbacked.value.DexBackedEncodedValue
 import com.android.tools.smali.dexlib2.iface.value.EncodedValue
 
 abstract class EncodedArrayItemIterator {
-    abstract fun getNextOrNull(): EncodedValue?
+    abstract val nextOrNull: EncodedValue?
 
     abstract fun skipNext()
 
-    abstract fun getReaderOffset(): Int
+    abstract val readerOffset: Int
 
-    abstract fun getItemCount(): Int
+    abstract val itemCount: Int
 
     private class EncodedArrayItemIteratorImpl(
         dexFile: DexBackedDexFile,
@@ -54,7 +54,7 @@ abstract class EncodedArrayItemIterator {
         private val size: Int = reader.readSmallUleb128()
         private var index = 0
 
-        override fun getNextOrNull(): EncodedValue? {
+        override val nextOrNull: EncodedValue? get() {
             if (index < size) {
                 index++
                 return DexBackedEncodedValue.readFrom(dexFile, reader)
@@ -69,25 +69,25 @@ abstract class EncodedArrayItemIterator {
             }
         }
 
-        override fun getReaderOffset(): Int {
+        override val readerOffset: Int get() {
             return reader.offset
         }
 
-        override fun getItemCount(): Int {
+        override val itemCount: Int get() {
             return size
         }
     }
 
     companion object {
         val EMPTY: EncodedArrayItemIterator = object : EncodedArrayItemIterator() {
-            override fun getNextOrNull(): EncodedValue? = null
+            override val nextOrNull: EncodedValue? get() = null
 
             override fun skipNext() {
             }
 
-            override fun getReaderOffset(): Int = 0
+            override val readerOffset: Int get() = 0
 
-            override fun getItemCount(): Int = 0
+            override val itemCount: Int get() = 0
         }
 
         fun newOrEmpty(dexFile: DexBackedDexFile, offset: Int): EncodedArrayItemIterator {

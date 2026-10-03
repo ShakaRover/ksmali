@@ -170,7 +170,7 @@ class MethodAnalyzerTest {
                 AccessFlags.PUBLIC.value, null, null, methodImplementation)
         val classDef = ImmutableClassDef("Lmain;", AccessFlags.PUBLIC.value, "Ljava/lang/Object;", null,
                 null, null, null, listOf(method))
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), listOf(classDef))
+        val dexFile = ImmutableDexFile(Opcodes.default, listOf(classDef))
 
         val classPath = ClassPath(DexClassProvider(dexFile))
         val methodAnalyzer = MethodAnalyzer(classPath, method, null, false)
@@ -240,7 +240,7 @@ class MethodAnalyzerTest {
                 AccessFlags.PUBLIC.value, null, null, methodImplementation)
         val classDef = ImmutableClassDef("Lmain;", AccessFlags.PUBLIC.value, "Ljava/lang/Object;", null,
                 null, null, null, listOf(method))
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), listOf(classDef))
+        val dexFile = ImmutableDexFile(Opcodes.default, listOf(classDef))
 
         val classPath = ClassPath(DexClassProvider(dexFile))
         val methodAnalyzer = MethodAnalyzer(classPath, method, null, false)

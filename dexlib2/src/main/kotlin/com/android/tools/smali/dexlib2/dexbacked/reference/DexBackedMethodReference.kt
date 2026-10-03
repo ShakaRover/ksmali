@@ -109,7 +109,7 @@ class DexBackedMethodReference(
      *
      * @return size in bytes
      */
-    fun getSize(): Int {
+    val size: Int get() {
         return MethodIdItem.ITEM_SIZE //ushort + ushort + uint for indices
     }
 

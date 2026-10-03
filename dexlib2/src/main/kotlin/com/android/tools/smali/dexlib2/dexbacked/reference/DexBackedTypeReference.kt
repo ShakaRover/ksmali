@@ -49,7 +49,7 @@ class DexBackedTypeReference(
      *
      * @return size in bytes
      */
-    fun getSize(): Int {
+    val size: Int get() {
         return TypeIdItem.ITEM_SIZE //uint for descriptor_idx
     }
 

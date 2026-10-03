@@ -73,7 +73,7 @@ class MethodDefinition(
 
     init {
         try {
-            //TODO: what about try/catch blocks inside the dead code? those will need to be commented out too. ugh.
+            // TODO: also comment out try/catch blocks that fall inside dead code.
 
             var endOffset = instructionOffsetMap.getInstructionCodeOffset(instructions.size - 1) +
                 instructions[instructions.size - 1].codeUnits
@@ -260,7 +260,6 @@ class MethodDefinition(
 
         writer.write('\n')
 
-        val methodItems = getMethodItems()
         for (methodItem in methodItems) {
             if (methodItem.writeTo(writer)) {
                 writer.write('\n')
@@ -278,8 +277,8 @@ class MethodDefinition(
             throw InvalidSwitchPayload(targetOffset)
         }
 
-        //TODO: does dalvik let you pad with multiple nops?
-        //TODO: does dalvik let a switch instruction point to a non-payload instruction?
+        // TODO: confirm dalvik allows a switch target to be padded with multiple NOPs.
+        // TODO: confirm dalvik allows a switch target to point at a non-payload instruction.
 
         var instruction = instructions[targetIndex]
         if (instruction.opcode != type) {
@@ -307,8 +306,8 @@ class MethodDefinition(
             throw InvalidSwitchPayload(targetOffset)
         }
 
-        //TODO: does dalvik let you pad with multiple nops?
-        //TODO: does dalvik let a switch instruction point to a non-payload instruction?
+        // TODO: confirm dalvik allows a switch target to be padded with multiple NOPs.
+        // TODO: confirm dalvik allows a switch target to point at a non-payload instruction.
 
         var instruction = instructions[targetIndex]
         if (instruction.opcode != type) {
@@ -336,7 +335,7 @@ class MethodDefinition(
         return sparseSwitchMap.get(sparseSwitchPayloadCodeOffset, -1)
     }
 
-    private fun getMethodItems(): List<MethodItem> {
+    private val methodItems: List<MethodItem> get() {
         val methodItems = mutableListOf<MethodItem>()
 
         if ((classDef.options.registerInfo != 0) || classDef.options.normalizeVirtualMethods ||
@@ -434,7 +433,7 @@ class MethodDefinition(
 
         val analysisException = methodAnalyzer.analysisException
         if (analysisException != null) {
-            // TODO: need to keep track of whether any errors occurred, so we can exit with a non-zero result
+            // TODO: track whether any analysis errors occurred so the process can exit with a non-zero result.
             methodItems.add(CommentMethodItem(
                 "AnalysisException: ${analysisException.message}",
                 analysisException.codeAddress, Integer.MIN_VALUE.toDouble()))

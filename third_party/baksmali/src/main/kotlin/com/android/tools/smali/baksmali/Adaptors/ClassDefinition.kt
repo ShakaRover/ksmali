@@ -255,7 +255,7 @@ class ClassDefinition(
             }
             writer.write('\n')
 
-            // TODO: check for method validation errors
+            // TODO: surface method validation errors here instead of writing the method unconditionally.
             val methodString = formatter.getShortMethodDescriptor(method)
 
             var methodWriter = writer
@@ -294,7 +294,7 @@ class ClassDefinition(
             }
             writer.write('\n')
 
-            // TODO: check for method validation errors
+            // TODO: surface method validation errors here instead of writing the method unconditionally.
             val methodString = formatter.getShortMethodDescriptor(method)
 
             var methodWriter = writer

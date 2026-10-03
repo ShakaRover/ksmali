@@ -268,11 +268,11 @@ object CodeItem {
     ) : SectionAnnotator(annotator, mapItem) {
         private var debugInfoAnnotator: SectionAnnotator? = null
 
-        override fun getItemName(): String {
+        override val itemName: String get() {
             return "code_item"
         }
 
-        override fun getItemAlignment(): Int {
+        override val itemAlignment: Int get() {
             return 4
         }
 

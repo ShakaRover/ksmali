@@ -286,7 +286,7 @@ open class AnalyzedInstruction(
         return false
     }
 
-    fun isInvokeInit(): Boolean {
+    val isInvokeInit: Boolean get() {
         if (!instruction.opcode.canInitializeReference()) {
             return false
         }
@@ -311,7 +311,7 @@ open class AnalyzedInstruction(
         // However, this is a frequently called method, and this is a more efficient implementation, because it doesn't
         // allocate a new list, and it can potentially exit earlier
 
-        if (isInvokeInit()) {
+        if (isInvokeInit) {
             // When constructing a new object, the register type will be an uninitialized reference after the
             // new-instance instruction, but becomes an initialized reference once the <init> method is called. So even
             // though invoke instructions don't normally change any registers, calling an <init> method will change the
@@ -360,7 +360,7 @@ open class AnalyzedInstruction(
         // In order to correctly handle this case, we have to propagate the narrowed register type to the appropriate
         // branch of the following if-eqz/if-nez
         if (instructionIndex > 0 &&
-            methodAnalyzer.classPath.isArt() &&
+            methodAnalyzer.classPath.isArt &&
             predecessorCount == 1 &&
             (instruction.opcode == Opcode.IF_EQZ || instruction.opcode == Opcode.IF_NEZ)
         ) {
@@ -381,7 +381,7 @@ open class AnalyzedInstruction(
                 // new register type for the original register that the value was moved from.
                 // In some cases, the instance-of may have multiple predecessors. In this case, we should only do the
                 // propagation if all predecessors are move-object instructions for the same source register
-                // TODO: do we need to do some sort of additional check that these multiple move-object predecessors actually refer to the same value?
+                // TODO: when there are multiple move-object predecessors, verify that they all refer to the same value before propagating.
                 if (instructionIndex > 1) {
                     var originalSourceRegister = -1
 
@@ -439,28 +439,28 @@ open class AnalyzedInstruction(
         if (!instruction.opcode.setsRegister()) {
             return false
         }
-        val destinationRegister = getDestinationRegister()
+        val destRegister = destinationRegister
 
-        if (registerNumber == destinationRegister) {
+        if (registerNumber == destRegister) {
             return true
         }
-        if (instruction.opcode.setsWideRegister() && registerNumber == destinationRegister + 1) {
+        if (instruction.opcode.setsWideRegister() && registerNumber == destRegister + 1) {
             return true
         }
         return false
     }
 
-    fun getSetRegisters(): List<Int> {
+    val setRegisters: List<Int> get() {
         val setRegisters = ArrayList<Int>()
 
         if (instruction.opcode.setsRegister()) {
-            setRegisters.add(getDestinationRegister())
+            setRegisters.add(destinationRegister)
         }
         if (instruction.opcode.setsWideRegister()) {
-            setRegisters.add(getDestinationRegister() + 1)
+            setRegisters.add(destinationRegister + 1)
         }
 
-        if (isInvokeInit()) {
+        if (isInvokeInit) {
             //When constructing a new object, the register type will be an uninitialized reference after the new-instance
             //instruction, but becomes an initialized reference once the <init> method is called. So even though invoke
             //instructions don't normally change any registers, calling an <init> method will change the type of its
@@ -524,7 +524,7 @@ open class AnalyzedInstruction(
         // In order to correctly handle this case, we have to propagate the narrowed register type to the appropriate
         // branch of the following if-eqz/if-nez
         if (instructionIndex > 0 &&
-            methodAnalyzer.classPath.isArt() &&
+            methodAnalyzer.classPath.isArt &&
             predecessorCount == 1 &&
             (instruction.opcode == Opcode.IF_EQZ || instruction.opcode == Opcode.IF_NEZ)
         ) {
@@ -542,7 +542,7 @@ open class AnalyzedInstruction(
                 // new register type for the original register that the value was moved from.
                 // In some cases, the instance-of may have multiple predecessors. In this case, we should only do the
                 // propagation if all predecessors are move-object instructions for the same source register
-                // TODO: do we need to do some sort of additional check that these multiple move-object predecessors actually refer to the same value?
+                // TODO: when there are multiple move-object predecessors, verify that they all refer to the same value before propagating.
                 if (instructionIndex > 1) {
                     var originalSourceRegister = -1
 
@@ -600,10 +600,10 @@ open class AnalyzedInstruction(
         return setRegisters
     }
 
-    fun getDestinationRegister(): Int {
+    val destinationRegister: Int get() {
         if (!this.instruction.opcode.setsRegister()) {
             throw ExceptionWithContext(
-                "Cannot call getDestinationRegister() for an instruction that doesn't " +
+                "Cannot call destinationRegister for an instruction that doesn't " +
                         "store a value"
             )
         }

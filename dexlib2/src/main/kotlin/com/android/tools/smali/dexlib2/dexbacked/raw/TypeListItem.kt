@@ -40,7 +40,7 @@ object TypeListItem {
 
     fun makeAnnotator(annotator: DexAnnotator, mapItem: MapItem): SectionAnnotator {
         return object : SectionAnnotator(annotator, mapItem) {
-            override fun getItemName(): String {
+            override val itemName: String get() {
                 return "type_list"
             }
 
@@ -54,7 +54,7 @@ object TypeListItem {
                 }
             }
 
-            override fun getItemAlignment(): Int {
+            override val itemAlignment: Int get() {
                 return 4
             }
         }

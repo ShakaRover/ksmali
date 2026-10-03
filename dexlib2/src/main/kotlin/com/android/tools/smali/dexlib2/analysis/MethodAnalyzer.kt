@@ -326,10 +326,10 @@ open class MethodAnalyzer(
     }
 
     val analyzedInstructions: List<AnalyzedInstruction>
-        get() = analyzedInstructionsByAddress.getValues()
+        get() = analyzedInstructionsByAddress.values
 
-    fun getInstructions(): List<Instruction> {
-        return analyzedInstructionsByAddress.getValues().map { it.instruction }
+    val instructions: List<Instruction> get() {
+        return analyzedInstructionsByAddress.values.map { it.instruction }
     }
 
     val analysisException: AnalysisException?
@@ -347,7 +347,7 @@ open class MethodAnalyzer(
         registerType: RegisterType
     ) {
         setPostRegisterTypeAndPropagateChanges(
-            analyzedInstruction, analyzedInstruction.getDestinationRegister(),
+            analyzedInstruction, analyzedInstruction.destinationRegister,
             registerType
         )
     }
@@ -889,7 +889,7 @@ open class MethodAnalyzer(
                 return true
             }
             Opcode.INVOKE_STATIC -> return true
-            Opcode.INVOKE_INTERFACE -> // TODO: normalize interfaces
+            Opcode.INVOKE_INTERFACE -> // TODO: normalize the interface reference before analyzing this invoke-interface.
                 return true
             Opcode.INVOKE_VIRTUAL_RANGE -> {
                 analyzeInvokeVirtual(analyzedInstruction, true)
@@ -904,7 +904,7 @@ open class MethodAnalyzer(
                 return true
             }
             Opcode.INVOKE_STATIC_RANGE -> return true
-            Opcode.INVOKE_INTERFACE_RANGE -> // TODO: normalize interfaces
+            Opcode.INVOKE_INTERFACE_RANGE -> // TODO: normalize the interface reference before analyzing this invoke-interface-range.
                 return true
             Opcode.NEG_INT,
             Opcode.NOT_INT -> {
@@ -1237,12 +1237,12 @@ open class MethodAnalyzer(
             analyzedIfInstruction: AnalyzedInstruction,
             classPath: ClassPath
         ): Boolean {
-            if (!classPath.isArt()) {
+            if (!classPath.isArt) {
                 return false
             }
 
             val ifInstruction = analyzedIfInstruction.instruction
-            if ((ifInstruction as Instruction21t).registerA == analyzedInstanceOfInstruction.getDestinationRegister()) {
+            if ((ifInstruction as Instruction21t).registerA == analyzedInstanceOfInstruction.destinationRegister) {
                 val reference: Reference =
                     (analyzedInstanceOfInstruction.instruction as Instruction22c).reference
                 val registerType = RegisterType.getRegisterType(classPath, reference as TypeReference)
@@ -1417,7 +1417,7 @@ open class MethodAnalyzer(
      * narrow the type if possible, and then NOP out any corresponding check-cast instruction later on
      */
     private fun analyzeIfEqzNez(analyzedInstruction: AnalyzedInstruction) {
-        if (classPath.isArt()) {
+        if (classPath.isArt) {
             val instructionIndex = analyzedInstruction.instructionIndex
             if (instructionIndex > 0) {
                 if (analyzedInstruction.predecessorCount != 1) {
@@ -1443,7 +1443,7 @@ open class MethodAnalyzer(
                         instanceOfInstruction.reference as TypeReference
                     )
 
-                    for (register in analyzedInstruction.getSetRegisters()) {
+                    for (register in analyzedInstruction.setRegisters) {
                         if (analyzedInstruction.instruction.opcode == Opcode.IF_EQZ) {
                             overridePredecessorRegisterTypeAndPropagateChanges(
                                 fallthroughInstruction,
@@ -1574,7 +1574,7 @@ open class MethodAnalyzer(
 
             val arrayProto = arrayRegisterType.type as ArrayProto
 
-            val elementType = arrayProto.getImmediateElementType()
+            val elementType = arrayProto.immediateElementType
 
             setDestinationRegisterTypeAndPropagateChanges(
                 analyzedInstruction,
@@ -1623,16 +1623,16 @@ open class MethodAnalyzer(
         // register, so we don't stop propagation.
         //
         // We check for any of these unpropagated uninitialized references here and propagate them.
-        if (analyzedInstruction.isInvokeInit()) {
+        if (analyzedInstruction.isInvokeInit) {
             val uninitRef = analyzedInstruction.getPreInstructionRegisterType(objectRegister)
             if (uninitRef.category != RegisterType.UNINIT_REF && uninitRef.category != RegisterType.UNINIT_THIS) {
-                assert(analyzedInstruction.getSetRegisters().isEmpty())
+                assert(analyzedInstruction.setRegisters.isEmpty())
                 return
             }
 
             val initRef = RegisterType.getRegisterType(RegisterType.REFERENCE, uninitRef.type)
 
-            for (register in analyzedInstruction.getSetRegisters()) {
+            for (register in analyzedInstruction.setRegisters) {
                 val registerType = analyzedInstruction.getPreInstructionRegisterType(register)
 
                 if (registerType == uninitRef) {
@@ -1957,7 +1957,7 @@ open class MethodAnalyzer(
 
         val fieldType = resolvedField!!.type
 
-        val opcode = classPath.getFieldInstructionMapper().getAndCheckDeodexedOpcode(
+        val opcode = classPath.fieldInstructionMapper.getAndCheckDeodexedOpcode(
             fieldType, instruction.opcode
         )
 
@@ -2160,13 +2160,13 @@ open class MethodAnalyzer(
 
         val originalOpcode = analyzedInstruction.instruction.opcode
 
-        val opcode = classPath.getFieldInstructionMapper().getAndCheckDeodexedOpcode(
+        val opcode = classPath.fieldInstructionMapper.getAndCheckDeodexedOpcode(
             fieldType, originalOpcode
         )
 
         val deodexedInstruction: Instruction
 
-        if (originalOpcode.isStaticFieldAccessor()) {
+        if (originalOpcode.isStaticFieldAccessor) {
             val instruction = analyzedInstruction.instruction as OneRegisterInstruction
             deodexedInstruction = ImmutableInstruction21c(opcode, instruction.registerA, field)
         } else {

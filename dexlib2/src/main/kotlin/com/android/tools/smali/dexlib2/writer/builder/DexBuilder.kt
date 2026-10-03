@@ -103,7 +103,7 @@ class DexBuilder(opcodes: Opcodes) : DexWriter<BuilderStringReference, BuilderSt
     BuilderAnnotationElement, BuilderStringPool, BuilderTypePool, BuilderProtoPool, BuilderFieldPool,
     BuilderMethodPool, BuilderClassPool, BuilderCallSitePool, BuilderMethodHandlePool, BuilderTypeListPool,
     BuilderAnnotationPool, BuilderAnnotationSetPool, BuilderEncodedArrayPool>(opcodes) {
-    override fun getSectionProvider(): SectionProvider {
+    override val sectionProvider: SectionProvider get() {
         return DexBuilderSectionProvider()
     }
 
@@ -400,51 +400,51 @@ class DexBuilder(opcodes: Opcodes) : DexWriter<BuilderStringReference, BuilderSt
         return BuilderMethodHandleEncodedValue(methodHandleSection.internMethodHandle(methodHandle.value))
     }
     protected inner class DexBuilderSectionProvider : SectionProvider() {
-        override fun getStringSection(): BuilderStringPool {
+        override val stringSection: BuilderStringPool get() {
             return BuilderStringPool()
         }
 
-        override fun getTypeSection(): BuilderTypePool {
+        override val typeSection: BuilderTypePool get() {
             return BuilderTypePool(this@DexBuilder)
         }
 
-        override fun getProtoSection(): BuilderProtoPool {
+        override val protoSection: BuilderProtoPool get() {
             return BuilderProtoPool(this@DexBuilder)
         }
 
-        override fun getFieldSection(): BuilderFieldPool {
+        override val fieldSection: BuilderFieldPool get() {
             return BuilderFieldPool(this@DexBuilder)
         }
 
-        override fun getMethodSection(): BuilderMethodPool {
+        override val methodSection: BuilderMethodPool get() {
             return BuilderMethodPool(this@DexBuilder)
         }
 
-        override fun getClassSection(): BuilderClassPool {
+        override val classSection: BuilderClassPool get() {
             return BuilderClassPool(this@DexBuilder)
         }
 
-        override fun getCallSiteSection(): BuilderCallSitePool {
+        override val callSiteSection: BuilderCallSitePool get() {
             return BuilderCallSitePool(this@DexBuilder)
         }
 
-        override fun getMethodHandleSection(): BuilderMethodHandlePool {
+        override val methodHandleSection: BuilderMethodHandlePool get() {
             return BuilderMethodHandlePool(this@DexBuilder)
         }
 
-        override fun getTypeListSection(): BuilderTypeListPool {
+        override val typeListSection: BuilderTypeListPool get() {
             return BuilderTypeListPool(this@DexBuilder)
         }
 
-        override fun getAnnotationSection(): BuilderAnnotationPool {
+        override val annotationSection: BuilderAnnotationPool get() {
             return BuilderAnnotationPool(this@DexBuilder)
         }
 
-        override fun getAnnotationSetSection(): BuilderAnnotationSetPool {
+        override val annotationSetSection: BuilderAnnotationSetPool get() {
             return BuilderAnnotationSetPool(this@DexBuilder)
         }
 
-        override fun getEncodedArraySection(): BuilderEncodedArrayPool {
+        override val encodedArraySection: BuilderEncodedArrayPool get() {
             return BuilderEncodedArrayPool(this@DexBuilder)
         }
     }

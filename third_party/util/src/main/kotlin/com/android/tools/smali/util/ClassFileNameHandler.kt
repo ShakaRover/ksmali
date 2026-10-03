@@ -58,7 +58,7 @@ class ClassFileNameHandler {
     constructor(path: File, fileExtension: String) {
         this.top = DirectoryEntry(path)
         this.fileExtension = fileExtension
-        this.modifyWindowsReservedFilenames = isWindows()
+        this.modifyWindowsReservedFilenames = isWindows
     }
 
     // for testing
@@ -70,7 +70,7 @@ class ClassFileNameHandler {
         this.modifyWindowsReservedFilenames = modifyWindowsReservedFilenames
     }
 
-    private fun getMaxFilenameLength(): Int {
+    private val maxFilenameLength: Int get() {
         return MAX_FILENAME_LENGTH - NUMERIC_SUFFIX_RESERVE
     }
 
@@ -151,7 +151,7 @@ class ClassFileNameHandler {
         fun getNormalizedName(preserveCase: Boolean): String {
             var elementName = logicalName
             val parent = this.parent
-            if (!preserveCase && parent != null && !parent.isCaseSensitive()) {
+            if (!preserveCase && parent != null && !parent.isCaseSensitive) {
                 elementName = elementName.lowercase(Locale.getDefault())
             }
 
@@ -160,8 +160,8 @@ class ClassFileNameHandler {
             }
 
             val elementUtf8Length = utf8Length(elementName)
-            if (elementUtf8Length > getMaxFilenameLength()) {
-                elementName = shortenPathComponent(elementName, elementUtf8Length - getMaxFilenameLength())
+            if (elementUtf8Length > maxFilenameLength) {
+                elementName = shortenPathComponent(elementName, elementUtf8Length - maxFilenameLength)
             }
             return elementName
         }
@@ -267,7 +267,7 @@ class ClassFileNameHandler {
             }
         }
 
-        fun isCaseSensitive(): Boolean {
+        val isCaseSensitive: Boolean get() {
             if (physicalName == null || file == null) {
                 throw IllegalStateException("Must call setSuffix() first")
             }
@@ -416,7 +416,7 @@ class ClassFileNameHandler {
             }
         }
 
-        private fun isWindows(): Boolean {
+        private val isWindows: Boolean get() {
             return System.getProperty("os.name").startsWith("Windows")
         }
 

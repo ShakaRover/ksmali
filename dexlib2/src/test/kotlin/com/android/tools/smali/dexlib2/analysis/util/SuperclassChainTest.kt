@@ -55,7 +55,7 @@ class SuperclassChainTest {
             objectClassDef, oneClassDef, twoClassDef, threeClassDef
         )
 
-        val classPath = ClassPath(DexClassProvider(ImmutableDexFile(Opcodes.getDefault(), classes)))
+        val classPath = ClassPath(DexClassProvider(ImmutableDexFile(Opcodes.default, classes)))
 
         val objectClassProto = classPath.getClass("Ljava/lang/Object;")
         val oneClassProto = classPath.getClass("Ltest/one;")
@@ -91,9 +91,9 @@ class SuperclassChainTest {
         val twoClassDef = TestUtils.makeClassDef("Ltest/two;", "Ltest/one;")
         val threeClassDef = TestUtils.makeClassDef("Ltest/three;", "Ltest/two;")
         val classes = setOf<ClassDef>(twoClassDef, threeClassDef)
-        val classPath = ClassPath(DexClassProvider(ImmutableDexFile(Opcodes.getDefault(), classes)))
+        val classPath = ClassPath(DexClassProvider(ImmutableDexFile(Opcodes.default, classes)))
 
-        val unknownClassProto = classPath.getUnknownClass()
+        val unknownClassProto = classPath.unknownClass
         val oneClassProto = classPath.getClass("Ltest/one;")
         val twoClassProto = classPath.getClass("Ltest/two;")
         val threeClassProto = classPath.getClass("Ltest/three;")

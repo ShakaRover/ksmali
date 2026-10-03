@@ -90,7 +90,7 @@ class CommonSuperclassTest {
                 TestUtils.makeClassDef("Liface/classsub1234;", "Ljava/lang/Object;", "Liface/sub1;",
                         "Liface/sub2;", "Liface/sub3;", "Liface/sub4;"))
 
-        oldClassPath = ClassPath(DexClassProvider(ImmutableDexFile(Opcodes.getDefault(), classes)))
+        oldClassPath = ClassPath(DexClassProvider(ImmutableDexFile(Opcodes.default, classes)))
         newClassPath = ClassPath(mutableListOf(DexClassProvider(
                 ImmutableDexFile(Opcodes.forArtVersion(72), classes))), true, 72)
     }

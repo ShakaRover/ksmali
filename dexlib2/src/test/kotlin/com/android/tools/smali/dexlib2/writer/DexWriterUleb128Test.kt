@@ -231,7 +231,7 @@ class DexWriterUleb128Test {
         writer.writeUleb128(integerValue)
         writer.flush()
 
-        val writtenData = output.getBuffer()
+        val writtenData = output.buffer
 
         Assert.assertEquals(startPosition + encodedLength, writer.position)
         for (i in 0 until encodedLength) {

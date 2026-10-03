@@ -36,7 +36,7 @@ import java.util.regex.Pattern
  * Attempt to find the width of the console. If it can't get the width, return a default of 80
  * @return The current console width
  */
-fun getConsoleWidth(): Int {
+val consoleWidth: Int get() {
     if (System.getProperty("os.name").lowercase(Locale.getDefault()).contains("windows")) {
         try {
             return attemptMode()

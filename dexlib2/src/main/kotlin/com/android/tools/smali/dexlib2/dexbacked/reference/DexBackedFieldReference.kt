@@ -67,7 +67,7 @@ class DexBackedFieldReference(
      *
      * @return size in bytes
      */
-    fun getSize(): Int {
+    val size: Int get() {
         return FieldIdItem.ITEM_SIZE
     }
 

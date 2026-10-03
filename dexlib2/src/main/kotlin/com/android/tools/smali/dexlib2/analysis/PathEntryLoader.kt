@@ -46,7 +46,7 @@ open class PathEntryLoader(var opcodes: Opcodes) {
 
     val classProviders: MutableList<ClassProvider> = ArrayList()
 
-    fun getResolvedClassProviders(): List<ClassProvider> {
+    val resolvedClassProviders: List<ClassProvider> get() {
         return classProviders
     }
 

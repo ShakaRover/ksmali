@@ -58,13 +58,13 @@ class DexBackedCallSiteReference(
     override val methodHandle: MethodHandleReference
         get() {
             val iter = callSiteIterator
-            if (iter.getItemCount() < 3) {
+            if (iter.itemCount < 3) {
                 throw ExceptionWithContext(
                     "Invalid call site item: must contain at least 3 entries."
                 )
             }
 
-            val encodedValue = callSiteIterator.getNextOrNull()
+            val encodedValue = callSiteIterator.nextOrNull
             assert(encodedValue != null)
             if (encodedValue!!.valueType != ValueType.METHOD_HANDLE) {
                 throw ExceptionWithContext(
@@ -78,14 +78,14 @@ class DexBackedCallSiteReference(
     override val methodName: String
         get() {
             val iter = callSiteIterator
-            if (iter.getItemCount() < 3) {
+            if (iter.itemCount < 3) {
                 throw ExceptionWithContext(
                     "Invalid call site item: must contain at least 3 entries."
                 )
             }
 
             iter.skipNext()
-            val encodedValue = iter.getNextOrNull()
+            val encodedValue = iter.nextOrNull
             assert(encodedValue != null)
             if (encodedValue!!.valueType != ValueType.STRING) {
                 throw ExceptionWithContext(
@@ -99,7 +99,7 @@ class DexBackedCallSiteReference(
     override val methodProto: MethodProtoReference
         get() {
             val iter = callSiteIterator
-            if (iter.getItemCount() < 3) {
+            if (iter.itemCount < 3) {
                 throw ExceptionWithContext(
                     "Invalid call site item: must contain at least 3 entries."
                 )
@@ -107,7 +107,7 @@ class DexBackedCallSiteReference(
 
             iter.skipNext()
             iter.skipNext()
-            val encodedValue = iter.getNextOrNull()
+            val encodedValue = iter.nextOrNull
             assert(encodedValue != null)
             if (encodedValue!!.valueType != ValueType.METHOD_TYPE) {
                 throw ExceptionWithContext(
@@ -123,12 +123,12 @@ class DexBackedCallSiteReference(
             val values = ArrayList<EncodedValue>()
 
             val iter = callSiteIterator
-            if (iter.getItemCount() < 3) {
+            if (iter.itemCount < 3) {
                 throw ExceptionWithContext(
                     "Invalid call site item: must contain at least 3 entries."
                 )
             }
-            if (iter.getItemCount() == 3) {
+            if (iter.itemCount == 3) {
                 return values
             }
 
@@ -136,10 +136,10 @@ class DexBackedCallSiteReference(
             iter.skipNext()
             iter.skipNext()
 
-            var item = iter.getNextOrNull()
+            var item = iter.nextOrNull
             while (item != null) {
                 values.add(item)
-                item = iter.getNextOrNull()
+                item = iter.nextOrNull
             }
             return values
         }

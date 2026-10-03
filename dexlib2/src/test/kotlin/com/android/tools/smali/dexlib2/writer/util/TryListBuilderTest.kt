@@ -45,7 +45,7 @@ class TryListBuilderTest {
 
         tlb.addHandler(0, 10, ImmutableExceptionHandler(null, 5))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(ImmutableTryBlock(0, 10,
                 listOf(ImmutableExceptionHandler(null, 5))))
@@ -59,7 +59,7 @@ class TryListBuilderTest {
 
         tlb.addHandler(5, 10, ImmutableExceptionHandler(null, 15))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(ImmutableTryBlock(5, 5,
                 listOf(ImmutableExceptionHandler(null, 15))))
@@ -73,7 +73,7 @@ class TryListBuilderTest {
 
         tlb.addHandler(0, 10, ImmutableExceptionHandler("Ljava/lang/Exception;", 5))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(ImmutableTryBlock(0, 10,
                 listOf(ImmutableExceptionHandler("Ljava/lang/Exception;", 5))))
@@ -87,7 +87,7 @@ class TryListBuilderTest {
 
         tlb.addHandler(5, 10, ImmutableExceptionHandler("Ljava/lang/Exception;", 15))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(ImmutableTryBlock(5, 5,
                 listOf(ImmutableExceptionHandler("Ljava/lang/Exception;", 15))))
@@ -102,7 +102,7 @@ class TryListBuilderTest {
         tlb.addHandler(0, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(10, 20, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 10,
@@ -120,7 +120,7 @@ class TryListBuilderTest {
         tlb.addHandler(0, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(15, 20, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 10,
@@ -138,7 +138,7 @@ class TryListBuilderTest {
         tlb.addHandler(5, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 5, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 5,
@@ -156,7 +156,7 @@ class TryListBuilderTest {
         tlb.addHandler(5, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 3, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 3,
@@ -174,7 +174,7 @@ class TryListBuilderTest {
         tlb.addHandler(0, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 10, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 10,
@@ -192,7 +192,7 @@ class TryListBuilderTest {
         tlb.addHandler(0, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 5, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 5,
@@ -213,7 +213,7 @@ class TryListBuilderTest {
         tlb.addHandler(0, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(2, 7, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 2,
@@ -237,7 +237,7 @@ class TryListBuilderTest {
         tlb.addHandler(0, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(5, 10, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 5,
@@ -258,7 +258,7 @@ class TryListBuilderTest {
         tlb.addHandler(0, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 15, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 10,
@@ -279,7 +279,7 @@ class TryListBuilderTest {
         tlb.addHandler(0, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(5, 15, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 5,
@@ -303,7 +303,7 @@ class TryListBuilderTest {
         tlb.addHandler(5, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 10, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 5,
@@ -324,7 +324,7 @@ class TryListBuilderTest {
         tlb.addHandler(5, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 7, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 5,
@@ -348,7 +348,7 @@ class TryListBuilderTest {
         tlb.addHandler(5, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 15, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 5,
@@ -373,7 +373,7 @@ class TryListBuilderTest {
         tlb.addHandler(10, 14, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 15, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 1,
@@ -404,7 +404,7 @@ class TryListBuilderTest {
         tlb.addHandler(5, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 15, ImmutableExceptionHandler("LException1;", 5))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 15,
@@ -421,7 +421,7 @@ class TryListBuilderTest {
         tlb.addHandler(5, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 15, ImmutableExceptionHandler("LException2;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 5,
@@ -454,7 +454,7 @@ class TryListBuilderTest {
         tlb.addHandler(5, 10, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(0, 15, ImmutableExceptionHandler(null, 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 5,
@@ -478,7 +478,7 @@ class TryListBuilderTest {
         tlb.addHandler(5, 10, ImmutableExceptionHandler(null, 5))
         tlb.addHandler(0, 15, ImmutableExceptionHandler("LException1;", 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 5,
@@ -502,7 +502,7 @@ class TryListBuilderTest {
         tlb.addHandler(5, 10, ImmutableExceptionHandler(null, 5))
         tlb.addHandler(0, 15, ImmutableExceptionHandler(null, 5))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 15,
@@ -534,7 +534,7 @@ class TryListBuilderTest {
         tlb.addHandler(20, 30, ImmutableExceptionHandler("LException1;", 5))
         tlb.addHandler(25, 40, ImmutableExceptionHandler(null, 6))
 
-        val tryBlocks = tlb.getTryBlocks()
+        val tryBlocks = tlb.tryBlocks
 
         val expected = listOf(
                 ImmutableTryBlock(0, 10,

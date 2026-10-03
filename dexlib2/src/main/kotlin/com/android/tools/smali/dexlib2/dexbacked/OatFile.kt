@@ -95,7 +95,7 @@ class OatFile constructor(
     val oatVersion: Int
         get() = oatHeader.version
 
-    fun isSupportedVersion(): Int {
+    val isSupportedVersion: Int get() {
         val version = oatVersion
         if (version < MIN_OAT_VERSION) {
             return UNSUPPORTED
@@ -119,7 +119,7 @@ class OatFile constructor(
         get() {
             return object : AbstractForwardSequentialList<DexBackedDexFile>() {
                 override val size: Int
-                    get() = DexEntryIterator().getSize()
+                    get() = DexEntryIterator().size
 
                 override fun iterator(): MutableIterator<DexBackedDexFile> {
                     return TransformedIterator(
@@ -136,7 +136,7 @@ class OatFile constructor(
     override val dexEntryNames: List<String>
         get() = object : AbstractForwardSequentialList<String>() {
             override val size: Int
-                get() = DexEntryIterator().getSize()
+                get() = DexEntryIterator().size
 
             override fun iterator(): MutableIterator<String> {
                 return TransformedIterator(
@@ -567,7 +567,7 @@ class OatFile constructor(
                 val filenameLength = readSmallUint(offset)
                 offset += 4
 
-                // TODO: what is the correct character encoding?
+                // TODO: verify the correct character encoding; oat filenames are currently decoded as US-ASCII.
                 val filename = String(buf, offset, filenameLength, Charset.forName("US-ASCII"))
                 offset += filenameLength
 
@@ -640,7 +640,7 @@ class OatFile constructor(
          * Returns the number of elements remaining in `iterator`. The iterator will be left
          * exhausted: its `hasNext()` method will return `false`.
          */
-        fun getSize(): Int {
+        val size: Int get() {
             var count = 0
             while (hasNext()) {
                 if (next() != null) {

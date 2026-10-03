@@ -90,7 +90,7 @@ class ZipDexContainer constructor(
         // LinkedHashMap is used to preserve the strict deterministic insertion ordering of entries.
         val localEntries = LinkedHashMap<String, ZipDexEntry>()
         entries = localEntries
-        getZipFile().use { zipFile ->
+        zipFile.use { zipFile ->
             val validZipEntries = HashMap<String, ZipEntry>()
             val entriesEnumeration = zipFile.entries()
 
@@ -133,8 +133,8 @@ class ZipDexContainer constructor(
                 var fileSize = 0
                 try {
                     val dex = DexBackedDexFile(opcodes, buf, 0, true, headerOffset)
-                    isLast = dex.isDexContainerLastEntry()
-                    fileSize = dex.getFileSize()
+                    isLast = dex.isDexContainerLastEntry
+                    fileSize = dex.fileSize
                 } catch (ex: NotADexFile) {
                     if (ignoreInvalid) return
                     isLast = true
@@ -189,7 +189,7 @@ class ZipDexContainer constructor(
     val isZipFile: Boolean
         get() {
             try {
-                getZipFile().use {
+                zipFile.use {
                     return true
                 }
             } catch (ex: IOException) {
@@ -215,8 +215,8 @@ class ZipDexContainer constructor(
         return true
     }
 
-    @Throws(IOException::class)
-    protected fun getZipFile(): ZipFile {
+    @get:Throws(IOException::class)
+    protected val zipFile: ZipFile get() {
         try {
             return ZipFile(zipFilePath)
         } catch (ex: IOException) {

@@ -61,7 +61,7 @@ class RewriteArrayTypeTest {
             )
         )
 
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), setOf(class1))
+        val dexFile = ImmutableDexFile(Opcodes.default, setOf(class1))
 
         val rewriter = DexRewriter(object : RewriterModule() {
             override fun getTypeRewriter(rewriters: Rewriters): Rewriter<String> {
@@ -99,7 +99,7 @@ class RewriteArrayTypeTest {
             )
         )
 
-        val dexFile = ImmutableDexFile(Opcodes.getDefault(), setOf(class1))
+        val dexFile = ImmutableDexFile(Opcodes.default, setOf(class1))
 
         val rewriter = DexRewriter(RewriterModule())
 

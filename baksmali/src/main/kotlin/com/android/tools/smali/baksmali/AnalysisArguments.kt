@@ -136,8 +136,8 @@ open class AnalysisArguments {
 
         val bootClassPath = this.bootClassPath
         if (bootClassPath == null) {
-            // TODO: we should be able to get the api from the Opcodes object associated with the dexFile..
-            // except that the oat version -> api mapping doesn't fully work yet
+            // TODO: obtain the api from the Opcodes object associated with the dexFile instead of
+            // defaulting it; the oat version -> api mapping required for that is not complete yet.
             resolver = ClassPathResolver(filteredClassPathDirectories, classPath, dexEntry)
         } else if (bootClassPath.size == 1 && bootClassPath[0].isEmpty()) {
             // --bootclasspath "" is a special case, denoting that no bootclasspath should be used
