@@ -64,6 +64,11 @@ sourceSets {
     }
 }
 
+// The Kotlin sources reference the ANTLR-generated Java parser/lexer/tree-walker, so make the
+// generated-source tasks explicit inputs of the Kotlin compilation tasks.
+tasks.named('compileKotlin') { dependsOn 'generateGrammarSource' }
+tasks.named('compileTestKotlin') { dependsOn 'generateTestGrammarSource' }
+
 idea {
     module {
         excludeDirs -= buildDir
