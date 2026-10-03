@@ -1,17 +1,17 @@
 /*
- * Copyright 2016, Google LLC
+ * Copyright 2012, Google LLC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
  *
- * Redistributions of source code must retain the above copyright
+ *     * Redistributions of source code must retain the above copyright
  * notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above
+ *     * Redistributions in binary form must reproduce the above
  * copyright notice, this list of conditions and the following disclaimer
  * in the documentation and/or other materials provided with the
  * distribution.
- * Neither the name of Google LLC nor the names of its
+ *     * Neither the name of Google LLC nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -28,27 +28,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.android.tools.smali.dexlib2.analysis;
 
-import com.android.tools.smali.dexlib2.DexFileFactory.UnsupportedFileTypeException;
-import com.android.tools.smali.dexlib2.dexbacked.DexBackedOdexFile;
-import com.android.tools.smali.dexlib2.dexbacked.OatFile;
-import com.android.tools.smali.dexlib2.iface.DexFile;
-import com.android.tools.smali.dexlib2.iface.MultiDexContainer;
-import com.android.tools.smali.dexlib2.iface.MultiDexContainer.DexEntry;
-import com.android.tools.smali.util.StringUtils;
+package com.android.tools.smali.dexlib2.analysis
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import com.android.tools.smali.dexlib2.DexFileFactory.UnsupportedFileTypeException
+import com.android.tools.smali.dexlib2.dexbacked.DexBackedOdexFile
+import com.android.tools.smali.dexlib2.dexbacked.OatFile
+import com.android.tools.smali.dexlib2.iface.DexFile
+import com.android.tools.smali.dexlib2.iface.MultiDexContainer
+import com.android.tools.smali.dexlib2.iface.MultiDexContainer.DexEntry
+import com.android.tools.smali.util.StringUtils
+import java.io.File
+import java.io.IOException
+import java.util.Arrays
 
-public class ClassPathResolver {
-    private final Iterable<String> classPathDirs;
+open class ClassPathResolver @Throws(IOException::class) constructor(
+    bootClassPathDirs: List<String>,
+    bootClassPathEntries: List<String>?,
+    extraClassPathEntries: List<String>,
+    dexEntry: DexEntry<*>
+) {
+    private val classPathDirs: Iterable<String>
 
-    private final PathEntryLoader pathEntryLoader;
+    private val pathEntryLoader: PathEntryLoader
 
     /**
      * Constructs a new ClassPathResolver using a specified list of bootclasspath entries
@@ -69,67 +71,61 @@ public class ClassPathResolver {
      *                             depending on the the file type of dexFile and the api level. If empty, no boot
      *                             classpath entries will be loaded
      */
-    public ClassPathResolver(@Nonnull List<String> bootClassPathDirs,
-                             @Nullable List<String> bootClassPathEntries,
-                             @Nonnull List<String> extraClassPathEntries,
-                             @Nonnull DexEntry<?> dexEntry)
-            throws IOException {
-        DexFile dexFile = dexEntry.getDexFile();
+    init {
+        val dexFile = dexEntry.dexFile
 
-        this.classPathDirs = bootClassPathDirs;
-        this.pathEntryLoader = new PathEntryLoader(dexEntry.getDexFile().getOpcodes());
+        this.classPathDirs = bootClassPathDirs
+        this.pathEntryLoader = PathEntryLoader(dexEntry.dexFile.opcodes)
 
-        if (bootClassPathEntries == null) {
-            bootClassPathEntries = getDefaultBootClassPath(dexEntry, dexFile.getOpcodes().api);
-        }
+        val bootEntries = bootClassPathEntries ?: getDefaultBootClassPath(dexEntry, dexFile.opcodes.api)
 
-        for (String entry : bootClassPathEntries) {
+        for (entry in bootEntries) {
             try {
-                loadLocalOrDeviceBootClassPathEntry(entry);
-            } catch (PathEntryLoader.NoDexException ex) {
+                loadLocalOrDeviceBootClassPathEntry(entry)
+            } catch (ex: PathEntryLoader.NoDexException) {
                 if (entry.endsWith(".jar")) {
-                    String odexEntry = entry.substring(0, entry.length() - 4) + ".odex";
+                    val odexEntry = entry.substring(0, entry.length - 4) + ".odex"
                     try {
-                        loadLocalOrDeviceBootClassPathEntry(odexEntry);
-                    } catch (PathEntryLoader.NoDexException ex2) {
-                        throw new ResolveException("Neither %s nor %s contain a dex file", entry, odexEntry);
-                    } catch (NotFoundException ex2) {
-                        throw new ResolveException(ex);
+                        loadLocalOrDeviceBootClassPathEntry(odexEntry)
+                    } catch (ex2: PathEntryLoader.NoDexException) {
+                        throw ResolveException("Neither %s nor %s contain a dex file", entry, odexEntry)
+                    } catch (ex2: NotFoundException) {
+                        throw ResolveException(ex)
                     }
                 } else {
-                    throw new ResolveException(ex);
+                    throw ResolveException(ex)
                 }
-            } catch (NotFoundException ex) {
+            } catch (ex: NotFoundException) {
                 if (entry.endsWith(".odex")) {
-                    String jarEntry = entry.substring(0, entry.length() - 5) + ".jar";
+                    val jarEntry = entry.substring(0, entry.length - 5) + ".jar"
                     try {
-                        loadLocalOrDeviceBootClassPathEntry(jarEntry);
-                    } catch (PathEntryLoader.NoDexException ex2) {
-                        throw new ResolveException("Neither %s nor %s contain a dex file", entry, jarEntry);
-                    } catch (NotFoundException ex2) {
-                        throw new ResolveException(ex);
+                        loadLocalOrDeviceBootClassPathEntry(jarEntry)
+                    } catch (ex2: PathEntryLoader.NoDexException) {
+                        throw ResolveException("Neither %s nor %s contain a dex file", entry, jarEntry)
+                    } catch (ex2: NotFoundException) {
+                        throw ResolveException(ex)
                     }
                 } else {
-                    throw new ResolveException(ex);
+                    throw ResolveException(ex)
                 }
             }
         }
 
-        for (String entry: extraClassPathEntries) {
+        for (entry in extraClassPathEntries) {
             // extra classpath entries must be specified using a local path, so we don't need to do the search through
             // bootClassPathDirs
             try {
-                loadLocalClassPathEntry(entry);
-            } catch (PathEntryLoader.NoDexException ex) {
-                throw new ResolveException(ex);
+                loadLocalClassPathEntry(entry)
+            } catch (ex: PathEntryLoader.NoDexException) {
+                throw ResolveException(ex)
             }
         }
 
-        MultiDexContainer<? extends DexFile> container = dexEntry.getContainer();
-        for (String entry: container.getDexEntryNames()) {
-            MultiDexContainer.DexEntry<? extends DexFile> tempDexEntry = container.getEntry(entry);
-            assert tempDexEntry != null;
-            pathEntryLoader.getClassProviders().add(new DexClassProvider(tempDexEntry.getDexFile()));
+        val container = dexEntry.container
+        for (entry in container.dexEntryNames) {
+            val tempDexEntry = container.getEntry(entry)
+            assert(tempDexEntry != null)
+            pathEntryLoader.classProviders.add(DexClassProvider(tempDexEntry!!.dexFile))
         }
     }
 
@@ -147,125 +143,121 @@ public class ClassPathResolver {
      *                             depending on the the file type of dexFile and the api level. If empty, no boot
      *                             classpath entries will be loaded
      */
-    public ClassPathResolver(@Nonnull List<String> bootClassPathDirs, @Nonnull List<String> extraClassPathEntries,
-                             @Nonnull MultiDexContainer.DexEntry<?> dexEntry)
-            throws IOException {
-        this(bootClassPathDirs, null, extraClassPathEntries, dexEntry);
+    @Throws(IOException::class)
+    constructor(
+        bootClassPathDirs: List<String>,
+        extraClassPathEntries: List<String>,
+        dexEntry: DexEntry<*>
+    ) : this(bootClassPathDirs, null, extraClassPathEntries, dexEntry)
+
+    fun getResolvedClassProviders(): List<ClassProvider> {
+        return pathEntryLoader.getResolvedClassProviders()
     }
 
-    @Nonnull
-    public List<ClassProvider> getResolvedClassProviders() {
-        return pathEntryLoader.getResolvedClassProviders();
-    }
-
-    private boolean loadLocalClassPathEntry(@Nonnull String entry) throws PathEntryLoader.NoDexException, IOException {
-        File entryFile = new File(entry);
-        if (entryFile.exists() && entryFile.isFile()) {
+    @Throws(PathEntryLoader.NoDexException::class, IOException::class)
+    private fun loadLocalClassPathEntry(entry: String): Boolean {
+        val entryFile = File(entry)
+        if (entryFile.exists() && entryFile.isFile) {
             try {
-                pathEntryLoader.loadEntry(entryFile, true);
-                return true;
-            } catch (UnsupportedFileTypeException ex) {
-                throw new ResolveException(ex, "Couldn't load classpath entry %s", entry);
+                pathEntryLoader.loadEntry(entryFile, true)
+                return true
+            } catch (ex: UnsupportedFileTypeException) {
+                throw ResolveException(ex, "Couldn't load classpath entry %s", entry)
             }
         }
-        return false;
+        return false
     }
 
-    private void loadLocalOrDeviceBootClassPathEntry(@Nonnull String entry)
-            throws IOException, PathEntryLoader.NoDexException, NotFoundException {
+    @Throws(IOException::class, PathEntryLoader.NoDexException::class, NotFoundException::class)
+    private fun loadLocalOrDeviceBootClassPathEntry(entry: String) {
         // first, see if the entry is a valid local path
         if (loadLocalClassPathEntry(entry)) {
-            return;
+            return
         }
 
         // It's not a local path, so let's try to resolve it as a device path, relative to one of the provided
         // directories
-        List<String> pathComponents = splitDevicePath(entry);
+        val pathComponents = splitDevicePath(entry)
 
-        for (String directory: classPathDirs) {
-            File directoryFile = new File(directory);
+        for (directory in classPathDirs) {
+            val directoryFile = File(directory)
             if (!directoryFile.exists()) {
-                continue;
+                continue
             }
 
-            for (int i=0; i<pathComponents.size(); i++) {
-                String partialPath = StringUtils.join(
-                        pathComponents.subList(i, pathComponents.size()), File.separator);
-                File entryFile = new File(directoryFile, partialPath);
-                if (entryFile.exists() && entryFile.isFile()) {
-                    pathEntryLoader.loadEntry(entryFile, true);
-                    return;
+            for (i in pathComponents.indices) {
+                val partialPath = StringUtils.join(
+                    pathComponents.subList(i, pathComponents.size), File.separator
+                )
+                val entryFile = File(directoryFile, partialPath)
+                if (entryFile.exists() && entryFile.isFile) {
+                    pathEntryLoader.loadEntry(entryFile, true)
+                    return
                 }
             }
         }
 
-        throw new NotFoundException("Could not find classpath entry %s", entry);
+        throw NotFoundException("Could not find classpath entry %s", entry)
     }
 
-    @Nonnull
-    private static List<String> splitDevicePath(@Nonnull String path) {
-        return Arrays.asList(path.split("/"));
-    }
-
-    static class NotFoundException extends Exception {
-        public NotFoundException(String message, Object... formatArgs) {
-            super(String.format(message, formatArgs));
-        }
-    }
+    internal class NotFoundException(message: String, vararg formatArgs: Any?) :
+        Exception(String.format(message, *formatArgs))
 
     /**
      * An error that occurred while resolving the classpath
      */
-    public static class ResolveException extends RuntimeException {
-        public ResolveException (String message, Object... formatArgs) {
-            super(String.format(message, formatArgs));
-        }
+    open class ResolveException : RuntimeException {
+        constructor(message: String, vararg formatArgs: Any?) :
+            super(String.format(message, *formatArgs))
 
-        public ResolveException (Throwable cause) {
-            super(cause);
-        }
+        constructor(cause: Throwable) : super(cause)
 
-        public ResolveException (Throwable cause, String message, Object... formatArgs) {
-            super(String.format(message, formatArgs), cause);
-        }
+        constructor(cause: Throwable, message: String, vararg formatArgs: Any?) :
+            super(String.format(message, *formatArgs), cause)
     }
 
-    /**
-     * Returns the default boot class path for the given dex file and api level.
-     */
-    @Nonnull
-    private static List<String> getDefaultBootClassPath(
-            @Nonnull MultiDexContainer.DexEntry<?> dexEntry, int apiLevel) {
-        MultiDexContainer<? extends DexFile> container = dexEntry.getContainer();
-
-        if (container instanceof OatFile) {
-            return bootClassPathForOat((OatFile) container);
+    companion object {
+        @JvmStatic
+        private fun splitDevicePath(path: String): List<String> {
+            return path.split("/")
         }
 
-        DexFile dexFile = dexEntry.getDexFile();
+        /**
+         * Returns the default boot class path for the given dex file and api level.
+         */
+        private fun getDefaultBootClassPath(dexEntry: DexEntry<*>, apiLevel: Int): List<String> {
+            val container = dexEntry.container
 
-        if (dexFile instanceof DexBackedOdexFile) {
-            return ((DexBackedOdexFile)dexFile).getDependencies();
-        }
+            if (container is OatFile) {
+                return bootClassPathForOat(container)
+            }
 
-        if (apiLevel <= 8) {
-            return Arrays.asList(
+            val dexFile = dexEntry.dexFile
+
+            if (dexFile is DexBackedOdexFile) {
+                return dexFile.dependencies
+            }
+
+            if (apiLevel <= 8) {
+                return Arrays.asList(
                     "/system/framework/core.jar",
                     "/system/framework/ext.jar",
                     "/system/framework/framework.jar",
                     "/system/framework/android.policy.jar",
-                    "/system/framework/services.jar");
-        } else if (apiLevel <= 11) {
-            return Arrays.asList(
+                    "/system/framework/services.jar"
+                )
+            } else if (apiLevel <= 11) {
+                return Arrays.asList(
                     "/system/framework/core.jar",
                     "/system/framework/bouncycastle.jar",
                     "/system/framework/ext.jar",
                     "/system/framework/framework.jar",
                     "/system/framework/android.policy.jar",
                     "/system/framework/services.jar",
-                    "/system/framework/core-junit.jar");
-        } else if (apiLevel <= 13) {
-            return Arrays.asList(
+                    "/system/framework/core-junit.jar"
+                )
+            } else if (apiLevel <= 13) {
+                return Arrays.asList(
                     "/system/framework/core.jar",
                     "/system/framework/apache-xml.jar",
                     "/system/framework/bouncycastle.jar",
@@ -273,9 +265,10 @@ public class ClassPathResolver {
                     "/system/framework/framework.jar",
                     "/system/framework/android.policy.jar",
                     "/system/framework/services.jar",
-                    "/system/framework/core-junit.jar");
-        } else if (apiLevel <= 15) {
-            return Arrays.asList(
+                    "/system/framework/core-junit.jar"
+                )
+            } else if (apiLevel <= 15) {
+                return Arrays.asList(
                     "/system/framework/core.jar",
                     "/system/framework/core-junit.jar",
                     "/system/framework/bouncycastle.jar",
@@ -284,10 +277,11 @@ public class ClassPathResolver {
                     "/system/framework/android.policy.jar",
                     "/system/framework/services.jar",
                     "/system/framework/apache-xml.jar",
-                    "/system/framework/filterfw.jar");
-        } else if (apiLevel <= 17) {
-            // this is correct as of api 17/4.2.2
-            return Arrays.asList(
+                    "/system/framework/filterfw.jar"
+                )
+            } else if (apiLevel <= 17) {
+                // this is correct as of api 17/4.2.2
+                return Arrays.asList(
                     "/system/framework/core.jar",
                     "/system/framework/core-junit.jar",
                     "/system/framework/bouncycastle.jar",
@@ -297,9 +291,10 @@ public class ClassPathResolver {
                     "/system/framework/mms-common.jar",
                     "/system/framework/android.policy.jar",
                     "/system/framework/services.jar",
-                    "/system/framework/apache-xml.jar");
-        } else if (apiLevel <= 18) {
-            return Arrays.asList(
+                    "/system/framework/apache-xml.jar"
+                )
+            } else if (apiLevel <= 18) {
+                return Arrays.asList(
                     "/system/framework/core.jar",
                     "/system/framework/core-junit.jar",
                     "/system/framework/bouncycastle.jar",
@@ -310,9 +305,10 @@ public class ClassPathResolver {
                     "/system/framework/mms-common.jar",
                     "/system/framework/android.policy.jar",
                     "/system/framework/services.jar",
-                    "/system/framework/apache-xml.jar");
-        } else if (apiLevel <= 19) {
-            return Arrays.asList(
+                    "/system/framework/apache-xml.jar"
+                )
+            } else if (apiLevel <= 19) {
+                return Arrays.asList(
                     "/system/framework/core.jar",
                     "/system/framework/conscrypt.jar",
                     "/system/framework/core-junit.jar",
@@ -326,9 +322,10 @@ public class ClassPathResolver {
                     "/system/framework/android.policy.jar",
                     "/system/framework/services.jar",
                     "/system/framework/apache-xml.jar",
-                    "/system/framework/webviewchromium.jar");
-        } else if (apiLevel <= 22) {
-            return Arrays.asList(
+                    "/system/framework/webviewchromium.jar"
+                )
+            } else if (apiLevel <= 22) {
+                return Arrays.asList(
                     "/system/framework/core-libart.jar",
                     "/system/framework/conscrypt.jar",
                     "/system/framework/okhttp.jar",
@@ -341,9 +338,10 @@ public class ClassPathResolver {
                     "/system/framework/ims-common.jar",
                     "/system/framework/mms-common.jar",
                     "/system/framework/android.policy.jar",
-                    "/system/framework/apache-xml.jar");
-        } else if (apiLevel <= 23) {
-            return Arrays.asList(
+                    "/system/framework/apache-xml.jar"
+                )
+            } else if (apiLevel <= 23) {
+                return Arrays.asList(
                     "/system/framework/core-libart.jar",
                     "/system/framework/conscrypt.jar",
                     "/system/framework/okhttp.jar",
@@ -355,9 +353,10 @@ public class ClassPathResolver {
                     "/system/framework/voip-common.jar",
                     "/system/framework/ims-common.jar",
                     "/system/framework/apache-xml.jar",
-                    "/system/framework/org.apache.http.legacy.boot.jar");
-        } else /*if (apiLevel <= 24)*/ {
-            return Arrays.asList(
+                    "/system/framework/org.apache.http.legacy.boot.jar"
+                )
+            } else /*if (apiLevel <= 24)*/ {
+                return Arrays.asList(
                     "/system/framework/core-oj.jar",
                     "/system/framework/core-libart.jar",
                     "/system/framework/conscrypt.jar",
@@ -370,26 +369,32 @@ public class ClassPathResolver {
                     "/system/framework/voip-common.jar",
                     "/system/framework/ims-common.jar",
                     "/system/framework/apache-xml.jar",
-                    "/system/framework/org.apache.http.legacy.boot.jar");
-        }
-    }
-
-    private static List<String> bootClassPathForOat(@Nonnull OatFile oatFile) {
-        List<String> bcp = oatFile.getBootClassPath();
-        if(bcp.isEmpty()) {
-            return Arrays.asList("boot.oat");
-        } else {
-            return replaceElementsSuffix(bcp, ".art", ".oat");
-        }
-    }
-
-    private static List<String> replaceElementsSuffix(List<String> bcp, String originalSuffix, String newSuffix) {
-        for (int i=0; i<bcp.size(); i++) {
-            String entry = bcp.get(i);
-            if (entry.endsWith(originalSuffix)) {
-                bcp.set(i, entry.substring(0, entry.length() - originalSuffix.length()) + newSuffix);
+                    "/system/framework/org.apache.http.legacy.boot.jar"
+                )
             }
         }
-        return bcp;
+
+        private fun bootClassPathForOat(oatFile: OatFile): List<String> {
+            val bcp = oatFile.bootClassPath
+            if (bcp.isEmpty()) {
+                return Arrays.asList("boot.oat")
+            } else {
+                return replaceElementsSuffix(bcp, ".art", ".oat")
+            }
+        }
+
+        private fun replaceElementsSuffix(
+            bcp: MutableList<String>,
+            originalSuffix: String,
+            newSuffix: String
+        ): List<String> {
+            for (i in bcp.indices) {
+                val entry = bcp[i]
+                if (entry.endsWith(originalSuffix)) {
+                    bcp[i] = entry.substring(0, entry.length - originalSuffix.length) + newSuffix
+                }
+            }
+            return bcp
+        }
     }
 }
