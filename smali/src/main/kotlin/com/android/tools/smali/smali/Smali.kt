@@ -171,30 +171,11 @@ private fun assembleSmaliFile(smaliFile: File, dexBuilder: DexBuilder, options: 
             setVerboseErrors(options.verboseErrors)
             setAllowOdex(options.allowOdexOpcodes)
             setApiLevel(options.apiLevel)
-        }
-
-        val result = parser.smali_file()
-
-        if (parser.getNumberOfSyntaxErrors() > 0 || lexer.getNumberOfSyntaxErrors() > 0) {
-            return@use false
-        }
-
-        val tree = result.n
-
-        if (options.printTokens) {
-            println(tree.toStringTree())
-        }
-
-        val dexGen = smaliTreeWalker(ListTokenStream(tree.flatten())).apply {
-            setBuildParseTree(false)
-            setErrorHandler(NoSyncErrorStrategy())
-            setApiLevel(options.apiLevel)
-            setVerboseErrors(options.verboseErrors)
             setDexBuilder(dexBuilder)
         }
 
         try {
-            dexGen.smali_file()
+            parser.smali_file()
         } catch (ex: RuntimeException) {
             if (options.verboseErrors) {
                 ex.printStackTrace(System.err)
@@ -202,7 +183,7 @@ private fun assembleSmaliFile(smaliFile: File, dexBuilder: DexBuilder, options: 
             return@use false
         }
 
-        dexGen.getNumberOfSyntaxErrors() == 0
+        parser.getNumberOfSyntaxErrors() == 0 && lexer.getNumberOfSyntaxErrors() == 0
     }
 
 private fun printTokensForSingleFile(smaliFile: File, options: SmaliOptions): Boolean =

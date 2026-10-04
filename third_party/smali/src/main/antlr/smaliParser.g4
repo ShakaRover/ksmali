@@ -25,155 +25,87 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// smali is assembled in a single pass: the parser rules below execute the semantic actions
+// directly and build the DexBuilder contents as they recognise the source, so there is no AST
+// and no second tree-grammar parse. The rule bodies mirror the historical smaliTreeWalker.g4.
 parser grammar smaliParser;
 
 options {
   tokenVocab=smaliLexer;
 }
 
-tokens {
-  INTEGER_LITERAL,
-  I_CLASS_DEF,
-  I_SUPER,
-  I_IMPLEMENTS,
-  I_SOURCE,
-  I_ACCESS_LIST,
-  I_ACCESS_OR_RESTRICTION_LIST,
-  I_METHODS,
-  I_FIELDS,
-  I_FIELD,
-  I_FIELD_TYPE,
-  I_FIELD_INITIAL_VALUE,
-  I_METHOD,
-  I_METHOD_PROTOTYPE,
-  I_METHOD_RETURN_TYPE,
-  I_REGISTERS,
-  I_LOCALS,
-  I_LABEL,
-  I_ANNOTATIONS,
-  I_ANNOTATION,
-  I_ANNOTATION_ELEMENT,
-  I_SUBANNOTATION,
-  I_ENCODED_METHOD_HANDLE,
-  I_ENCODED_FIELD,
-  I_ENCODED_METHOD,
-  I_ENCODED_ENUM,
-  I_ENCODED_ARRAY,
-  I_ARRAY_ELEMENT_SIZE,
-  I_ARRAY_ELEMENTS,
-  I_PACKED_SWITCH_START_KEY,
-  I_PACKED_SWITCH_ELEMENTS,
-  I_SPARSE_SWITCH_ELEMENTS,
-  I_CATCH,
-  I_CATCHALL,
-  I_CATCHES,
-  I_PARAMETER,
-  I_PARAMETERS,
-  I_PARAMETER_NOT_SPECIFIED,
-  I_LINE,
-  I_LOCAL,
-  I_END_LOCAL,
-  I_RESTART_LOCAL,
-  I_PROLOGUE,
-  I_EPILOGUE,
-  I_ORDERED_METHOD_ITEMS,
-  I_STATEMENT_FORMAT10t,
-  I_STATEMENT_FORMAT10x,
-  I_STATEMENT_FORMAT11n,
-  I_STATEMENT_FORMAT11x,
-  I_STATEMENT_FORMAT12x,
-  I_STATEMENT_FORMAT20bc,
-  I_STATEMENT_FORMAT20t,
-  I_STATEMENT_FORMAT21c_TYPE,
-  I_STATEMENT_FORMAT21c_FIELD,
-  I_STATEMENT_FORMAT21c_STRING,
-  I_STATEMENT_FORMAT21c_METHOD_HANDLE,
-  I_STATEMENT_FORMAT21c_METHOD_TYPE,
-  I_STATEMENT_FORMAT21ih,
-  I_STATEMENT_FORMAT21lh,
-  I_STATEMENT_FORMAT21s,
-  I_STATEMENT_FORMAT21t,
-  I_STATEMENT_FORMAT22b,
-  I_STATEMENT_FORMAT22c_FIELD,
-  I_STATEMENT_FORMAT22c_TYPE,
-  I_STATEMENT_FORMAT22s,
-  I_STATEMENT_FORMAT22t,
-  I_STATEMENT_FORMAT22x,
-  I_STATEMENT_FORMAT23x,
-  I_STATEMENT_FORMAT30t,
-  I_STATEMENT_FORMAT31c,
-  I_STATEMENT_FORMAT31i,
-  I_STATEMENT_FORMAT31t,
-  I_STATEMENT_FORMAT32x,
-  I_STATEMENT_FORMAT35c_CALL_SITE,
-  I_STATEMENT_FORMAT35c_METHOD,
-  I_STATEMENT_FORMAT35c_TYPE,
-  I_STATEMENT_FORMAT3rc_CALL_SITE,
-  I_STATEMENT_FORMAT3rc_METHOD,
-  I_STATEMENT_FORMAT3rc_TYPE,
-  I_STATEMENT_FORMAT45cc_METHOD,
-  I_STATEMENT_FORMAT4rcc_METHOD,
-  I_STATEMENT_FORMAT51l,
-  I_STATEMENT_ARRAY_DATA,
-  I_STATEMENT_PACKED_SWITCH,
-  I_STATEMENT_SPARSE_SWITCH,
-  I_REGISTER_RANGE,
-  I_REGISTER_LIST,
-  I_CALL_SITE_EXTRA_ARGUMENTS,
-  I_CALL_SITE_REFERENCE,
-  DOWN,
-  UP
-}
-
-
 @parser::header {
 package com.android.tools.smali.smali;
 
-import com.android.tools.smali.dexlib2.Opcode;
-import com.android.tools.smali.dexlib2.Opcodes;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
+import com.android.tools.smali.dexlib2.*;
+import com.android.tools.smali.dexlib2.builder.Label;
+import com.android.tools.smali.dexlib2.builder.MethodImplementationBuilder;
+import com.android.tools.smali.dexlib2.builder.SwitchLabelElement;
+import com.android.tools.smali.dexlib2.builder.instruction.*;
+import com.android.tools.smali.dexlib2.iface.Annotation;
+import com.android.tools.smali.dexlib2.iface.AnnotationElement;
+import com.android.tools.smali.dexlib2.iface.ClassDef;
+import com.android.tools.smali.dexlib2.iface.MethodImplementation;
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference;
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference;
+import com.android.tools.smali.dexlib2.iface.value.EncodedValue;
+import com.android.tools.smali.dexlib2.immutable.ImmutableAnnotation;
+import com.android.tools.smali.dexlib2.immutable.ImmutableAnnotationElement;
+import com.android.tools.smali.dexlib2.immutable.reference.ImmutableCallSiteReference;
+import com.android.tools.smali.dexlib2.immutable.reference.ImmutableFieldReference;
+import com.android.tools.smali.dexlib2.immutable.reference.ImmutableMethodHandleReference;
+import com.android.tools.smali.dexlib2.immutable.reference.ImmutableMethodReference;
+import com.android.tools.smali.dexlib2.immutable.reference.ImmutableMethodProtoReference;
+import com.android.tools.smali.dexlib2.immutable.reference.ImmutableReference;
+import com.android.tools.smali.dexlib2.immutable.reference.ImmutableTypeReference;
+import com.android.tools.smali.dexlib2.immutable.value.*;
+import com.android.tools.smali.dexlib2.util.MethodUtil;
+import com.android.tools.smali.dexlib2.writer.builder.*;
+import com.android.tools.smali.util.LinearSearch;
+import java.util.*;
 }
 
 @parser::members {
   public static final int ERROR_CHANNEL = 100;
 
+  public String classType;
   private boolean verboseErrors = false;
   private boolean allowOdex = false;
   private int apiLevel = 15;
   private Opcodes opcodes = Opcodes.forApi(apiLevel);
+  private DexBuilder dexBuilder;
 
   // Replaces the ANTLR3 smali_file scope
   private boolean smaliFileHasClassSpec;
   private boolean smaliFileHasSuperSpec;
   private boolean smaliFileHasSourceSpec;
-  private List<AstNode> classAnnotations = new ArrayList<AstNode>();
+  private List<Annotation> classAnnotations = new ArrayList<Annotation>();
 
   // Replaces the ANTLR3 statements_and_directives scope
   private boolean statementsHasRegistersDirective;
-  private List<AstNode> statementsMethodAnnotations;
+  private List<Annotation> statementsMethodAnnotations;
 
-  public void setVerboseErrors(boolean verboseErrors) {
-    this.verboseErrors = verboseErrors;
-  }
+  // Replaces the ANTLR3 'method' rule scope
+  private boolean methodIsStatic;
+  private int methodTotalRegisters;
+  private int methodParameterRegisters;
+  private MethodImplementationBuilder methodBuilder;
+  private Token methodRegistersDirectiveStart;
+  private boolean methodIsLocalsDirective;
+  private Token smaliFileStartToken;
 
-  public void setAllowOdex(boolean allowOdex) {
-    this.allowOdex = allowOdex;
-  }
+  public void setDexBuilder(DexBuilder dexBuilder) { this.dexBuilder = dexBuilder; }
+  public void setVerboseErrors(boolean verboseErrors) { this.verboseErrors = verboseErrors; }
+  public void setAllowOdex(boolean allowOdex) { this.allowOdex = allowOdex; }
 
   public void setApiLevel(int apiLevel) {
     this.opcodes = Opcodes.forApi(apiLevel);
     this.apiLevel = apiLevel;
   }
 
-  public Opcodes getOpcodes() {
-    return opcodes;
-  }
+  public Opcodes getOpcodes() { return opcodes; }
 
   /** The symbolic name of a token type (unlike the deprecated tokenNames array, which prefers literals). */
   public static String tokenName(int type) {
@@ -185,53 +117,108 @@ import org.antlr.v4.runtime.Token;
     return name != null ? name : "<INVALID>";
   }
 
-  // ---- AST construction helpers -------------------------------------------
-
-  private AstNode ast(int type, Token start, Object... parts) {
-    AstNode node = AstNode.imaginary(type, start);
-    addParts(node, parts);
-    return node;
+  private Set<Annotation> buildAnnotationSet(List<Annotation> annotations) {
+    HashMap<String, Annotation> annotationMap = new HashMap<String, Annotation>();
+    for (Annotation anno : annotations) {
+      Annotation old = annotationMap.put(anno.getType(), anno);
+      if (old != null) {
+        throw new SemanticException(_input, "Multiple annotations of type %s", anno.getType());
+      }
+    }
+    return Collections.unmodifiableSet(new LinkedHashSet<Annotation>(annotationMap.values()));
   }
 
-  private AstNode flat(Object... parts) {
-    AstNode node = AstNode.flat(new ArrayList<AstNode>());
-    addParts(node, parts);
-    return node;
+  private byte parseRegister_nibble(String register) throws SemanticException {
+    int totalMethodRegisters = methodTotalRegisters;
+    int methodParameterRegisters = this.methodParameterRegisters;
+
+    //register should be in the format "v12"
+    int val = Byte.parseByte(register.substring(1));
+    if (register.charAt(0) == 'p') {
+      val = totalMethodRegisters - methodParameterRegisters + val;
+    }
+    if (val >= 2<<4) {
+      throw new SemanticException(_input, "The maximum allowed register in this context is list of registers is v15");
+    }
+    //the parser wouldn't have accepted a negative register, i.e. v-1, so we don't have to check for val<0;
+    return (byte)val;
   }
 
-  private void addParts(AstNode node, Object[] parts) {
-    for (Object part : parts) {
-      if (part == null) {
-        continue;
+  //return a short, because java's byte is signed
+  private short parseRegister_byte(String register) throws SemanticException {
+    int totalMethodRegisters = methodTotalRegisters;
+    int methodParameterRegisters = this.methodParameterRegisters;
+    //register should be in the format "v123"
+    int val = Short.parseShort(register.substring(1));
+    if (register.charAt(0) == 'p') {
+      val = totalMethodRegisters - methodParameterRegisters + val;
+    }
+    if (val >= 2<<8) {
+      throw new SemanticException(_input, "The maximum allowed register in this context is v255");
+    }
+    return (short)val;
+  }
+
+  //return an int because java's short is signed
+  private int parseRegister_short(String register) throws SemanticException {
+    int totalMethodRegisters = methodTotalRegisters;
+    int methodParameterRegisters = this.methodParameterRegisters;
+    //register should be in the format "v12345"
+    int val = Integer.parseInt(register.substring(1));
+    if (register.charAt(0) == 'p') {
+      val = totalMethodRegisters - methodParameterRegisters + val;
+    }
+    if (val >= 2<<16) {
+      throw new SemanticException(_input, "The maximum allowed register in this context is v65535");
+    }
+    //the parser wouldn't accept a negative register, i.e. v-1, so we don't have to check for val<0;
+    return val;
+  }
+
+  private void applyParameter(List<SmaliMethodParameter> params, int paramOrdinal, Token parameterDirective,
+      Token reg, String pname, Set<Annotation> anns) throws SemanticException {
+    SmaliMethodParameter methodParameter;
+    if (reg != null) {
+      final int registerNumber = parseRegister_short(reg.getText());
+      int totalMethodRegisters = methodTotalRegisters;
+      int methodParameterRegisters = this.methodParameterRegisters;
+
+      if (registerNumber >= totalMethodRegisters) {
+        throw new SemanticException(_input, parameterDirective, "Register %s is larger than the maximum register v%d " +
+            "for this method", reg.getText(), totalMethodRegisters-1);
       }
-      if (part instanceof AstNode) {
-        node.addChild((AstNode) part);
-      } else if (part instanceof Token) {
-        node.addChild(AstNode.leaf((Token) part));
-      } else if (part instanceof List) {
-        for (Object item : (List<?>) part) {
-          addParts(node, new Object[] { item });
-        }
-      } else {
-        throw new IllegalArgumentException("Unsupported AST part: " + part);
+      final int indexGuess = registerNumber - (totalMethodRegisters - methodParameterRegisters) - (methodIsStatic?0:1);
+
+      if (indexGuess < 0) {
+        throw new SemanticException(_input, parameterDirective, "Register %s is not a parameter register.",
+            reg.getText());
       }
+
+      int parameterIndex = LinearSearch.linearSearch(params, SmaliMethodParameter.COMPARATOR,
+          new WithRegister() { public int getRegister() { return indexGuess; } }, indexGuess);
+
+      if (parameterIndex < 0) {
+        throw new SemanticException(_input, parameterDirective, "Register %s is the second half of a wide parameter.",
+            reg.getText());
+      }
+
+      methodParameter = params.get(parameterIndex);
+    } else {
+      // Legacy .parameter directive with no register: parameters are positional.
+      if (paramOrdinal >= params.size()) {
+        throw new SemanticException(_input, parameterDirective, "No parameter exists for this parameter directive");
+      }
+      methodParameter = params.get(paramOrdinal);
+    }
+
+    methodParameter.setName(pname);
+    if (anns != null && anns.size() > 0) {
+      methodParameter.setAnnotations(anns);
     }
   }
 
-  private AstNode retype(Token src, int type) {
-    return AstNode.retype(src, type);
-  }
-
-  private AstNode retypedText(int type, Token start, String text) {
-    return AstNode.retypedText(type, start, text);
-  }
-
-  private String textOf(ParserRuleContext ctx) {
-    return _input.getText(ctx.start, ctx.stop);
-  }
-
-  private AstNode buildTree(int type, List<AstNode> children) {
-    return AstNode.node(type, null, children);
+  public String getErrorHeader(RecognitionException e) {
+    return getSourceName()+"["+ e.getOffendingToken().getLine()+","+e.getOffendingToken().getCharPositionInLine()+"]";
   }
 
   private void throwOdexedInstructionException(String odexedInstruction)
@@ -240,20 +227,32 @@ import org.antlr.v4.runtime.Token;
   }
 }
 
-
-smali_file returns[AstNode n]
+smali_file returns[ClassDef classDef]
   @init
   { smaliFileHasClassSpec = smaliFileHasSuperSpec = smaliFileHasSourceSpec = false;
-    classAnnotations = new ArrayList<AstNode>();
+    classAnnotations = new ArrayList<Annotation>();
+    List<BuilderField> fieldList = new ArrayList<BuilderField>();
+    List<BuilderMethod> methodList = new ArrayList<BuilderMethod>();
+    String localClassType = null;
+    int localAccessFlags = 0;
+    String localSuperType = null;
+    List<String> localImplementsList = null;
+    String localSourceSpec = null;
   }
   :
-  ( {!smaliFileHasClassSpec}? class_spec { smaliFileHasClassSpec = true; }
-  | {!smaliFileHasSuperSpec}? ss=super_spec { smaliFileHasSuperSpec = true; }
-  | impl+=implements_spec
-  | {!smaliFileHasSourceSpec}? src=source_spec { smaliFileHasSourceSpec = true; }
-  | m+=method
-  | fld+=field
-  | annotation { classAnnotations.add($annotation.n); }
+  { smaliFileStartToken = _input.LT(1); }
+  ( {!smaliFileHasClassSpec}? cs=class_spec
+      { smaliFileHasClassSpec = true; localClassType = $cs.className; localAccessFlags = $cs.accessFlags; }
+  | {!smaliFileHasSuperSpec}? ss=super_spec
+      { smaliFileHasSuperSpec = true; localSuperType = $ss.type; }
+  | is=implements_spec
+      { if (localImplementsList == null) { localImplementsList = new ArrayList<String>(); }
+        localImplementsList.add($is.type); }
+  | {!smaliFileHasSourceSpec}? src=source_spec
+      { smaliFileHasSourceSpec = true; localSourceSpec = $src.sourceStr; }
+  | m=method { methodList.add($m.ret); }
+  | f=field { fieldList.add($f.fieldValue); }
+  | an=annotation { classAnnotations.add($an.annotationValue); }
   )+
   EOF
   {
@@ -262,756 +261,1288 @@ smali_file returns[AstNode n]
     }
 
     if (!smaliFileHasSuperSpec) {
-      if (!$class_spec.className.equals("Ljava/lang/Object;")) {
+      if (!localClassType.equals("Ljava/lang/Object;")) {
         throw new SemanticException(_input, _localctx.start, "The file must contain a .super directive");
       }
     }
 
-    List<AstNode> implementsList = new ArrayList<AstNode>();
-    for (Implements_specContext ctx : $impl) {
-      implementsList.add(ctx.n);
-    }
-    List<AstNode> methodList = new ArrayList<AstNode>();
-    for (MethodContext ctx : $m) {
-      methodList.add(ctx.n);
-    }
-    List<AstNode> fieldList = new ArrayList<AstNode>();
-    for (FieldContext ctx : $fld) {
-      fieldList.add(ctx.n);
-    }
-
-    $n = ast(I_CLASS_DEF, _localctx.start,
-             $class_spec.n,
-             _localctx.ss != null ? $ss.n : null,
-             implementsList,
-             _localctx.src != null ? $src.n : null,
-             ast(I_METHODS, _localctx.start, methodList),
-             ast(I_FIELDS, _localctx.start, fieldList),
-             buildTree(I_ANNOTATIONS, classAnnotations));
+    $classDef = dexBuilder.internClassDef(localClassType, localAccessFlags, localSuperType,
+            localImplementsList, localSourceSpec, buildAnnotationSet(classAnnotations), fieldList, methodList);
   };
 
-class_spec returns[String className, AstNode n]
-  : CLASS_DIRECTIVE access_list CLASS_DESCRIPTOR
-    { $className = $CLASS_DESCRIPTOR.text;
-      $n = flat(AstNode.leaf($CLASS_DESCRIPTOR), $access_list.n); };
+class_spec returns[String className, int accessFlags]
+  : CLASS_DIRECTIVE al=access_list CLASS_DESCRIPTOR
+    { $className = $CLASS_DESCRIPTOR.text; $accessFlags = $al.value; classType = $className; };
 
-super_spec returns[AstNode n]
+super_spec returns[String type]
   : SUPER_DIRECTIVE CLASS_DESCRIPTOR
-    { $n = ast(I_SUPER, _localctx.start, $CLASS_DESCRIPTOR); };
+    { $type = $CLASS_DESCRIPTOR.text; };
 
-implements_spec returns[AstNode n]
+implements_spec returns[String type]
   : IMPLEMENTS_DIRECTIVE CLASS_DESCRIPTOR
-    { $n = ast(I_IMPLEMENTS, _localctx.start, $CLASS_DESCRIPTOR); };
+    { $type = $CLASS_DESCRIPTOR.text; };
 
-source_spec returns[AstNode n]
-  : SOURCE_DIRECTIVE STRING_LITERAL
-    { $n = ast(I_SOURCE, _localctx.start, $STRING_LITERAL); };
+source_spec returns[String sourceStr]
+  : SOURCE_DIRECTIVE sl=string_literal
+    { $sourceStr = $sl.value; };
 
-access_list returns[AstNode n]
-  @init { List<AstNode> specs = new ArrayList<AstNode>(); }
-  : ( ACCESS_SPEC { specs.add(AstNode.leaf($ACCESS_SPEC)); } )*
-    { $n = ast(I_ACCESS_LIST, _localctx.start, specs); };
+access_list returns[int value]
+  @init { $value = 0; }
+  : ( ACCESS_SPEC { $value |= AccessFlags.getAccessFlag($ACCESS_SPEC.getText()).getValue(); } )*;
 
-access_or_restriction returns[AstNode n]
-  : ACCESS_SPEC { $n = AstNode.leaf($ACCESS_SPEC); }
-  | HIDDENAPI_RESTRICTION { $n = AstNode.leaf($HIDDENAPI_RESTRICTION); };
-
-access_or_restriction_list returns[AstNode n]
-  @init { List<AstNode> items = new ArrayList<AstNode>(); }
-  : ( access_or_restriction { items.add($access_or_restriction.n); } )*
-    { $n = ast(I_ACCESS_OR_RESTRICTION_LIST, _localctx.start, items); };
-
-field returns[AstNode n]
-  @init { List<AstNode> annotations = new ArrayList<AstNode>(); }
-  : FIELD_DIRECTIVE access_or_restriction_list member_name COLON nonvoid_type_descriptor (EQUAL lit=literal)?
-    ( ({_input.LA(1) == ANNOTATION_DIRECTIVE}? annotation { annotations.add($annotation.n); })*
-      ( END_FIELD_DIRECTIVE
-        { $n = ast(I_FIELD, _localctx.start, $member_name.n, $access_or_restriction_list.n,
-                   ast(I_FIELD_TYPE, _localctx.start, $nonvoid_type_descriptor.n),
-                   _localctx.lit != null ? ast(I_FIELD_INITIAL_VALUE, _localctx.start, $lit.n) : null,
-                   buildTree(I_ANNOTATIONS, annotations)); }
-      | { classAnnotations.addAll(annotations); }
-        { $n = ast(I_FIELD, _localctx.start, $member_name.n, $access_or_restriction_list.n,
-                   ast(I_FIELD_TYPE, _localctx.start, $nonvoid_type_descriptor.n),
-                   _localctx.lit != null ? ast(I_FIELD_INITIAL_VALUE, _localctx.start, $lit.n) : null,
-                   buildTree(I_ANNOTATIONS, new ArrayList<AstNode>())); }
-      )
-    );
-
-method returns[AstNode n]
-  : METHOD_DIRECTIVE access_or_restriction_list member_name method_prototype statements_and_directives
-    END_METHOD_DIRECTIVE
-    { $n = ast(I_METHOD, _localctx.start, $member_name.n, $method_prototype.n,
-               $access_or_restriction_list.n, $statements_and_directives.n); };
-
-statements_and_directives returns[AstNode n]
+access_or_restriction_list returns[int value, Set<HiddenApiRestriction> hiddenApiRestrictions]
   @init
-  { statementsHasRegistersDirective = false;
-    statementsMethodAnnotations = new ArrayList<AstNode>();
-    List<AstNode> methodAnnotations = statementsMethodAnnotations;
-    List<AstNode> orderedItems = new ArrayList<AstNode>();
-    List<AstNode> catches = new ArrayList<AstNode>();
-    List<AstNode> catchAlls = new ArrayList<AstNode>();
-    List<AstNode> parameters = new ArrayList<AstNode>();
-    AstNode registers = null;
+  {
+    $value = 0;
+    HiddenApiRestriction hiddenApiRestriction = null;
+    List<HiddenApiRestriction> domainSpecificApiRestrictions = new ArrayList<HiddenApiRestriction>();
   }
-  : ( ordered_method_item { orderedItems.add($ordered_method_item.n); }
-    | registers_directive { registers = $registers_directive.n; }
-    | catch_directive { catches.add($catch_directive.n); }
-    | catchall_directive { catchAlls.add($catchall_directive.n); }
-    | parameter_directive { parameters.add($parameter_directive.n); }
-    | annotation { methodAnnotations.add($annotation.n); }
-    )*
-    { catches.addAll(catchAlls);
-      $n = flat(registers,
-                ast(I_ORDERED_METHOD_ITEMS, _localctx.start, orderedItems),
-                ast(I_CATCHES, _localctx.start, catches),
-                ast(I_PARAMETERS, _localctx.start, parameters),
-                buildTree(I_ANNOTATIONS, methodAnnotations)); };
-
-/* Method items whose order/location is important */
-ordered_method_item returns[AstNode n]
-  : label { $n = $label.n; }
-  | instruction { $n = $instruction.n; }
-  | debug_directive { $n = $debug_directive.n; };
-
-registers_directive returns[AstNode n]
   : (
-      directive=REGISTERS_DIRECTIVE regCount=integral_literal
-        { $n = ast(I_REGISTERS, $directive, $regCount.n); }
-    | directive=LOCALS_DIRECTIVE regCount2=integral_literal
-        { $n = ast(I_LOCALS, $directive, $regCount2.n); }
+      ACCESS_SPEC
+        { $value |= AccessFlags.getAccessFlag($ACCESS_SPEC.getText()).getValue(); }
+    | HIDDENAPI_RESTRICTION
+        {
+          if (opcodes.api < 29) {
+            throw new SemanticException(_input, $HIDDENAPI_RESTRICTION, "Hidden API restrictions are only supported on api 29 and above.");
+          }
+          HiddenApiRestriction restriction = HiddenApiRestriction.forName($HIDDENAPI_RESTRICTION.getText());
+          if (restriction.isDomainSpecificApiFlag()) {
+            domainSpecificApiRestrictions.add(restriction);
+          } else {
+            if (hiddenApiRestriction != null) {
+              throw new SemanticException(_input, $HIDDENAPI_RESTRICTION, "Only one hidden api restriction may be specified.");
+            }
+            hiddenApiRestriction = restriction;
+          }
+        }
+    )*
+    {
+      Set<HiddenApiRestriction> restrictions = new LinkedHashSet<HiddenApiRestriction>();
+      if (hiddenApiRestriction != null) {
+        restrictions.add(hiddenApiRestriction);
+      }
+      restrictions.addAll(domainSpecificApiRestrictions);
+      $hiddenApiRestrictions = Collections.unmodifiableSet(restrictions);
+    };
+
+field returns[BuilderField fieldValue]
+  @init { List<Annotation> annotations = new ArrayList<Annotation>(); }
+  : FIELD_DIRECTIVE ar=access_or_restriction_list mn=member_name COLON nvtd=nonvoid_type_descriptor
+    ( EQUAL lit=literal )?
+    ( ({_input.LA(1) == ANNOTATION_DIRECTIVE}? an=annotation { annotations.add($an.annotationValue); })*
+      ( END_FIELD_DIRECTIVE
+      | { classAnnotations.addAll(annotations); annotations = new ArrayList<Annotation>(); }
+      )
+    )
+    {
+      if (classType == null) {
+        throw new SemanticException(_input, smaliFileStartToken, "The file must contain a .class directive");
+      }
+
+      int accessFlags = $ar.value;
+      Set<HiddenApiRestriction> hiddenApiRestrictions = $ar.hiddenApiRestrictions;
+      EncodedValue initialValue = _localctx.lit != null ? $lit.encodedValue : null;
+
+      if (!AccessFlags.STATIC.isSet(accessFlags) && initialValue != null) {
+        throw new SemanticException(_input, "Initial field values can only be specified for static fields.");
+      }
+
+      $fieldValue = dexBuilder.internField(classType, $mn.value, $nvtd.type, accessFlags,
+          initialValue, buildAnnotationSet(annotations), hiddenApiRestrictions);
+    };
+
+method returns[BuilderMethod ret]
+  @init
+  {
+    methodTotalRegisters = 0;
+    methodParameterRegisters = 0;
+    int accessFlags = 0;
+    methodIsStatic = false;
+    Set<HiddenApiRestriction> hiddenApiRestrictions = null;
+    methodBuilder = new MethodImplementationBuilder(0);
+    methodRegistersDirectiveStart = null;
+    methodIsLocalsDirective = false;
+  }
+  : METHOD_DIRECTIVE
+    ar=access_or_restriction_list
+    mnp=method_name_and_prototype
+    {
+      accessFlags = $ar.value;
+      hiddenApiRestrictions = $ar.hiddenApiRestrictions;
+      methodIsStatic = AccessFlags.STATIC.isSet(accessFlags);
+      methodParameterRegisters = MethodUtil.getParameterRegisterCount($mnp.parameterList, methodIsStatic);
+    }
+    statements_and_directives[$mnp.parameterList]
+    END_METHOD_DIRECTIVE
+    {
+      if (classType == null) {
+        throw new SemanticException(_input, smaliFileStartToken, "The file must contain a .class directive");
+      }
+
+      MethodImplementation methodImplementation = null;
+
+      boolean isAbstract = false;
+      boolean isNative = false;
+
+      if ((accessFlags & AccessFlags.ABSTRACT.getValue()) != 0) {
+        isAbstract = true;
+      } else if ((accessFlags & AccessFlags.NATIVE.getValue()) != 0) {
+        isNative = true;
+      }
+
+      methodImplementation = methodBuilder.getMethodImplementation();
+
+      if (!methodImplementation.getInstructions().iterator().hasNext()) {
+        if (!isAbstract && !isNative) {
+          throw new SemanticException(_input, $METHOD_DIRECTIVE, "A non-abstract/non-native method must have at least 1 instruction");
+        }
+
+        String methodType;
+        if (isAbstract) {
+          methodType = "an abstract";
+        } else {
+          methodType = "a native";
+        }
+
+        if (methodRegistersDirectiveStart != null) {
+          if (methodIsLocalsDirective) {
+            throw new SemanticException(_input, methodRegistersDirectiveStart, "A .locals directive is not valid in %s method", methodType);
+          } else {
+            throw new SemanticException(_input, methodRegistersDirectiveStart, "A .registers directive is not valid in %s method", methodType);
+          }
+        }
+
+        if (methodImplementation.getTryBlocks().size() > 0) {
+          throw new SemanticException(_input, $METHOD_DIRECTIVE, "try/catch blocks cannot be present in %s method", methodType);
+        }
+
+        if (methodImplementation.getDebugItems().iterator().hasNext()) {
+          throw new SemanticException(_input, $METHOD_DIRECTIVE, "debug directives cannot be present in %s method", methodType);
+        }
+
+        methodImplementation = null;
+      } else {
+        if (isAbstract) {
+          throw new SemanticException(_input, $METHOD_DIRECTIVE, "An abstract method cannot have any instructions");
+        }
+        if (isNative) {
+          throw new SemanticException(_input, $METHOD_DIRECTIVE, "A native method cannot have any instructions");
+        }
+
+        if (methodRegistersDirectiveStart == null) {
+          throw new SemanticException(_input, $METHOD_DIRECTIVE, "A .registers or .locals directive must be present for a non-abstract/non-final method");
+        }
+
+        if (methodTotalRegisters < methodParameterRegisters) {
+          throw new SemanticException(_input, methodRegistersDirectiveStart, "This method requires at least " +
+              Integer.toString(methodParameterRegisters) +
+              " registers, for the method parameters");
+        }
+      }
+
+      $ret = dexBuilder.internMethod(
+              classType,
+              $mnp.name,
+              $mnp.parameterList,
+              $mnp.returnType,
+              accessFlags,
+              buildAnnotationSet(statementsMethodAnnotations),
+              hiddenApiRestrictions,
+              methodImplementation);
+    };
+
+statements_and_directives[List<SmaliMethodParameter> params]
+  @init
+  {
+    statementsHasRegistersDirective = false;
+    statementsMethodAnnotations = new ArrayList<Annotation>();
+    List<Catch_directiveContext> catches = new ArrayList<Catch_directiveContext>();
+    List<Catchall_directiveContext> catchAlls = new ArrayList<Catchall_directiveContext>();
+    int paramOrdinal = 0;
+  }
+  : ( ordered_method_item
+    | registers_directive
+    | cd=catch_directive { catches.add(_localctx.cd); }
+    | cad=catchall_directive { catchAlls.add(_localctx.cad); }
+    | parameter_directive[params, paramOrdinal] { paramOrdinal++; }
+    | an=annotation { statementsMethodAnnotations.add($an.annotationValue); }
+    )*
+    {
+      for (Catch_directiveContext catchCtx : catches) {
+        methodBuilder.addCatch(dexBuilder.internTypeReference(catchCtx.nvtd.type),
+            catchCtx.from.target, catchCtx.to.target, catchCtx.using.target);
+      }
+      for (Catchall_directiveContext catchallCtx : catchAlls) {
+        methodBuilder.addCatch(catchallCtx.from.target, catchallCtx.to.target, catchallCtx.using.target);
+      }
+    };
+
+ordered_method_item
+  : label
+  | instruction
+  | debug_directive;
+
+registers_directive
+  : ( d=REGISTERS_DIRECTIVE rc=short_integral_literal
+        { methodIsLocalsDirective = false; methodRegistersDirectiveStart = $d; methodTotalRegisters = $rc.value & 0xFFFF; }
+    | d2=LOCALS_DIRECTIVE rc2=short_integral_literal
+        { methodIsLocalsDirective = true; methodRegistersDirectiveStart = $d2; methodTotalRegisters = ($rc2.value & 0xFFFF) + methodParameterRegisters; }
     )
     {
       if (statementsHasRegistersDirective) {
-        throw new SemanticException(_input, $directive, "There can only be a single .registers or .locals directive in a method");
+        throw new SemanticException(_input, $d != null ? $d : $d2, "There can only be a single .registers or .locals directive in a method");
       }
       statementsHasRegistersDirective = true;
+      methodBuilder = new MethodImplementationBuilder(methodTotalRegisters);
     };
 
-param_list_or_id returns[AstNode n]
-  @init { List<AstNode> items = new ArrayList<AstNode>(); }
-  : ( PARAM_LIST_OR_ID_PRIMITIVE_TYPE { items.add(AstNode.leaf($PARAM_LIST_OR_ID_PRIMITIVE_TYPE)); } )+
-    { $n = flat(items); };
+method_name_and_prototype returns[String name, List<SmaliMethodParameter> parameterList, String returnType]
+  : mn=member_name mp=method_prototype
+    {
+      $name = $mn.value;
+      $parameterList = new ArrayList<SmaliMethodParameter>();
 
-/*identifiers are much more general than most languages. Any of the below can either be
-the indicated type OR an identifier, depending on the context*/
-simple_name returns[AstNode n]
-  : SIMPLE_NAME { $n = AstNode.leaf($SIMPLE_NAME); }
-  | ACCESS_SPEC { $n = retype($ACCESS_SPEC, SIMPLE_NAME); }
-  | HIDDENAPI_RESTRICTION { $n = retype($HIDDENAPI_RESTRICTION, SIMPLE_NAME); }
-  | VERIFICATION_ERROR_TYPE { $n = retype($VERIFICATION_ERROR_TYPE, SIMPLE_NAME); }
-  | POSITIVE_INTEGER_LITERAL { $n = retype($POSITIVE_INTEGER_LITERAL, SIMPLE_NAME); }
-  | NEGATIVE_INTEGER_LITERAL { $n = retype($NEGATIVE_INTEGER_LITERAL, SIMPLE_NAME); }
-  | FLOAT_LITERAL_OR_ID { $n = retype($FLOAT_LITERAL_OR_ID, SIMPLE_NAME); }
-  | DOUBLE_LITERAL_OR_ID { $n = retype($DOUBLE_LITERAL_OR_ID, SIMPLE_NAME); }
-  | BOOL_LITERAL { $n = retype($BOOL_LITERAL, SIMPLE_NAME); }
-  | NULL_LITERAL { $n = retype($NULL_LITERAL, SIMPLE_NAME); }
-  | REGISTER { $n = retype($REGISTER, SIMPLE_NAME); }
-  | plid=param_list_or_id { $n = retypedText(SIMPLE_NAME, _localctx.start, textOf(_localctx.plid)); }
-  | PRIMITIVE_TYPE { $n = retype($PRIMITIVE_TYPE, SIMPLE_NAME); }
-  | VOID_TYPE { $n = retype($VOID_TYPE, SIMPLE_NAME); }
-  | ANNOTATION_VISIBILITY { $n = retype($ANNOTATION_VISIBILITY, SIMPLE_NAME); }
-  | METHOD_HANDLE_TYPE_FIELD { $n = AstNode.leaf($METHOD_HANDLE_TYPE_FIELD); }
-  | METHOD_HANDLE_TYPE_METHOD { $n = AstNode.leaf($METHOD_HANDLE_TYPE_METHOD); }
-  | INSTRUCTION_FORMAT10t { $n = retype($INSTRUCTION_FORMAT10t, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT10x { $n = retype($INSTRUCTION_FORMAT10x, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT10x_ODEX { $n = retype($INSTRUCTION_FORMAT10x_ODEX, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT11x { $n = retype($INSTRUCTION_FORMAT11x, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT12x_OR_ID { $n = retype($INSTRUCTION_FORMAT12x_OR_ID, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT21c_FIELD { $n = retype($INSTRUCTION_FORMAT21c_FIELD, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT21c_FIELD_ODEX { $n = retype($INSTRUCTION_FORMAT21c_FIELD_ODEX, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT21c_METHOD_HANDLE { $n = retype($INSTRUCTION_FORMAT21c_METHOD_HANDLE, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT21c_METHOD_TYPE { $n = retype($INSTRUCTION_FORMAT21c_METHOD_TYPE, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT21c_STRING { $n = retype($INSTRUCTION_FORMAT21c_STRING, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT21c_TYPE { $n = retype($INSTRUCTION_FORMAT21c_TYPE, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT21t { $n = retype($INSTRUCTION_FORMAT21t, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT22c_FIELD { $n = retype($INSTRUCTION_FORMAT22c_FIELD, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT22c_FIELD_ODEX { $n = retype($INSTRUCTION_FORMAT22c_FIELD_ODEX, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT22c_TYPE { $n = retype($INSTRUCTION_FORMAT22c_TYPE, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT22cs_FIELD { $n = retype($INSTRUCTION_FORMAT22cs_FIELD, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT22s_OR_ID { $n = retype($INSTRUCTION_FORMAT22s_OR_ID, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT22t { $n = retype($INSTRUCTION_FORMAT22t, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT23x { $n = retype($INSTRUCTION_FORMAT23x, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT31i_OR_ID { $n = retype($INSTRUCTION_FORMAT31i_OR_ID, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT31t { $n = retype($INSTRUCTION_FORMAT31t, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT35c_CALL_SITE { $n = retype($INSTRUCTION_FORMAT35c_CALL_SITE, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT35c_METHOD { $n = retype($INSTRUCTION_FORMAT35c_METHOD, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT35c_METHOD_ODEX { $n = retype($INSTRUCTION_FORMAT35c_METHOD_ODEX, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE { $n = retype($INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT35c_TYPE { $n = retype($INSTRUCTION_FORMAT35c_TYPE, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT35mi_METHOD { $n = retype($INSTRUCTION_FORMAT35mi_METHOD, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT35ms_METHOD { $n = retype($INSTRUCTION_FORMAT35ms_METHOD, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT45cc_METHOD { $n = retype($INSTRUCTION_FORMAT45cc_METHOD, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT4rcc_METHOD { $n = retype($INSTRUCTION_FORMAT4rcc_METHOD, SIMPLE_NAME); }
-  | INSTRUCTION_FORMAT51l { $n = retype($INSTRUCTION_FORMAT51l, SIMPLE_NAME); };
+      int paramRegister = 0;
+      for (CharSequence type: $mp.proto.getParameterTypes()) {
+          $parameterList.add(new SmaliMethodParameter(paramRegister++, type.toString()));
+          char c = type.charAt(0);
+          if (c == 'D' || c == 'J') {
+              paramRegister++;
+          }
+      }
+      $returnType = $mp.proto.getReturnType();
+    };
 
-member_name returns[AstNode n]
-  : simple_name { $n = $simple_name.n; }
-  | MEMBER_NAME { $n = retype($MEMBER_NAME, SIMPLE_NAME); };
+method_prototype returns[ImmutableMethodProtoReference proto]
+  : OPEN_PAREN pl=param_list CLOSE_PAREN td=type_descriptor
+    { $proto = new ImmutableMethodProtoReference($pl.types, $td.type); };
 
-method_prototype returns[AstNode n]
-  : OPEN_PAREN param_list CLOSE_PAREN type_descriptor
-    { $n = ast(I_METHOD_PROTOTYPE, _localctx.start,
-               ast(I_METHOD_RETURN_TYPE, _localctx.start, $type_descriptor.n),
-               $param_list.n); };
+param_list_or_id returns[String value]
+  @init { StringBuilder sb = new StringBuilder(); }
+  : ( PARAM_LIST_OR_ID_PRIMITIVE_TYPE { sb.append($PARAM_LIST_OR_ID_PRIMITIVE_TYPE.text); } )+
+    { $value = sb.toString(); };
 
-param_list_or_id_primitive_type returns[AstNode n]
-  : PARAM_LIST_OR_ID_PRIMITIVE_TYPE { $n = retype($PARAM_LIST_OR_ID_PRIMITIVE_TYPE, PRIMITIVE_TYPE); };
+param_list_or_id_primitive_type returns[String value]
+  : PARAM_LIST_OR_ID_PRIMITIVE_TYPE { $value = $PARAM_LIST_OR_ID_PRIMITIVE_TYPE.text; };
 
-param_list returns[AstNode n]
-  @init { List<AstNode> items = new ArrayList<AstNode>(); }
-  : ( param_list_or_id_primitive_type { items.add($param_list_or_id_primitive_type.n); } )+
-      { $n = flat(items); }
-  | ( nonvoid_type_descriptor { items.add($nonvoid_type_descriptor.n); } )*
-      { $n = flat(items); };
+param_list returns[List<String> types]
+  @init { $types = new ArrayList<String>(); }
+  : ( pt=param_list_or_id_primitive_type { $types.add($pt.value); } )+
+  | ( nvtd=nonvoid_type_descriptor { $types.add($nvtd.type); } )*;
 
-array_descriptor returns[AstNode n]
+simple_name returns[String value]
+  : SIMPLE_NAME { $value = $SIMPLE_NAME.text; }
+  | ACCESS_SPEC { $value = $ACCESS_SPEC.text; }
+  | HIDDENAPI_RESTRICTION { $value = $HIDDENAPI_RESTRICTION.text; }
+  | VERIFICATION_ERROR_TYPE { $value = $VERIFICATION_ERROR_TYPE.text; }
+  | POSITIVE_INTEGER_LITERAL { $value = $POSITIVE_INTEGER_LITERAL.text; }
+  | NEGATIVE_INTEGER_LITERAL { $value = $NEGATIVE_INTEGER_LITERAL.text; }
+  | FLOAT_LITERAL_OR_ID { $value = $FLOAT_LITERAL_OR_ID.text; }
+  | DOUBLE_LITERAL_OR_ID { $value = $DOUBLE_LITERAL_OR_ID.text; }
+  | BOOL_LITERAL { $value = $BOOL_LITERAL.text; }
+  | NULL_LITERAL { $value = $NULL_LITERAL.text; }
+  | REGISTER { $value = $REGISTER.text; }
+  | plid=param_list_or_id { $value = $plid.value; }
+  | PRIMITIVE_TYPE { $value = $PRIMITIVE_TYPE.text; }
+  | VOID_TYPE { $value = $VOID_TYPE.text; }
+  | ANNOTATION_VISIBILITY { $value = $ANNOTATION_VISIBILITY.text; }
+  | METHOD_HANDLE_TYPE_FIELD { $value = $METHOD_HANDLE_TYPE_FIELD.text; }
+  | METHOD_HANDLE_TYPE_METHOD { $value = $METHOD_HANDLE_TYPE_METHOD.text; }
+  | INSTRUCTION_FORMAT10t { $value = $INSTRUCTION_FORMAT10t.text; }
+  | INSTRUCTION_FORMAT10x { $value = $INSTRUCTION_FORMAT10x.text; }
+  | INSTRUCTION_FORMAT10x_ODEX { $value = $INSTRUCTION_FORMAT10x_ODEX.text; }
+  | INSTRUCTION_FORMAT11x { $value = $INSTRUCTION_FORMAT11x.text; }
+  | INSTRUCTION_FORMAT12x_OR_ID { $value = $INSTRUCTION_FORMAT12x_OR_ID.text; }
+  | INSTRUCTION_FORMAT21c_FIELD { $value = $INSTRUCTION_FORMAT21c_FIELD.text; }
+  | INSTRUCTION_FORMAT21c_FIELD_ODEX { $value = $INSTRUCTION_FORMAT21c_FIELD_ODEX.text; }
+  | INSTRUCTION_FORMAT21c_METHOD_HANDLE { $value = $INSTRUCTION_FORMAT21c_METHOD_HANDLE.text; }
+  | INSTRUCTION_FORMAT21c_METHOD_TYPE { $value = $INSTRUCTION_FORMAT21c_METHOD_TYPE.text; }
+  | INSTRUCTION_FORMAT21c_STRING { $value = $INSTRUCTION_FORMAT21c_STRING.text; }
+  | INSTRUCTION_FORMAT21c_TYPE { $value = $INSTRUCTION_FORMAT21c_TYPE.text; }
+  | INSTRUCTION_FORMAT21t { $value = $INSTRUCTION_FORMAT21t.text; }
+  | INSTRUCTION_FORMAT22c_FIELD { $value = $INSTRUCTION_FORMAT22c_FIELD.text; }
+  | INSTRUCTION_FORMAT22c_FIELD_ODEX { $value = $INSTRUCTION_FORMAT22c_FIELD_ODEX.text; }
+  | INSTRUCTION_FORMAT22c_TYPE { $value = $INSTRUCTION_FORMAT22c_TYPE.text; }
+  | INSTRUCTION_FORMAT22cs_FIELD { $value = $INSTRUCTION_FORMAT22cs_FIELD.text; }
+  | INSTRUCTION_FORMAT22s_OR_ID { $value = $INSTRUCTION_FORMAT22s_OR_ID.text; }
+  | INSTRUCTION_FORMAT22t { $value = $INSTRUCTION_FORMAT22t.text; }
+  | INSTRUCTION_FORMAT23x { $value = $INSTRUCTION_FORMAT23x.text; }
+  | INSTRUCTION_FORMAT31i_OR_ID { $value = $INSTRUCTION_FORMAT31i_OR_ID.text; }
+  | INSTRUCTION_FORMAT31t { $value = $INSTRUCTION_FORMAT31t.text; }
+  | INSTRUCTION_FORMAT35c_CALL_SITE { $value = $INSTRUCTION_FORMAT35c_CALL_SITE.text; }
+  | INSTRUCTION_FORMAT35c_METHOD { $value = $INSTRUCTION_FORMAT35c_METHOD.text; }
+  | INSTRUCTION_FORMAT35c_METHOD_ODEX { $value = $INSTRUCTION_FORMAT35c_METHOD_ODEX.text; }
+  | INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE { $value = $INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE.text; }
+  | INSTRUCTION_FORMAT35c_TYPE { $value = $INSTRUCTION_FORMAT35c_TYPE.text; }
+  | INSTRUCTION_FORMAT35mi_METHOD { $value = $INSTRUCTION_FORMAT35mi_METHOD.text; }
+  | INSTRUCTION_FORMAT35ms_METHOD { $value = $INSTRUCTION_FORMAT35ms_METHOD.text; }
+  | INSTRUCTION_FORMAT45cc_METHOD { $value = $INSTRUCTION_FORMAT45cc_METHOD.text; }
+  | INSTRUCTION_FORMAT4rcc_METHOD { $value = $INSTRUCTION_FORMAT4rcc_METHOD.text; }
+  | INSTRUCTION_FORMAT51l { $value = $INSTRUCTION_FORMAT51l.text; };
+
+member_name returns[String value]
+  : sn=simple_name { $value = $sn.value; }
+  | MEMBER_NAME { $value = $MEMBER_NAME.text; };
+
+array_descriptor returns[String type]
   : ARRAY_TYPE_PREFIX PRIMITIVE_TYPE
-    { $n = flat(AstNode.leaf($ARRAY_TYPE_PREFIX), AstNode.leaf($PRIMITIVE_TYPE)); }
+    { $type = $ARRAY_TYPE_PREFIX.text + $PRIMITIVE_TYPE.text; }
   | ARRAY_TYPE_PREFIX CLASS_DESCRIPTOR
-    { $n = flat(AstNode.leaf($ARRAY_TYPE_PREFIX), AstNode.leaf($CLASS_DESCRIPTOR)); };
+    { $type = $ARRAY_TYPE_PREFIX.text + $CLASS_DESCRIPTOR.text; };
 
-type_descriptor returns[AstNode n]
-  : VOID_TYPE { $n = AstNode.leaf($VOID_TYPE); }
-  | PRIMITIVE_TYPE { $n = AstNode.leaf($PRIMITIVE_TYPE); }
-  | CLASS_DESCRIPTOR { $n = AstNode.leaf($CLASS_DESCRIPTOR); }
-  | array_descriptor { $n = $array_descriptor.n; };
+type_descriptor returns[String type]
+  : VOID_TYPE { $type = "V"; }
+  | nvtd=nonvoid_type_descriptor { $type = $nvtd.type; };
 
-nonvoid_type_descriptor returns[AstNode n]
-  : PRIMITIVE_TYPE { $n = AstNode.leaf($PRIMITIVE_TYPE); }
-  | CLASS_DESCRIPTOR { $n = AstNode.leaf($CLASS_DESCRIPTOR); }
-  | array_descriptor { $n = $array_descriptor.n; };
+nonvoid_type_descriptor returns[String type]
+  : PRIMITIVE_TYPE { $type = $PRIMITIVE_TYPE.text; }
+  | CLASS_DESCRIPTOR { $type = $CLASS_DESCRIPTOR.text; }
+  | ad=array_descriptor { $type = $ad.type; };
 
-reference_type_descriptor returns[AstNode n]
-  : CLASS_DESCRIPTOR { $n = AstNode.leaf($CLASS_DESCRIPTOR); }
-  | array_descriptor { $n = $array_descriptor.n; };
+reference_type_descriptor returns[String type]
+  : CLASS_DESCRIPTOR { $type = $CLASS_DESCRIPTOR.text; }
+  | ad=array_descriptor { $type = $ad.type; };
 
-integer_literal returns[AstNode n]
-  : POSITIVE_INTEGER_LITERAL { $n = retype($POSITIVE_INTEGER_LITERAL, INTEGER_LITERAL); }
-  | NEGATIVE_INTEGER_LITERAL { $n = retype($NEGATIVE_INTEGER_LITERAL, INTEGER_LITERAL); };
+string_literal returns[String value]
+  : STRING_LITERAL
+    {
+      $value = $STRING_LITERAL.text;
+      $value = $value.substring(1,$value.length()-1);
+    };
 
-float_literal returns[AstNode n]
-  : FLOAT_LITERAL_OR_ID { $n = retype($FLOAT_LITERAL_OR_ID, FLOAT_LITERAL); }
-  | FLOAT_LITERAL { $n = AstNode.leaf($FLOAT_LITERAL); };
+integer_literal returns[int value]
+  : il=POSITIVE_INTEGER_LITERAL { $value = LiteralTools.parseInt($il.text); }
+  | il=NEGATIVE_INTEGER_LITERAL { $value = LiteralTools.parseInt($il.text); };
 
-double_literal returns[AstNode n]
-  : DOUBLE_LITERAL_OR_ID { $n = retype($DOUBLE_LITERAL_OR_ID, DOUBLE_LITERAL); }
-  | DOUBLE_LITERAL { $n = AstNode.leaf($DOUBLE_LITERAL); };
+long_literal returns[long value]
+  : ll=LONG_LITERAL { $value = LiteralTools.parseLong($ll.text); };
 
-literal returns[AstNode n]
-  : LONG_LITERAL { $n = AstNode.leaf($LONG_LITERAL); }
-  | integer_literal { $n = $integer_literal.n; }
-  | SHORT_LITERAL { $n = AstNode.leaf($SHORT_LITERAL); }
-  | BYTE_LITERAL { $n = AstNode.leaf($BYTE_LITERAL); }
-  | float_literal { $n = $float_literal.n; }
-  | double_literal { $n = $double_literal.n; }
-  | CHAR_LITERAL { $n = AstNode.leaf($CHAR_LITERAL); }
-  | STRING_LITERAL { $n = AstNode.leaf($STRING_LITERAL); }
-  | BOOL_LITERAL { $n = AstNode.leaf($BOOL_LITERAL); }
-  | NULL_LITERAL { $n = AstNode.leaf($NULL_LITERAL); }
-  | array_literal { $n = $array_literal.n; }
-  | subannotation { $n = $subannotation.n; }
-  | type_field_method_literal { $n = $type_field_method_literal.n; }
-  | enum_literal { $n = $enum_literal.n; }
-  | method_handle_literal { $n = $method_handle_literal.n; }
-  | method_prototype { $n = $method_prototype.n; };
+short_literal returns[short value]
+  : sl=SHORT_LITERAL { $value = LiteralTools.parseShort($sl.text); };
 
-parsed_integer_literal returns[int value, AstNode n]
-  : il=integer_literal
-    { $value = LiteralTools.parseInt(textOf(_localctx.il)); $n = $il.n; };
+byte_literal returns[byte value]
+  : bl=BYTE_LITERAL { $value = LiteralTools.parseByte($bl.text); };
 
-integral_literal returns[AstNode n]
-  : LONG_LITERAL { $n = AstNode.leaf($LONG_LITERAL); }
-  | integer_literal { $n = $integer_literal.n; }
-  | SHORT_LITERAL { $n = AstNode.leaf($SHORT_LITERAL); }
-  | CHAR_LITERAL { $n = AstNode.leaf($CHAR_LITERAL); }
-  | BYTE_LITERAL { $n = AstNode.leaf($BYTE_LITERAL); };
+float_literal returns[float value]
+  : fl=FLOAT_LITERAL_OR_ID { $value = LiteralTools.parseFloat($fl.text); }
+  | fl2=FLOAT_LITERAL { $value = LiteralTools.parseFloat($fl2.text); };
 
-fixed_32bit_literal returns[AstNode n]
-  : LONG_LITERAL { $n = AstNode.leaf($LONG_LITERAL); }
-  | integer_literal { $n = $integer_literal.n; }
-  | SHORT_LITERAL { $n = AstNode.leaf($SHORT_LITERAL); }
-  | BYTE_LITERAL { $n = AstNode.leaf($BYTE_LITERAL); }
-  | float_literal { $n = $float_literal.n; }
-  | CHAR_LITERAL { $n = AstNode.leaf($CHAR_LITERAL); }
-  | BOOL_LITERAL { $n = AstNode.leaf($BOOL_LITERAL); };
+double_literal returns[double value]
+  : dl=DOUBLE_LITERAL_OR_ID { $value = LiteralTools.parseDouble($dl.text); }
+  | dl2=DOUBLE_LITERAL { $value = LiteralTools.parseDouble($dl2.text); };
 
-fixed_literal returns[AstNode n]
-  : integer_literal { $n = $integer_literal.n; }
-  | LONG_LITERAL { $n = AstNode.leaf($LONG_LITERAL); }
-  | SHORT_LITERAL { $n = AstNode.leaf($SHORT_LITERAL); }
-  | BYTE_LITERAL { $n = AstNode.leaf($BYTE_LITERAL); }
-  | float_literal { $n = $float_literal.n; }
-  | double_literal { $n = $double_literal.n; }
-  | CHAR_LITERAL { $n = AstNode.leaf($CHAR_LITERAL); }
-  | BOOL_LITERAL { $n = AstNode.leaf($BOOL_LITERAL); };
+char_literal returns[char value]
+  : cl=CHAR_LITERAL { $value = $cl.text.charAt(1); };
 
-array_literal returns[AstNode n]
-  @init { List<AstNode> literals = new ArrayList<AstNode>(); }
-  : OPEN_BRACE ( literal { literals.add($literal.n); } ( COMMA literal { literals.add($literal.n); } )* )? CLOSE_BRACE
-    { $n = ast(I_ENCODED_ARRAY, _localctx.start, literals); };
+bool_literal returns[boolean value]
+  : bl=BOOL_LITERAL { $value = Boolean.parseBoolean($bl.text); };
 
-annotation_element returns[AstNode n]
-  : simple_name EQUAL literal
-    { $n = ast(I_ANNOTATION_ELEMENT, _localctx.start, $simple_name.n, $literal.n); };
+short_integral_literal returns[short value]
+  : ll=long_literal
+    {
+      LiteralTools.checkShort($ll.value);
+      $value = (short)$ll.value;
+    }
+  | il=integer_literal
+    {
+      LiteralTools.checkShort($il.value);
+      $value = (short)$il.value;
+    }
+  | sl=short_literal { $value = $sl.value; }
+  | cl=char_literal { $value = (short)$cl.value; }
+  | bl=byte_literal { $value = $bl.value; };
 
-annotation returns[AstNode n]
-  : ANNOTATION_DIRECTIVE ANNOTATION_VISIBILITY CLASS_DESCRIPTOR els+=annotation_element* END_ANNOTATION_DIRECTIVE
-    { List<AstNode> elements = new ArrayList<AstNode>();
-      for (Annotation_elementContext ctx : $els) {
-        elements.add(ctx.n);
+integral_literal returns[int value]
+  : ll=long_literal
+    {
+      LiteralTools.checkInt($ll.value);
+      $value = (int)$ll.value;
+    }
+  | il=integer_literal { $value = $il.value; }
+  | sl=short_literal { $value = $sl.value; }
+  | bl=byte_literal { $value = $bl.value; };
+
+// everything but string and double; long is allowed, but it must fit into an int
+fixed_32bit_literal returns[int value]
+  : il=integer_literal { $value = $il.value; }
+  | ll=long_literal { LiteralTools.checkInt($ll.value); $value = (int)$ll.value; }
+  | sl=short_literal { $value = $sl.value; }
+  | bl=byte_literal { $value = $bl.value; }
+  | fl=float_literal { $value = Float.floatToRawIntBits($fl.value); }
+  | cl=char_literal { $value = $cl.value; }
+  | bol=bool_literal { $value = $bol.value?1:0; };
+
+// same literal set as fixed_32bit_literal, but returned as a long for const-wide/high16
+fixed_wide_literal returns[long value]
+  : il=integer_literal { $value = $il.value; }
+  | ll=long_literal { $value = $ll.value; }
+  | sl=short_literal { $value = $sl.value; }
+  | bl=byte_literal { $value = $bl.value; }
+  | fl=float_literal { $value = Float.floatToRawIntBits($fl.value); }
+  | cl=char_literal { $value = $cl.value; }
+  | bol=bool_literal { $value = $bol.value?1:0; };
+
+// everything but string
+fixed_64bit_literal returns[long value]
+  : il=integer_literal { $value = $il.value; }
+  | ll=long_literal { $value = $ll.value; }
+  | sl=short_literal { $value = $sl.value; }
+  | bl=byte_literal { $value = $bl.value; }
+  | fl=float_literal { $value = Float.floatToRawIntBits($fl.value); }
+  | dl=double_literal { $value = Double.doubleToRawLongBits($dl.value); }
+  | cl=char_literal { $value = $cl.value; }
+  | bol=bool_literal { $value = $bol.value?1:0; };
+
+fixed_64bit_literal_number returns[Number value]
+  : il=integer_literal { $value = $il.value; }
+  | ll=long_literal { $value = $ll.value; }
+  | sl=short_literal { $value = $sl.value; }
+  | bl=byte_literal { $value = $bl.value; }
+  | fl=float_literal { $value = Float.floatToRawIntBits($fl.value); }
+  | dl=double_literal { $value = Double.doubleToRawLongBits($dl.value); }
+  | cl=char_literal { $value = (int)$cl.value; }
+  | bol=bool_literal { $value = $bol.value?1:0; };
+
+parsed_integer_literal returns[int value]
+  : il=integer_literal { $value = $il.value; };
+
+array_literal returns[List<EncodedValue> elements]
+  @init { $elements = new ArrayList<EncodedValue>(); }
+  : OPEN_BRACE ( l=literal { $elements.add($l.encodedValue); }
+      ( COMMA l2=literal { $elements.add($l2.encodedValue); } )* )? CLOSE_BRACE;
+
+literal returns[ImmutableEncodedValue encodedValue]
+  : il=integer_literal { $encodedValue = new ImmutableIntEncodedValue($il.value); }
+  | ll=long_literal { $encodedValue = new ImmutableLongEncodedValue($ll.value); }
+  | sl=short_literal { $encodedValue = new ImmutableShortEncodedValue($sl.value); }
+  | bl=byte_literal { $encodedValue = new ImmutableByteEncodedValue($bl.value); }
+  | fl=float_literal { $encodedValue = new ImmutableFloatEncodedValue($fl.value); }
+  | dl=double_literal { $encodedValue = new ImmutableDoubleEncodedValue($dl.value); }
+  | cl=char_literal { $encodedValue = new ImmutableCharEncodedValue($cl.value); }
+  | stl=string_literal { $encodedValue = new ImmutableStringEncodedValue($stl.value); }
+  | bol=bool_literal { $encodedValue = ImmutableBooleanEncodedValue.forBoolean($bol.value); }
+  | NULL_LITERAL { $encodedValue = ImmutableNullEncodedValue.INSTANCE; }
+  | al=array_literal { $encodedValue = new ImmutableArrayEncodedValue($al.elements); }
+  | sa=subannotation { $encodedValue = new ImmutableAnnotationEncodedValue($sa.annotationType, $sa.elements); }
+  | tfml=type_field_method_literal { $encodedValue = $tfml.encodedValue; }
+  | el=enum_literal { $encodedValue = new ImmutableEnumEncodedValue($el.value); }
+  | mhl=method_handle_literal { $encodedValue = new ImmutableMethodHandleEncodedValue($mhl.value); }
+  | mp=method_prototype { $encodedValue = new ImmutableMethodTypeEncodedValue($mp.proto); };
+
+annotation_element returns[AnnotationElement element]
+  : sn=simple_name EQUAL lit=literal
+    { $element = new ImmutableAnnotationElement($sn.value, $lit.encodedValue); };
+
+annotation returns[Annotation annotationValue]
+  : ANNOTATION_DIRECTIVE av=ANNOTATION_VISIBILITY cd=CLASS_DESCRIPTOR an+=annotation_element* END_ANNOTATION_DIRECTIVE
+    {
+      int visibility = AnnotationVisibility.getVisibility($av.text);
+      List<AnnotationElement> elements = new ArrayList<AnnotationElement>();
+      for (Annotation_elementContext ctx : $an) {
+        elements.add(ctx.element);
       }
-      $n = ast(I_ANNOTATION, _localctx.start, AstNode.leaf($ANNOTATION_VISIBILITY),
-               ast(I_SUBANNOTATION, _localctx.start, $CLASS_DESCRIPTOR, elements)); };
+      $annotationValue = new ImmutableAnnotation(visibility, $cd.text, elements);
+    };
 
-subannotation returns[AstNode n]
-  : SUBANNOTATION_DIRECTIVE CLASS_DESCRIPTOR els+=annotation_element* END_SUBANNOTATION_DIRECTIVE
-    { List<AstNode> elements = new ArrayList<AstNode>();
-      for (Annotation_elementContext ctx : $els) {
-        elements.add(ctx.n);
+subannotation returns[String annotationType, List<AnnotationElement> elements]
+  @init { List<AnnotationElement> elems = new ArrayList<AnnotationElement>(); }
+  : SUBANNOTATION_DIRECTIVE cd=CLASS_DESCRIPTOR ( ae=annotation_element { elems.add($ae.element); } )* END_SUBANNOTATION_DIRECTIVE
+    { $annotationType = $cd.text; $elements = elems; };
+
+enum_literal returns[ImmutableFieldReference value]
+  : ENUM_DIRECTIVE fr=field_reference
+    { $value = $fr.fieldReference; };
+
+type_field_method_literal returns[ImmutableEncodedValue encodedValue]
+  : rtd=reference_type_descriptor
+      { $encodedValue = new ImmutableTypeEncodedValue($rtd.type); }
+  | fr=field_reference
+      { $encodedValue = new ImmutableFieldEncodedValue($fr.fieldReference); }
+  | mr=method_reference
+      { $encodedValue = new ImmutableMethodEncodedValue($mr.methodReference); }
+  | PRIMITIVE_TYPE
+      { $encodedValue = new ImmutableTypeEncodedValue($PRIMITIVE_TYPE.text); }
+  | VOID_TYPE
+      { $encodedValue = new ImmutableTypeEncodedValue("V"); };
+
+field_reference returns[ImmutableFieldReference fieldReference]
+  : (rt=reference_type_descriptor ARROW)? mn=member_name COLON nvtd=nonvoid_type_descriptor
+    {
+      String type;
+      if (_localctx.rt == null || $rt.type == null) {
+        type = classType;
+      } else {
+        type = $rt.type;
       }
-      $n = ast(I_SUBANNOTATION, _localctx.start, $CLASS_DESCRIPTOR, elements); };
+      $fieldReference = new ImmutableFieldReference(type, $mn.value, $nvtd.type);
+    };
 
-enum_literal returns[AstNode n]
-  : ENUM_DIRECTIVE field_reference
-    { $n = ast(I_ENCODED_ENUM, _localctx.start, $field_reference.n); };
+method_reference returns[ImmutableMethodReference methodReference]
+  : (rt=reference_type_descriptor ARROW)? mn=member_name mp=method_prototype
+    {
+      String type;
+      if (_localctx.rt == null || $rt.type == null) {
+        type = classType;
+      } else {
+        type = $rt.type;
+      }
+      $methodReference = new ImmutableMethodReference(type, $mn.value,
+          $mp.proto.getParameterTypes(), $mp.proto.getReturnType());
+    };
 
-type_field_method_literal returns[AstNode n]
-  : reference_type_descriptor { $n = $reference_type_descriptor.n; }
-  | ( (rt=reference_type_descriptor ARROW)?
-      ( member_name COLON nonvoid_type_descriptor
-          { $n = ast(I_ENCODED_FIELD, _localctx.start,
-                     _localctx.rt != null ? $rt.n : null,
-                     $member_name.n, $nonvoid_type_descriptor.n); }
-      | member_name method_prototype
-          { $n = ast(I_ENCODED_METHOD, _localctx.start,
-                     _localctx.rt != null ? $rt.n : null,
-                     $member_name.n, $method_prototype.n); }
-      )
-    )
-  | PRIMITIVE_TYPE { $n = AstNode.leaf($PRIMITIVE_TYPE); }
-  | VOID_TYPE { $n = AstNode.leaf($VOID_TYPE); };
+method_handle_reference returns[ImmutableMethodHandleReference methodHandle]
+  : METHOD_HANDLE_TYPE_FIELD AT fr=field_reference
+      { $methodHandle = new ImmutableMethodHandleReference(
+          MethodHandleType.getMethodHandleType($METHOD_HANDLE_TYPE_FIELD.text), $fr.fieldReference); }
+  | METHOD_HANDLE_TYPE_METHOD AT mr=method_reference
+      { $methodHandle = new ImmutableMethodHandleReference(
+          MethodHandleType.getMethodHandleType($METHOD_HANDLE_TYPE_METHOD.text), $mr.methodReference); }
+  | INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE AT mr=method_reference
+      { $methodHandle = new ImmutableMethodHandleReference(
+          MethodHandleType.getMethodHandleType($INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE.text), $mr.methodReference); };
 
-call_site_reference returns[AstNode n]
-  @init { List<AstNode> extraArguments = new ArrayList<AstNode>(); }
-  : simple_name OPEN_PAREN STRING_LITERAL COMMA method_prototype (COMMA literal { extraArguments.add($literal.n); })* CLOSE_PAREN AT method_reference
-    { $n = ast(I_CALL_SITE_REFERENCE, _localctx.start, $simple_name.n, $STRING_LITERAL, $method_prototype.n,
-               ast(I_CALL_SITE_EXTRA_ARGUMENTS, _localctx.start, extraArguments), $method_reference.n); };
+method_handle_literal returns[ImmutableMethodHandleReference value]
+  : mhr=method_handle_reference { $value = $mhr.methodHandle; };
 
-method_handle_reference returns[AstNode n]
-  : METHOD_HANDLE_TYPE_FIELD AT field_reference
-      { $n = flat(AstNode.leaf($METHOD_HANDLE_TYPE_FIELD), $field_reference.n); }
-  | METHOD_HANDLE_TYPE_METHOD AT method_reference
-      { $n = flat(AstNode.leaf($METHOD_HANDLE_TYPE_METHOD), $method_reference.n); }
-  | INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE AT method_reference
-      { $n = flat(AstNode.leaf($INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE), $method_reference.n); };
+call_site_reference returns[ImmutableCallSiteReference callSiteReference]
+  @init { List<ImmutableEncodedValue> extraArguments = new ArrayList<ImmutableEncodedValue>(); }
+  : sn=simple_name OPEN_PAREN mn=string_literal COMMA mp=method_prototype
+    ( COMMA lit=literal { extraArguments.add($lit.encodedValue); } )*
+    CLOSE_PAREN AT mr=method_reference
+    {
+      ImmutableMethodHandleReference methodHandleReference =
+          new ImmutableMethodHandleReference(MethodHandleType.INVOKE_STATIC, $mr.methodReference);
+      $callSiteReference = new ImmutableCallSiteReference(
+          $sn.value, methodHandleReference, $mn.value, $mp.proto, extraArguments);
+    };
 
-method_handle_literal returns[AstNode n]
-  : method_handle_reference
-    { $n = ast(I_ENCODED_METHOD_HANDLE, _localctx.start, $method_handle_reference.n); };
+verification_error_reference returns[ImmutableReference reference]
+  : cd=CLASS_DESCRIPTOR { $reference = new ImmutableTypeReference($cd.text); }
+  | fr=field_reference { $reference = $fr.fieldReference; }
+  | mr=method_reference { $reference = $mr.methodReference; };
 
-method_reference returns[AstNode n]
-  : (rt=reference_type_descriptor ARROW)? member_name method_prototype
-    { $n = flat(_localctx.rt != null ? $rt.n : null,
-                $member_name.n, $method_prototype.n); };
+verification_error_type returns[int verificationError]
+  : vt=VERIFICATION_ERROR_TYPE
+    { $verificationError = VerificationError.getVerificationError($vt.text); };
 
-field_reference returns[AstNode n]
-  : (rt=reference_type_descriptor ARROW)? member_name COLON nonvoid_type_descriptor
-    { $n = flat(_localctx.rt != null ? $rt.n : null,
-                $member_name.n, $nonvoid_type_descriptor.n); };
+label
+  : COLON sn=simple_name
+    { methodBuilder.addLabel($sn.value); };
 
-label returns[AstNode n]
-  : COLON simple_name { $n = ast(I_LABEL, $COLON, $simple_name.n); };
+label_ref returns[Label target]
+  : COLON sn=simple_name
+    { $target = methodBuilder.getLabel($sn.value); };
 
-label_ref returns[AstNode n]
-  : COLON simple_name { $n = $simple_name.n; };
+register_list returns[byte[] registers, byte registerCount]
+  @init
+  {
+    $registers = new byte[5];
+    $registerCount = 0;
+  }
+  : ( REGISTER
+      {
+        if ($registerCount == 5) {
+          throw new SemanticException(_input, $REGISTER, "A list of registers can only have a maximum of 5 " +
+                  "registers. Use the <op>/range alternate opcode instead.");
+        }
+        $registers[$registerCount++] = parseRegister_nibble($REGISTER.text);
+      }
+      ( COMMA REGISTER
+      {
+        if ($registerCount == 5) {
+          throw new SemanticException(_input, $REGISTER, "A list of registers can only have a maximum of 5 " +
+                  "registers. Use the <op>/range alternate opcode instead.");
+        }
+        $registers[$registerCount++] = parseRegister_nibble($REGISTER.text);
+      } )*
+    )?;
 
-register_list returns[AstNode n]
-  @init { List<AstNode> registers = new ArrayList<AstNode>(); }
-  : REGISTER { registers.add(AstNode.leaf($REGISTER)); } (COMMA REGISTER { registers.add(AstNode.leaf($REGISTER)); })*
-      { $n = ast(I_REGISTER_LIST, _localctx.start, registers); }
-  | { $n = ast(I_REGISTER_LIST, _localctx.start); };
+register_range returns[int startRegister, int endRegister]
+  : ( st=REGISTER ( DOTDOT en=REGISTER )? )?
+    {
+      if (_localctx.st == null) {
+        $startRegister = 0;
+        $endRegister = -1;
+      } else {
+        $startRegister = parseRegister_short($st.text);
+        if (_localctx.en == null) {
+          $endRegister = $startRegister;
+        } else {
+          $endRegister = parseRegister_short($en.text);
+        }
 
-register_range returns[AstNode n]
-  : (startreg=REGISTER (DOTDOT endreg=REGISTER)?)?
-    { $n = ast(I_REGISTER_RANGE, _localctx.start, $startreg, $endreg); };
+        int registerCount = $endRegister-$startRegister+1;
+        if (registerCount < 1) {
+          throw new SemanticException(_input, $st, "A register range must have the lower register listed first");
+        }
+      }
+    };
 
-verification_error_reference returns[AstNode n]
-  : CLASS_DESCRIPTOR { $n = AstNode.leaf($CLASS_DESCRIPTOR); }
-  | field_reference { $n = $field_reference.n; }
-  | method_reference { $n = $method_reference.n; };
+catch_directive
+  : CATCH_DIRECTIVE nvtd=nonvoid_type_descriptor OPEN_BRACE from=label_ref DOTDOT to=label_ref CLOSE_BRACE using=label_ref;
 
-catch_directive returns[AstNode n]
-  : CATCH_DIRECTIVE nonvoid_type_descriptor OPEN_BRACE from=label_ref DOTDOT to=label_ref CLOSE_BRACE using=label_ref
-    { $n = ast(I_CATCH, _localctx.start, $nonvoid_type_descriptor.n, $from.n, $to.n, $using.n); };
+catchall_directive
+  : CATCHALL_DIRECTIVE OPEN_BRACE from=label_ref DOTDOT to=label_ref CLOSE_BRACE using=label_ref;
 
-catchall_directive returns[AstNode n]
-  : CATCHALL_DIRECTIVE OPEN_BRACE from=label_ref DOTDOT to=label_ref CLOSE_BRACE using=label_ref
-    { $n = ast(I_CATCHALL, _localctx.start, $from.n, $to.n, $using.n); };
-
-parameter_directive returns[AstNode n]
-  @init { List<AstNode> annotations = new ArrayList<AstNode>(); }
+parameter_directive[List<SmaliMethodParameter> params, int paramOrdinal]
+  @init { List<Annotation> annotations = new ArrayList<Annotation>(); }
   : PARAMETER_DIRECTIVE
-    ( reg=REGISTER (COMMA name=STRING_LITERAL)?   // .param p1[, "name"]
-    | name=STRING_LITERAL                          // legacy .parameter ["name"]
+    ( reg=REGISTER (COMMA name=string_literal)?
+    | name=string_literal
     )?
-    ({_input.LA(1) == ANNOTATION_DIRECTIVE}? annotation { annotations.add($annotation.n); })*
+    ( {_input.LA(1) == ANNOTATION_DIRECTIVE}? an=annotation { annotations.add($an.annotationValue); } )*
     ( END_PARAMETER_DIRECTIVE
-      { $n = ast(I_PARAMETER, _localctx.start,
-                 _localctx.reg != null ? AstNode.leaf($reg) : null,
-                 $name,
-                 buildTree(I_ANNOTATIONS, annotations)); }
+        { applyParameter(params, paramOrdinal, $PARAMETER_DIRECTIVE, _localctx.reg,
+              _localctx.name != null ? $name.value : null, buildAnnotationSet(annotations)); }
     | { statementsMethodAnnotations.addAll(annotations); }
-      { $n = ast(I_PARAMETER, _localctx.start,
-                 _localctx.reg != null ? AstNode.leaf($reg) : null,
-                 $name,
-                 buildTree(I_ANNOTATIONS, new ArrayList<AstNode>())); }
+        { applyParameter(params, paramOrdinal, $PARAMETER_DIRECTIVE, _localctx.reg,
+              _localctx.name != null ? $name.value : null, buildAnnotationSet(new ArrayList<Annotation>())); }
     );
 
-debug_directive returns[AstNode n]
-  : line_directive { $n = $line_directive.n; }
-  | local_directive { $n = $local_directive.n; }
-  | end_local_directive { $n = $end_local_directive.n; }
-  | restart_local_directive { $n = $restart_local_directive.n; }
-  | prologue_directive { $n = $prologue_directive.n; }
-  | epilogue_directive { $n = $epilogue_directive.n; }
-  | source_directive { $n = $source_directive.n; };
+debug_directive
+  : line_directive
+  | local_directive
+  | end_local_directive
+  | restart_local_directive
+  | prologue_directive
+  | epilogue_directive
+  | source_directive;
 
-line_directive returns[AstNode n]
-  : LINE_DIRECTIVE integral_literal
-    { $n = ast(I_LINE, _localctx.start, $integral_literal.n); };
+line_directive
+  : LINE_DIRECTIVE il=integral_literal
+    { methodBuilder.addLineNumber($il.value); };
 
-local_directive returns[AstNode n]
-  : LOCAL_DIRECTIVE REGISTER (COMMA local_name COLON (VOID_TYPE | nvtd=nonvoid_type_descriptor)
-                              (COMMA signature=STRING_LITERAL)? )?
-    { $n = ast(I_LOCAL, _localctx.start, AstNode.leaf($REGISTER),
-               _localctx.local_name != null ? $local_name.n : null,
-               _localctx.nvtd != null ? $nvtd.n : null,
-               $signature); };
+local_directive
+  : LOCAL_DIRECTIVE REGISTER
+    ( COMMA ln=local_name COLON ( VOID_TYPE | nvtd=nonvoid_type_descriptor )
+      ( COMMA sig=string_literal )? )?
+    {
+      int registerNumber = parseRegister_short($REGISTER.text);
+      methodBuilder.addStartLocal(registerNumber,
+              dexBuilder.internNullableStringReference(_localctx.ln != null ? $ln.value : null),
+              dexBuilder.internNullableTypeReference(
+                      _localctx.nvtd != null ? $nvtd.type : null),
+              dexBuilder.internNullableStringReference(_localctx.sig != null ? $sig.value : null));
+    };
 
-local_name returns[AstNode n]
-  : NULL_LITERAL { $n = AstNode.leaf($NULL_LITERAL); }
-  | STRING_LITERAL { $n = AstNode.leaf($STRING_LITERAL); }
-  // An unquoted local name is lexed as a SIMPLE_NAME. Normalize it to a STRING_LITERAL
-  // node so the tree walker can keep reading a single string_literal form.
-  | SIMPLE_NAME { $n = retypedText(STRING_LITERAL, $SIMPLE_NAME, "\"" + $SIMPLE_NAME.text + "\""); };
+local_name returns[String value]
+  : NULL_LITERAL { $value = null; }
+  | sl=string_literal { $value = $sl.value; }
+  // An unquoted local name is lexed as a SIMPLE_NAME. Use its raw text, matching the way the
+  // historical tree walker stripped the quotes off the normalised STRING_LITERAL node.
+  | sn=SIMPLE_NAME { $value = $sn.text; };
 
-end_local_directive returns[AstNode n]
+end_local_directive
   : END_LOCAL_DIRECTIVE REGISTER
-    { $n = ast(I_END_LOCAL, _localctx.start, $REGISTER); };
+    {
+      int registerNumber = parseRegister_short($REGISTER.text);
+      methodBuilder.addEndLocal(registerNumber);
+    };
 
-restart_local_directive returns[AstNode n]
+restart_local_directive
   : RESTART_LOCAL_DIRECTIVE REGISTER
-    { $n = ast(I_RESTART_LOCAL, _localctx.start, $REGISTER); };
+    {
+      int registerNumber = parseRegister_short($REGISTER.text);
+      methodBuilder.addRestartLocal(registerNumber);
+    };
 
-prologue_directive returns[AstNode n]
+prologue_directive
   : PROLOGUE_DIRECTIVE
-    { $n = ast(I_PROLOGUE, _localctx.start); };
+    { methodBuilder.addPrologue(); };
 
-epilogue_directive returns[AstNode n]
+epilogue_directive
   : EPILOGUE_DIRECTIVE
-    { $n = ast(I_EPILOGUE, _localctx.start); };
+    { methodBuilder.addEpilogue(); };
 
-source_directive returns[AstNode n]
-  : SOURCE_DIRECTIVE STRING_LITERAL?
-    { $n = ast(I_SOURCE, _localctx.start, $STRING_LITERAL); };
+source_directive
+  : SOURCE_DIRECTIVE sl=string_literal?
+    { methodBuilder.addSetSourceFile(dexBuilder.internNullableStringReference(_localctx.sl != null ? $sl.value : null)); };
 
-instruction_format12x returns[AstNode n]
-  : INSTRUCTION_FORMAT12x { $n = AstNode.leaf($INSTRUCTION_FORMAT12x); }
-  | INSTRUCTION_FORMAT12x_OR_ID { $n = retype($INSTRUCTION_FORMAT12x_OR_ID, INSTRUCTION_FORMAT12x); };
+instruction_format12x returns[String opcodeName]
+  : t=INSTRUCTION_FORMAT12x { $opcodeName = $t.text; }
+  | t=INSTRUCTION_FORMAT12x_OR_ID { $opcodeName = $t.text; };
 
-instruction_format22s returns[AstNode n]
-  : INSTRUCTION_FORMAT22s { $n = AstNode.leaf($INSTRUCTION_FORMAT22s); }
-  | INSTRUCTION_FORMAT22s_OR_ID { $n = retype($INSTRUCTION_FORMAT22s_OR_ID, INSTRUCTION_FORMAT22s); };
+instruction_format22s returns[String opcodeName]
+  : t=INSTRUCTION_FORMAT22s { $opcodeName = $t.text; }
+  | t=INSTRUCTION_FORMAT22s_OR_ID { $opcodeName = $t.text; };
 
-instruction_format31i returns[AstNode n]
-  : INSTRUCTION_FORMAT31i { $n = AstNode.leaf($INSTRUCTION_FORMAT31i); }
-  | INSTRUCTION_FORMAT31i_OR_ID { $n = retype($INSTRUCTION_FORMAT31i_OR_ID, INSTRUCTION_FORMAT31i); };
+instruction_format31i returns[String opcodeName]
+  : t=INSTRUCTION_FORMAT31i { $opcodeName = $t.text; }
+  | t=INSTRUCTION_FORMAT31i_OR_ID { $opcodeName = $t.text; };
 
-instruction_format35c_method returns[AstNode n]
-  : INSTRUCTION_FORMAT35c_METHOD { $n = AstNode.leaf($INSTRUCTION_FORMAT35c_METHOD); }
-  | INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE { $n = retype($INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE, INSTRUCTION_FORMAT35c_METHOD); };
+instruction_format35c_method returns[String opcodeName]
+  : t=INSTRUCTION_FORMAT35c_METHOD { $opcodeName = $t.text; }
+  | t=INSTRUCTION_FORMAT35c_METHOD_OR_METHOD_HANDLE_TYPE { $opcodeName = $t.text; };
 
-instruction returns[AstNode n]
-  : insn_format10t { $n = $insn_format10t.n; }
-  | insn_format10x { $n = $insn_format10x.n; }
-  | insn_format10x_odex { $n = $insn_format10x_odex.n; }
-  | insn_format11n { $n = $insn_format11n.n; }
-  | insn_format11x { $n = $insn_format11x.n; }
-  | insn_format12x { $n = $insn_format12x.n; }
-  | insn_format20bc { $n = $insn_format20bc.n; }
-  | insn_format20t { $n = $insn_format20t.n; }
-  | insn_format21c_field { $n = $insn_format21c_field.n; }
-  | insn_format21c_field_odex { $n = $insn_format21c_field_odex.n; }
-  | insn_format21c_method_handle { $n = $insn_format21c_method_handle.n; }
-  | insn_format21c_method_type { $n = $insn_format21c_method_type.n; }
-  | insn_format21c_string { $n = $insn_format21c_string.n; }
-  | insn_format21c_type { $n = $insn_format21c_type.n; }
-  | insn_format21ih { $n = $insn_format21ih.n; }
-  | insn_format21lh { $n = $insn_format21lh.n; }
-  | insn_format21s { $n = $insn_format21s.n; }
-  | insn_format21t { $n = $insn_format21t.n; }
-  | insn_format22b { $n = $insn_format22b.n; }
-  | insn_format22c_field { $n = $insn_format22c_field.n; }
-  | insn_format22c_field_odex { $n = $insn_format22c_field_odex.n; }
-  | insn_format22c_type { $n = $insn_format22c_type.n; }
-  | insn_format22cs_field { $n = $insn_format22cs_field.n; }
-  | insn_format22s { $n = $insn_format22s.n; }
-  | insn_format22t { $n = $insn_format22t.n; }
-  | insn_format22x { $n = $insn_format22x.n; }
-  | insn_format23x { $n = $insn_format23x.n; }
-  | insn_format30t { $n = $insn_format30t.n; }
-  | insn_format31c { $n = $insn_format31c.n; }
-  | insn_format31i { $n = $insn_format31i.n; }
-  | insn_format31t { $n = $insn_format31t.n; }
-  | insn_format32x { $n = $insn_format32x.n; }
-  | insn_format35c_call_site { $n = $insn_format35c_call_site.n; }
-  | insn_format35c_method { $n = $insn_format35c_method.n; }
-  | insn_format35c_type { $n = $insn_format35c_type.n; }
-  | insn_format35c_method_odex { $n = $insn_format35c_method_odex.n; }
-  | insn_format35mi_method { $n = $insn_format35mi_method.n; }
-  | insn_format35ms_method { $n = $insn_format35ms_method.n; }
-  | insn_format3rc_call_site { $n = $insn_format3rc_call_site.n; }
-  | insn_format3rc_method { $n = $insn_format3rc_method.n; }
-  | insn_format3rc_method_odex { $n = $insn_format3rc_method_odex.n; }
-  | insn_format3rc_type { $n = $insn_format3rc_type.n; }
-  | insn_format3rmi_method { $n = $insn_format3rmi_method.n; }
-  | insn_format3rms_method { $n = $insn_format3rms_method.n; }
-  | insn_format45cc_method { $n = $insn_format45cc_method.n; }
-  | insn_format4rcc_method { $n = $insn_format4rcc_method.n; }
-  | insn_format51l { $n = $insn_format51l.n; }
-  | insn_array_data_directive { $n = $insn_array_data_directive.n; }
-  | insn_packed_switch_directive { $n = $insn_packed_switch_directive.n; }
-  | insn_sparse_switch_directive { $n = $insn_sparse_switch_directive.n; };
+instruction
+  : insn_format10t
+  | insn_format10x
+  | insn_format10x_odex
+  | insn_format11n
+  | insn_format11x
+  | insn_format12x
+  | insn_format20bc
+  | insn_format20t
+  | insn_format21c_field
+  | insn_format21c_field_odex
+  | insn_format21c_method_handle
+  | insn_format21c_method_type
+  | insn_format21c_string
+  | insn_format21c_type
+  | insn_format21ih
+  | insn_format21lh
+  | insn_format21s
+  | insn_format21t
+  | insn_format22b
+  | insn_format22c_field
+  | insn_format22c_field_odex
+  | insn_format22c_type
+  | insn_format22cs_field
+  | insn_format22s
+  | insn_format22t
+  | insn_format22x
+  | insn_format23x
+  | insn_format30t
+  | insn_format31c
+  | insn_format31i
+  | insn_format31t
+  | insn_format32x
+  | insn_format35c_call_site
+  | insn_format35c_method
+  | insn_format35c_type
+  | insn_format35c_method_odex
+  | insn_format35mi_method
+  | insn_format35ms_method
+  | insn_format3rc_call_site
+  | insn_format3rc_method
+  | insn_format3rc_method_odex
+  | insn_format3rc_type
+  | insn_format3rmi_method
+  | insn_format3rms_method
+  | insn_format45cc_method
+  | insn_format4rcc_method
+  | insn_format51l
+  | insn_array_data_directive
+  | insn_packed_switch_directive
+  | insn_sparse_switch_directive;
 
-insn_format10t returns[AstNode n]
-  : INSTRUCTION_FORMAT10t label_ref
-    { $n = ast(I_STATEMENT_FORMAT10t, _localctx.start, $INSTRUCTION_FORMAT10t, $label_ref.n); };
+insn_format10t
+  : INSTRUCTION_FORMAT10t lr=label_ref
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT10t.text);
+      methodBuilder.addInstruction(new BuilderInstruction10t(opcode, $lr.target));
+    };
 
-insn_format10x returns[AstNode n]
+insn_format10x
   : INSTRUCTION_FORMAT10x
-    { $n = ast(I_STATEMENT_FORMAT10x, _localctx.start, $INSTRUCTION_FORMAT10x); };
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT10x.text);
+      methodBuilder.addInstruction(new BuilderInstruction10x(opcode));
+    };
 
-insn_format10x_odex returns[AstNode n]
+insn_format10x_odex
   : INSTRUCTION_FORMAT10x_ODEX
     { throwOdexedInstructionException($INSTRUCTION_FORMAT10x_ODEX.text); };
 
-insn_format11n returns[AstNode n]
-  : INSTRUCTION_FORMAT11n REGISTER COMMA integral_literal
-    { $n = ast(I_STATEMENT_FORMAT11n, _localctx.start, $INSTRUCTION_FORMAT11n, $REGISTER, $integral_literal.n); };
+insn_format11n
+  : INSTRUCTION_FORMAT11n REGISTER COMMA sl=short_integral_literal
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT11n.text);
+      byte regA = parseRegister_nibble($REGISTER.text);
 
-insn_format11x returns[AstNode n]
+      short litB = $sl.value;
+      LiteralTools.checkNibble(litB);
+
+      methodBuilder.addInstruction(new BuilderInstruction11n(opcode, regA, litB));
+    };
+
+insn_format11x
   : INSTRUCTION_FORMAT11x REGISTER
-    { $n = ast(I_STATEMENT_FORMAT11x, _localctx.start, $INSTRUCTION_FORMAT11x, $REGISTER); };
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT11x.text);
+      short regA = parseRegister_byte($REGISTER.text);
 
-insn_format12x returns[AstNode n]
-  : instruction_format12x r1=REGISTER COMMA r2=REGISTER
-    { $n = ast(I_STATEMENT_FORMAT12x, _localctx.start, $instruction_format12x.n, $r1, $r2); };
+      methodBuilder.addInstruction(new BuilderInstruction11x(opcode, regA));
+    };
 
-insn_format20bc returns[AstNode n]
-  : INSTRUCTION_FORMAT20bc VERIFICATION_ERROR_TYPE COMMA verification_error_reference
+insn_format12x
+  : if12=instruction_format12x r1=REGISTER COMMA r2=REGISTER
+    {
+      Opcode opcode = opcodes.getOpcodeByName($if12.opcodeName);
+      byte regA = parseRegister_nibble($r1.text);
+      byte regB = parseRegister_nibble($r2.text);
+
+      methodBuilder.addInstruction(new BuilderInstruction12x(opcode, regA, regB));
+    };
+
+insn_format20bc
+  : INSTRUCTION_FORMAT20bc vet=verification_error_type COMMA ver=verification_error_reference
     {
       if (!allowOdex || opcodes.getOpcodeByName($INSTRUCTION_FORMAT20bc.text) == null || apiLevel >= 14) {
         throwOdexedInstructionException($INSTRUCTION_FORMAT20bc.text);
       }
-      $n = ast(I_STATEMENT_FORMAT20bc, _localctx.start, $INSTRUCTION_FORMAT20bc, $VERIFICATION_ERROR_TYPE, $verification_error_reference.n);
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT20bc.text);
+      int verificationError = $vet.verificationError;
+      ImmutableReference referencedItem = $ver.reference;
+
+      methodBuilder.addInstruction(new BuilderInstruction20bc(opcode, verificationError,
+              dexBuilder.internReference(referencedItem)));
     };
 
-insn_format20t returns[AstNode n]
-  : INSTRUCTION_FORMAT20t label_ref
-    { $n = ast(I_STATEMENT_FORMAT20t, _localctx.start, $INSTRUCTION_FORMAT20t, $label_ref.n); };
+insn_format20t
+  : INSTRUCTION_FORMAT20t lr=label_ref
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT20t.text);
+      methodBuilder.addInstruction(new BuilderInstruction20t(opcode, $lr.target));
+    };
 
-insn_format21c_field returns[AstNode n]
-  : INSTRUCTION_FORMAT21c_FIELD r1=REGISTER COMMA field_reference
-    { $n = ast(I_STATEMENT_FORMAT21c_FIELD, _localctx.start, $INSTRUCTION_FORMAT21c_FIELD, $r1, $field_reference.n); };
+insn_format21c_field
+  : INSTRUCTION_FORMAT21c_FIELD r1=REGISTER COMMA fr=field_reference
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_FIELD.text);
+      short regA = parseRegister_byte($r1.text);
+      ImmutableFieldReference fieldReference = $fr.fieldReference;
 
-insn_format21c_field_odex returns[AstNode n]
-  : INSTRUCTION_FORMAT21c_FIELD_ODEX r1=REGISTER COMMA field_reference
+      methodBuilder.addInstruction(new BuilderInstruction21c(opcode, regA,
+              dexBuilder.internFieldReference(fieldReference)));
+    };
+
+insn_format21c_field_odex
+  : INSTRUCTION_FORMAT21c_FIELD_ODEX r1=REGISTER COMMA fr=field_reference
     {
       if (!allowOdex || opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_FIELD_ODEX.text) == null || apiLevel >= 14) {
         throwOdexedInstructionException($INSTRUCTION_FORMAT21c_FIELD_ODEX.text);
       }
-      $n = ast(I_STATEMENT_FORMAT21c_FIELD, _localctx.start, $INSTRUCTION_FORMAT21c_FIELD_ODEX, $r1, $field_reference.n);
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_FIELD_ODEX.text);
+      short regA = parseRegister_byte($r1.text);
+      ImmutableFieldReference fieldReference = $fr.fieldReference;
+
+      methodBuilder.addInstruction(new BuilderInstruction21c(opcode, regA,
+              dexBuilder.internFieldReference(fieldReference)));
     };
 
-insn_format21c_method_handle returns[AstNode n]
-  : INSTRUCTION_FORMAT21c_METHOD_HANDLE r1=REGISTER COMMA method_handle_reference
-    { $n = ast(I_STATEMENT_FORMAT21c_METHOD_HANDLE, _localctx.start, $INSTRUCTION_FORMAT21c_METHOD_HANDLE, $r1, $method_handle_reference.n); };
+insn_format21c_method_handle
+  : INSTRUCTION_FORMAT21c_METHOD_HANDLE r1=REGISTER COMMA mhr=method_handle_reference
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_METHOD_HANDLE.text);
+      short regA = parseRegister_byte($r1.text);
+      ImmutableMethodHandleReference methodHandleReference = $mhr.methodHandle;
 
-insn_format21c_method_type returns[AstNode n]
-  : INSTRUCTION_FORMAT21c_METHOD_TYPE r1=REGISTER COMMA method_prototype
-    { $n = ast(I_STATEMENT_FORMAT21c_METHOD_TYPE, _localctx.start, $INSTRUCTION_FORMAT21c_METHOD_TYPE, $r1, $method_prototype.n); };
+      methodBuilder.addInstruction(new BuilderInstruction21c(opcode, regA,
+              dexBuilder.internMethodHandle(methodHandleReference)));
+    };
 
-insn_format21c_string returns[AstNode n]
-  : INSTRUCTION_FORMAT21c_STRING r1=REGISTER COMMA STRING_LITERAL
-    { $n = ast(I_STATEMENT_FORMAT21c_STRING, _localctx.start, $INSTRUCTION_FORMAT21c_STRING, $r1, $STRING_LITERAL); };
+insn_format21c_method_type
+  : INSTRUCTION_FORMAT21c_METHOD_TYPE r1=REGISTER COMMA mp=method_prototype
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_METHOD_TYPE.text);
+      short regA = parseRegister_byte($r1.text);
+      ImmutableMethodProtoReference methodProtoReference = $mp.proto;
 
-insn_format21c_type returns[AstNode n]
-  : INSTRUCTION_FORMAT21c_TYPE r1=REGISTER COMMA nonvoid_type_descriptor
-    { $n = ast(I_STATEMENT_FORMAT21c_TYPE, _localctx.start, $INSTRUCTION_FORMAT21c_TYPE, $r1, $nonvoid_type_descriptor.n); };
+      methodBuilder.addInstruction(new BuilderInstruction21c(opcode, regA,
+              dexBuilder.internMethodProtoReference(methodProtoReference)));
+    };
 
-insn_format21ih returns[AstNode n]
-  : INSTRUCTION_FORMAT21ih r1=REGISTER COMMA fixed_32bit_literal
-    { $n = ast(I_STATEMENT_FORMAT21ih, _localctx.start, $INSTRUCTION_FORMAT21ih, $r1, $fixed_32bit_literal.n); };
+insn_format21c_string
+  : INSTRUCTION_FORMAT21c_STRING r1=REGISTER COMMA sl=string_literal
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_STRING.text);
+      short regA = parseRegister_byte($r1.text);
 
-insn_format21lh returns[AstNode n]
-  : INSTRUCTION_FORMAT21lh r1=REGISTER COMMA fixed_32bit_literal
-    { $n = ast(I_STATEMENT_FORMAT21lh, _localctx.start, $INSTRUCTION_FORMAT21lh, $r1, $fixed_32bit_literal.n); };
+      methodBuilder.addInstruction(new BuilderInstruction21c(opcode, regA,
+              dexBuilder.internStringReference($sl.value)));
+    };
 
-insn_format21s returns[AstNode n]
-  : INSTRUCTION_FORMAT21s r1=REGISTER COMMA integral_literal
-    { $n = ast(I_STATEMENT_FORMAT21s, _localctx.start, $INSTRUCTION_FORMAT21s, $r1, $integral_literal.n); };
+insn_format21c_type
+  : INSTRUCTION_FORMAT21c_TYPE r1=REGISTER COMMA nvtd=nonvoid_type_descriptor
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_TYPE.text);
+      short regA = parseRegister_byte($r1.text);
 
-insn_format21t returns[AstNode n]
-  : INSTRUCTION_FORMAT21t r1=REGISTER COMMA label_ref
-    { $n = ast(I_STATEMENT_FORMAT21t, _localctx.start, $INSTRUCTION_FORMAT21t, $r1, $label_ref.n); };
+      methodBuilder.addInstruction(new BuilderInstruction21c(opcode, regA,
+              dexBuilder.internTypeReference($nvtd.type)));
+    };
 
-insn_format22b returns[AstNode n]
-  : INSTRUCTION_FORMAT22b r1=REGISTER COMMA r2=REGISTER COMMA integral_literal
-    { $n = ast(I_STATEMENT_FORMAT22b, _localctx.start, $INSTRUCTION_FORMAT22b, $r1, $r2, $integral_literal.n); };
+insn_format21ih
+  : INSTRUCTION_FORMAT21ih r1=REGISTER COMMA f32=fixed_32bit_literal
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21ih.text);
+      short regA = parseRegister_byte($r1.text);
 
-insn_format22c_field returns[AstNode n]
-  : INSTRUCTION_FORMAT22c_FIELD r1=REGISTER COMMA r2=REGISTER COMMA field_reference
-    { $n = ast(I_STATEMENT_FORMAT22c_FIELD, _localctx.start, $INSTRUCTION_FORMAT22c_FIELD, $r1, $r2, $field_reference.n); };
+      // A const/high16 literal is the high 16 bits of the value (e.g. 0x3000 means
+      // 0x30000000), but baksmali emits the already-shifted full value. Accept both by only
+      // shifting a literal that actually looks like a 16-bit hat. Anything else is left to the
+      // builder's checkIntegerHatLiteral, which reports the same error as before.
+      int litB = $f32.value;
+      if ((litB & 0xFFFF) != 0 && litB >= Short.MIN_VALUE && litB <= 0xFFFF) {
+        litB = litB << 16;
+      }
 
-insn_format22c_field_odex returns[AstNode n]
-  : INSTRUCTION_FORMAT22c_FIELD_ODEX r1=REGISTER COMMA r2=REGISTER COMMA field_reference
+      methodBuilder.addInstruction(new BuilderInstruction21ih(opcode, regA, litB));
+    };
+
+insn_format21lh
+  : INSTRUCTION_FORMAT21lh r1=REGISTER COMMA fw=fixed_wide_literal
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21lh.text);
+      short regA = parseRegister_byte($r1.text);
+
+      // A const-wide/high16 literal is the high 16 bits of the value, but baksmali emits the
+      // already-shifted full value. Accept both, as for format 21ih above.
+      long litB = $fw.value;
+      if ((litB & 0xFFFFFFFFFFFFL) != 0L && litB >= Short.MIN_VALUE && litB <= 0xFFFF) {
+        litB = litB << 48;
+      }
+
+      methodBuilder.addInstruction(new BuilderInstruction21lh(opcode, regA, litB));
+    };
+
+insn_format21s
+  : INSTRUCTION_FORMAT21s r1=REGISTER COMMA sl=short_integral_literal
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21s.text);
+      short regA = parseRegister_byte($r1.text);
+
+      short litB = $sl.value;
+
+      methodBuilder.addInstruction(new BuilderInstruction21s(opcode, regA, litB));
+    };
+
+insn_format21t
+  : INSTRUCTION_FORMAT21t r1=REGISTER COMMA lr=label_ref
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21t.text);
+      short regA = parseRegister_byte($r1.text);
+
+      methodBuilder.addInstruction(new BuilderInstruction21t(opcode, regA, $lr.target));
+    };
+
+insn_format22b
+  : INSTRUCTION_FORMAT22b r1=REGISTER COMMA r2=REGISTER COMMA sl=short_integral_literal
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT22b.text);
+      short regA = parseRegister_byte($r1.text);
+      short regB = parseRegister_byte($r2.text);
+
+      short litC = $sl.value;
+      LiteralTools.checkByte(litC);
+
+      methodBuilder.addInstruction(new BuilderInstruction22b(opcode, regA, regB, litC));
+    };
+
+insn_format22c_field
+  : INSTRUCTION_FORMAT22c_FIELD r1=REGISTER COMMA r2=REGISTER COMMA fr=field_reference
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT22c_FIELD.text);
+      byte regA = parseRegister_nibble($r1.text);
+      byte regB = parseRegister_nibble($r2.text);
+      ImmutableFieldReference fieldReference = $fr.fieldReference;
+
+      methodBuilder.addInstruction(new BuilderInstruction22c(opcode, regA, regB,
+              dexBuilder.internFieldReference(fieldReference)));
+    };
+
+insn_format22c_field_odex
+  : INSTRUCTION_FORMAT22c_FIELD_ODEX r1=REGISTER COMMA r2=REGISTER COMMA fr=field_reference
     {
       if (!allowOdex || opcodes.getOpcodeByName($INSTRUCTION_FORMAT22c_FIELD_ODEX.text) == null || apiLevel >= 14) {
         throwOdexedInstructionException($INSTRUCTION_FORMAT22c_FIELD_ODEX.text);
       }
-      $n = ast(I_STATEMENT_FORMAT22c_FIELD, _localctx.start, $INSTRUCTION_FORMAT22c_FIELD_ODEX, $r1, $r2, $field_reference.n);
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT22c_FIELD_ODEX.text);
+      byte regA = parseRegister_nibble($r1.text);
+      byte regB = parseRegister_nibble($r2.text);
+      ImmutableFieldReference fieldReference = $fr.fieldReference;
+
+      methodBuilder.addInstruction(new BuilderInstruction22c(opcode, regA, regB,
+              dexBuilder.internFieldReference(fieldReference)));
     };
 
-insn_format22c_type returns[AstNode n]
-  : INSTRUCTION_FORMAT22c_TYPE r1=REGISTER COMMA r2=REGISTER COMMA nonvoid_type_descriptor
-    { $n = ast(I_STATEMENT_FORMAT22c_TYPE, _localctx.start, $INSTRUCTION_FORMAT22c_TYPE, $r1, $r2, $nonvoid_type_descriptor.n); };
+insn_format22c_type
+  : INSTRUCTION_FORMAT22c_TYPE r1=REGISTER COMMA r2=REGISTER COMMA nvtd=nonvoid_type_descriptor
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT22c_TYPE.text);
+      byte regA = parseRegister_nibble($r1.text);
+      byte regB = parseRegister_nibble($r2.text);
 
-insn_format22cs_field returns[AstNode n]
+      methodBuilder.addInstruction(new BuilderInstruction22c(opcode, regA, regB,
+              dexBuilder.internTypeReference($nvtd.type)));
+    };
+
+insn_format22cs_field
   : INSTRUCTION_FORMAT22cs_FIELD r1=REGISTER COMMA r2=REGISTER COMMA FIELD_OFFSET
     { throwOdexedInstructionException($INSTRUCTION_FORMAT22cs_FIELD.text); };
 
-insn_format22s returns[AstNode n]
-  : instruction_format22s r1=REGISTER COMMA r2=REGISTER COMMA integral_literal
-    { $n = ast(I_STATEMENT_FORMAT22s, _localctx.start, $instruction_format22s.n, $r1, $r2, $integral_literal.n); };
+insn_format22s
+  : if22s=instruction_format22s r1=REGISTER COMMA r2=REGISTER COMMA sl=short_integral_literal
+    {
+      Opcode opcode = opcodes.getOpcodeByName($if22s.opcodeName);
+      byte regA = parseRegister_nibble($r1.text);
+      byte regB = parseRegister_nibble($r2.text);
 
-insn_format22t returns[AstNode n]
-  : INSTRUCTION_FORMAT22t r1=REGISTER COMMA r2=REGISTER COMMA label_ref
-    { $n = ast(I_STATEMENT_FORMAT22t, _localctx.start, $INSTRUCTION_FORMAT22t, $r1, $r2, $label_ref.n); };
+      short litC = $sl.value;
 
-insn_format22x returns[AstNode n]
+      methodBuilder.addInstruction(new BuilderInstruction22s(opcode, regA, regB, litC));
+    };
+
+insn_format22t
+  : INSTRUCTION_FORMAT22t r1=REGISTER COMMA r2=REGISTER COMMA lr=label_ref
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT22t.text);
+      byte regA = parseRegister_nibble($r1.text);
+      byte regB = parseRegister_nibble($r2.text);
+
+      methodBuilder.addInstruction(new BuilderInstruction22t(opcode, regA, regB, $lr.target));
+    };
+
+insn_format22x
   : INSTRUCTION_FORMAT22x r1=REGISTER COMMA r2=REGISTER
-    { $n = ast(I_STATEMENT_FORMAT22x, _localctx.start, $INSTRUCTION_FORMAT22x, $r1, $r2); };
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT22x.text);
+      short regA = parseRegister_byte($r1.text);
+      int regB = parseRegister_short($r2.text);
 
-insn_format23x returns[AstNode n]
+      methodBuilder.addInstruction(new BuilderInstruction22x(opcode, regA, regB));
+    };
+
+insn_format23x
   : INSTRUCTION_FORMAT23x r1=REGISTER COMMA r2=REGISTER COMMA r3=REGISTER
-    { $n = ast(I_STATEMENT_FORMAT23x, _localctx.start, $INSTRUCTION_FORMAT23x, $r1, $r2, $r3); };
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT23x.text);
+      short regA = parseRegister_byte($r1.text);
+      short regB = parseRegister_byte($r2.text);
+      short regC = parseRegister_byte($r3.text);
 
-insn_format30t returns[AstNode n]
-  : INSTRUCTION_FORMAT30t label_ref
-    { $n = ast(I_STATEMENT_FORMAT30t, _localctx.start, $INSTRUCTION_FORMAT30t, $label_ref.n); };
+      methodBuilder.addInstruction(new BuilderInstruction23x(opcode, regA, regB, regC));
+    };
 
-insn_format31c returns[AstNode n]
-  : INSTRUCTION_FORMAT31c r1=REGISTER COMMA STRING_LITERAL
-    { $n = ast(I_STATEMENT_FORMAT31c, _localctx.start, $INSTRUCTION_FORMAT31c, $r1, $STRING_LITERAL); };
+insn_format30t
+  : INSTRUCTION_FORMAT30t lr=label_ref
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT30t.text);
+      methodBuilder.addInstruction(new BuilderInstruction30t(opcode, $lr.target));
+    };
 
-insn_format31i returns[AstNode n]
-  : instruction_format31i r1=REGISTER COMMA fixed_32bit_literal
-    { $n = ast(I_STATEMENT_FORMAT31i, _localctx.start, $instruction_format31i.n, $r1, $fixed_32bit_literal.n); };
+insn_format31c
+  : INSTRUCTION_FORMAT31c r1=REGISTER COMMA sl=string_literal
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT31c.text);
+      short regA = parseRegister_byte($r1.text);
 
-insn_format31t returns[AstNode n]
-  : INSTRUCTION_FORMAT31t r1=REGISTER COMMA label_ref
-    { $n = ast(I_STATEMENT_FORMAT31t, _localctx.start, $INSTRUCTION_FORMAT31t, $r1, $label_ref.n); };
+      methodBuilder.addInstruction(new BuilderInstruction31c(opcode, regA,
+              dexBuilder.internStringReference($sl.value)));
+    };
 
-insn_format32x returns[AstNode n]
+insn_format31i
+  : if31i=instruction_format31i r1=REGISTER COMMA f32=fixed_32bit_literal
+    {
+      Opcode opcode = opcodes.getOpcodeByName($if31i.opcodeName);
+      short regA = parseRegister_byte($r1.text);
+      int litB = $f32.value;
+
+      methodBuilder.addInstruction(new BuilderInstruction31i(opcode, regA, litB));
+    };
+
+insn_format31t
+  : INSTRUCTION_FORMAT31t r1=REGISTER COMMA lr=label_ref
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT31t.text);
+      short regA = parseRegister_byte($r1.text);
+
+      methodBuilder.addInstruction(new BuilderInstruction31t(opcode, regA, $lr.target));
+    };
+
+insn_format32x
   : INSTRUCTION_FORMAT32x r1=REGISTER COMMA r2=REGISTER
-    { $n = ast(I_STATEMENT_FORMAT32x, _localctx.start, $INSTRUCTION_FORMAT32x, $r1, $r2); };
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT32x.text);
+      int regA = parseRegister_short($r1.text);
+      int regB = parseRegister_short($r2.text);
 
-insn_format35c_call_site returns[AstNode n]
-  : INSTRUCTION_FORMAT35c_CALL_SITE OPEN_BRACE register_list CLOSE_BRACE COMMA call_site_reference
-    { $n = ast(I_STATEMENT_FORMAT35c_CALL_SITE, _localctx.start, $INSTRUCTION_FORMAT35c_CALL_SITE, $register_list.n, $call_site_reference.n); };
+      methodBuilder.addInstruction(new BuilderInstruction32x(opcode, regA, regB));
+    };
 
-insn_format35c_method returns[AstNode n]
-  : instruction_format35c_method OPEN_BRACE register_list CLOSE_BRACE COMMA method_reference
-    { $n = ast(I_STATEMENT_FORMAT35c_METHOD, _localctx.start, $instruction_format35c_method.n, $register_list.n, $method_reference.n); };
+insn_format35c_call_site
+  : INSTRUCTION_FORMAT35c_CALL_SITE OPEN_BRACE rl=register_list CLOSE_BRACE COMMA csr=call_site_reference
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT35c_CALL_SITE.text);
 
-insn_format35c_type returns[AstNode n]
-  : INSTRUCTION_FORMAT35c_TYPE OPEN_BRACE register_list CLOSE_BRACE COMMA nonvoid_type_descriptor
-    { $n = ast(I_STATEMENT_FORMAT35c_TYPE, _localctx.start, $INSTRUCTION_FORMAT35c_TYPE, $register_list.n, $nonvoid_type_descriptor.n); };
+      //this depends on the fact that register_list returns a byte[5]
+      byte[] registers = $rl.registers;
+      byte registerCount = $rl.registerCount;
 
-insn_format35c_method_odex returns[AstNode n]
+      ImmutableCallSiteReference callSiteReference = $csr.callSiteReference;
+
+      methodBuilder.addInstruction(new BuilderInstruction35c(opcode, registerCount, registers[0],
+              registers[1], registers[2], registers[3], registers[4], dexBuilder.internCallSite(callSiteReference)));
+    };
+
+insn_format35c_method
+  : if35c=instruction_format35c_method OPEN_BRACE rl=register_list CLOSE_BRACE COMMA mr=method_reference
+    {
+      Opcode opcode = opcodes.getOpcodeByName($if35c.opcodeName);
+
+      //this depends on the fact that register_list returns a byte[5]
+      byte[] registers = $rl.registers;
+      byte registerCount = $rl.registerCount;
+
+      ImmutableMethodReference methodReference = $mr.methodReference;
+
+      methodBuilder.addInstruction(new BuilderInstruction35c(opcode, registerCount, registers[0], registers[1],
+              registers[2], registers[3], registers[4], dexBuilder.internMethodReference(methodReference)));
+    };
+
+insn_format35c_type
+  : INSTRUCTION_FORMAT35c_TYPE OPEN_BRACE rl=register_list CLOSE_BRACE COMMA nvtd=nonvoid_type_descriptor
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT35c_TYPE.text);
+
+      //this depends on the fact that register_list returns a byte[5]
+      byte[] registers = $rl.registers;
+      byte registerCount = $rl.registerCount;
+
+      methodBuilder.addInstruction(new BuilderInstruction35c(opcode, registerCount, registers[0], registers[1],
+              registers[2], registers[3], registers[4], dexBuilder.internTypeReference($nvtd.type)));
+    };
+
+insn_format35c_method_odex
   : INSTRUCTION_FORMAT35c_METHOD_ODEX OPEN_BRACE register_list CLOSE_BRACE COMMA method_reference
     { throwOdexedInstructionException($INSTRUCTION_FORMAT35c_METHOD_ODEX.text); };
 
-insn_format35mi_method returns[AstNode n]
+insn_format35mi_method
   : INSTRUCTION_FORMAT35mi_METHOD OPEN_BRACE register_list CLOSE_BRACE COMMA INLINE_INDEX
     { throwOdexedInstructionException($INSTRUCTION_FORMAT35mi_METHOD.text); };
 
-insn_format35ms_method returns[AstNode n]
+insn_format35ms_method
   : INSTRUCTION_FORMAT35ms_METHOD OPEN_BRACE register_list CLOSE_BRACE COMMA VTABLE_INDEX
     { throwOdexedInstructionException($INSTRUCTION_FORMAT35ms_METHOD.text); };
 
-insn_format3rc_call_site returns[AstNode n]
-  : INSTRUCTION_FORMAT3rc_CALL_SITE OPEN_BRACE register_range CLOSE_BRACE COMMA call_site_reference
-    { $n = ast(I_STATEMENT_FORMAT3rc_CALL_SITE, _localctx.start, $INSTRUCTION_FORMAT3rc_CALL_SITE, $register_range.n, $call_site_reference.n); };
+insn_format3rc_call_site
+  : INSTRUCTION_FORMAT3rc_CALL_SITE OPEN_BRACE rr=register_range CLOSE_BRACE COMMA csr=call_site_reference
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT3rc_CALL_SITE.text);
+      int startRegister = $rr.startRegister;
+      int endRegister = $rr.endRegister;
 
-insn_format3rc_method returns[AstNode n]
-  : INSTRUCTION_FORMAT3rc_METHOD OPEN_BRACE register_range CLOSE_BRACE COMMA method_reference
-    { $n = ast(I_STATEMENT_FORMAT3rc_METHOD, _localctx.start, $INSTRUCTION_FORMAT3rc_METHOD, $register_range.n, $method_reference.n); };
+      int registerCount = endRegister - startRegister + 1;
 
-insn_format3rc_method_odex returns[AstNode n]
+      ImmutableCallSiteReference callSiteReference = $csr.callSiteReference;
+
+      methodBuilder.addInstruction(new BuilderInstruction3rc(opcode, startRegister, registerCount,
+              dexBuilder.internCallSite(callSiteReference)));
+    };
+
+insn_format3rc_method
+  : INSTRUCTION_FORMAT3rc_METHOD OPEN_BRACE rr=register_range CLOSE_BRACE COMMA mr=method_reference
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT3rc_METHOD.text);
+      int startRegister = $rr.startRegister;
+      int endRegister = $rr.endRegister;
+
+      int registerCount = endRegister-startRegister+1;
+
+      ImmutableMethodReference methodReference = $mr.methodReference;
+
+      methodBuilder.addInstruction(new BuilderInstruction3rc(opcode, startRegister, registerCount,
+              dexBuilder.internMethodReference(methodReference)));
+    };
+
+insn_format3rc_method_odex
   : INSTRUCTION_FORMAT3rc_METHOD_ODEX OPEN_BRACE register_list CLOSE_BRACE COMMA method_reference
     { throwOdexedInstructionException($INSTRUCTION_FORMAT3rc_METHOD_ODEX.text); };
 
-insn_format3rc_type returns[AstNode n]
-  : INSTRUCTION_FORMAT3rc_TYPE OPEN_BRACE register_range CLOSE_BRACE COMMA nonvoid_type_descriptor
-    { $n = ast(I_STATEMENT_FORMAT3rc_TYPE, _localctx.start, $INSTRUCTION_FORMAT3rc_TYPE, $register_range.n, $nonvoid_type_descriptor.n); };
+insn_format3rc_type
+  : INSTRUCTION_FORMAT3rc_TYPE OPEN_BRACE rr=register_range CLOSE_BRACE COMMA nvtd=nonvoid_type_descriptor
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT3rc_TYPE.text);
+      int startRegister = $rr.startRegister;
+      int endRegister = $rr.endRegister;
 
-insn_format3rmi_method returns[AstNode n]
+      int registerCount = endRegister-startRegister+1;
+
+      methodBuilder.addInstruction(new BuilderInstruction3rc(opcode, startRegister, registerCount,
+              dexBuilder.internTypeReference($nvtd.type)));
+    };
+
+insn_format3rmi_method
   : INSTRUCTION_FORMAT3rmi_METHOD OPEN_BRACE register_range CLOSE_BRACE COMMA INLINE_INDEX
     { throwOdexedInstructionException($INSTRUCTION_FORMAT3rmi_METHOD.text); };
 
-insn_format3rms_method returns[AstNode n]
+insn_format3rms_method
   : INSTRUCTION_FORMAT3rms_METHOD OPEN_BRACE register_range CLOSE_BRACE COMMA VTABLE_INDEX
     { throwOdexedInstructionException($INSTRUCTION_FORMAT3rms_METHOD.text); };
 
-insn_format45cc_method returns[AstNode n]
-  : INSTRUCTION_FORMAT45cc_METHOD OPEN_BRACE register_list CLOSE_BRACE COMMA method_reference COMMA method_prototype
-    { $n = ast(I_STATEMENT_FORMAT45cc_METHOD, _localctx.start, $INSTRUCTION_FORMAT45cc_METHOD, $register_list.n, $method_reference.n, $method_prototype.n); };
-
-insn_format4rcc_method returns[AstNode n]
-  : INSTRUCTION_FORMAT4rcc_METHOD OPEN_BRACE register_range CLOSE_BRACE COMMA method_reference COMMA method_prototype
-    { $n = ast(I_STATEMENT_FORMAT4rcc_METHOD, _localctx.start, $INSTRUCTION_FORMAT4rcc_METHOD, $register_range.n, $method_reference.n, $method_prototype.n); };
-
-insn_format51l returns[AstNode n]
-  : INSTRUCTION_FORMAT51l r1=REGISTER COMMA fixed_literal
-    { $n = ast(I_STATEMENT_FORMAT51l, _localctx.start, $INSTRUCTION_FORMAT51l, $r1, $fixed_literal.n); };
-
-insn_array_data_directive returns[AstNode n]
-  @init { List<AstNode> elements = new ArrayList<AstNode>(); }
-  : ARRAY_DATA_DIRECTIVE parsed_integer_literal
+insn_format45cc_method
+  : INSTRUCTION_FORMAT45cc_METHOD OPEN_BRACE rl=register_list CLOSE_BRACE COMMA mr=method_reference COMMA mp=method_prototype
     {
-        int elementWidth = $parsed_integer_literal.value;
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT45cc_METHOD.text);
+
+      //this depends on the fact that register_list returns a byte[5]
+      byte[] registers = $rl.registers;
+      byte registerCount = $rl.registerCount;
+
+      ImmutableMethodReference methodReference = $mr.methodReference;
+
+      methodBuilder.addInstruction(new BuilderInstruction45cc(opcode, registerCount, registers[0], registers[1],
+              registers[2], registers[3], registers[4],
+              dexBuilder.internMethodReference(methodReference),
+              dexBuilder.internMethodProtoReference($mp.proto)));
+    };
+
+insn_format4rcc_method
+  : INSTRUCTION_FORMAT4rcc_METHOD OPEN_BRACE rr=register_range CLOSE_BRACE COMMA mr=method_reference COMMA mp=method_prototype
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT4rcc_METHOD.text);
+
+      int startRegister = $rr.startRegister;
+      int endRegister = $rr.endRegister;
+
+      int registerCount = endRegister-startRegister+1;
+
+      ImmutableMethodReference methodReference = $mr.methodReference;
+
+      methodBuilder.addInstruction(new BuilderInstruction4rcc(opcode, startRegister, registerCount,
+              dexBuilder.internMethodReference(methodReference),
+              dexBuilder.internMethodProtoReference($mp.proto)));
+    };
+
+insn_format51l
+  : INSTRUCTION_FORMAT51l r1=REGISTER COMMA f64=fixed_64bit_literal
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT51l.text);
+      short regA = parseRegister_byte($r1.text);
+
+      long litB = $f64.value;
+
+      methodBuilder.addInstruction(new BuilderInstruction51l(opcode, regA, litB));
+    };
+
+insn_array_data_directive
+  @init { List<Number> elements = new ArrayList<Number>(); }
+  : ARRAY_DATA_DIRECTIVE pil=parsed_integer_literal
+    {
+        int elementWidth = $pil.value;
         if (elementWidth != 4 && elementWidth != 8 && elementWidth != 1 && elementWidth != 2) {
             throw new SemanticException(_input, _localctx.start, "Invalid element width: %d. Must be 1, 2, 4 or 8", elementWidth);
         }
     }
-    ( fixed_literal { elements.add($fixed_literal.n); } )* END_ARRAY_DATA_DIRECTIVE
-    { $n = ast(I_STATEMENT_ARRAY_DATA, _localctx.start,
-               ast(I_ARRAY_ELEMENT_SIZE, _localctx.start, $parsed_integer_literal.n),
-               ast(I_ARRAY_ELEMENTS, _localctx.start, elements)); };
+    ( fln=fixed_64bit_literal_number { elements.add($fln.value); } )* END_ARRAY_DATA_DIRECTIVE
+    {
+      methodBuilder.addInstruction(new BuilderArrayPayload(elementWidth, elements));
+    };
 
-insn_packed_switch_directive returns[AstNode n]
-  @init { List<AstNode> labels = new ArrayList<AstNode>(); }
-  : PACKED_SWITCH_DIRECTIVE fixed_32bit_literal ( label_ref { labels.add($label_ref.n); } )* END_PACKED_SWITCH_DIRECTIVE
-    { $n = ast(I_STATEMENT_PACKED_SWITCH, _localctx.start,
-               ast(I_PACKED_SWITCH_START_KEY, _localctx.start, $fixed_32bit_literal.n),
-               ast(I_PACKED_SWITCH_ELEMENTS, _localctx.start, labels)); };
+insn_packed_switch_directive
+  @init { List<Label> labels = new ArrayList<Label>(); }
+  : PACKED_SWITCH_DIRECTIVE f32=fixed_32bit_literal ( lr=label_ref { labels.add($lr.target); } )* END_PACKED_SWITCH_DIRECTIVE
+    {
+      int startKey = $f32.value;
+      methodBuilder.addInstruction(new BuilderPackedSwitchPayload(startKey, labels));
+    };
 
-insn_sparse_switch_directive returns[AstNode n]
-  @init { List<AstNode> items = new ArrayList<AstNode>(); }
-  : SPARSE_SWITCH_DIRECTIVE ( fixed_32bit_literal ARROW label_ref
-      { items.add($fixed_32bit_literal.n); items.add($label_ref.n); } )* END_SPARSE_SWITCH_DIRECTIVE
-    { $n = ast(I_STATEMENT_SPARSE_SWITCH, _localctx.start,
-               ast(I_SPARSE_SWITCH_ELEMENTS, _localctx.start, items)); };
+insn_sparse_switch_directive
+  @init { List<SwitchLabelElement> items = new ArrayList<SwitchLabelElement>(); }
+  : SPARSE_SWITCH_DIRECTIVE ( f32=fixed_32bit_literal ARROW lr=label_ref
+      { items.add(new SwitchLabelElement($f32.value, $lr.target)); } )* END_SPARSE_SWITCH_DIRECTIVE
+    {
+      methodBuilder.addInstruction(new BuilderSparseSwitchPayload(items));
+    };
+

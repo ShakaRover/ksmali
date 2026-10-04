@@ -3,8 +3,8 @@
 This directory is the checked-in home for the ANTLR4-generated Java sources used by the
 `android-smali` Soong target (`smali/Android.bp`).
 
-ANTLR 4.13.2 has no Kotlin target, so `smaliLexer.java`, `smaliParser.java` and
-`smaliTreeWalker.java` are generated as Java from the `.g4` grammars in
+ANTLR 4.13.2 has no Kotlin target, so `smaliLexer.java` and
+`smaliParser.java` are generated as Java from the `.g4` grammars in
 `third_party/smali/src/main/antlr/`. The rest of the smali module is Kotlin.
 
 Because AOSP/Soong cannot run Gradle (and the ANTLR4 tool is not shipped in the platform),

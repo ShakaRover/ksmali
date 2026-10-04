@@ -59,26 +59,11 @@ fun compileSmali(smaliText: String, apiLevel: Int): DexBackedClassDef {
     parser.setVerboseErrors(true)
     parser.setAllowOdex(false)
     parser.setApiLevel(apiLevel)
+    parser.setDexBuilder(dexBuilder)
 
-    val result = parser.smali_file()
+    parser.smali_file()
 
     if (parser.getNumberOfSyntaxErrors() > 0 || lexer.getNumberOfSyntaxErrors() > 0) {
-        throw RuntimeException("Error occurred while compiling text")
-    }
-
-    val t = result.n
-
-    val treeStream = ListTokenStream(t.flatten())
-
-    val dexGen = smaliTreeWalker(treeStream)
-    dexGen.setBuildParseTree(false)
-    dexGen.setErrorHandler(NoSyncErrorStrategy())
-    dexGen.setApiLevel(apiLevel)
-    dexGen.setVerboseErrors(true)
-    dexGen.setDexBuilder(dexBuilder)
-    dexGen.smali_file()
-
-    if (dexGen.getNumberOfSyntaxErrors() > 0) {
         throw RuntimeException("Error occurred while compiling text")
     }
 

@@ -109,20 +109,6 @@ private fun runSmaliFrontEndPipeline(source: String, apiLevel: Int): SmaliFrontE
         setVerboseErrors(true)
         setAllowOdex(false)
         setApiLevel(apiLevel)
-        removeErrorListeners()
-        addErrorListener(listener)
-    }
-
-    val parsed = parser.smali_file()
-    if (parser.numberOfSyntaxErrors > 0 || lexer.numberOfSyntaxErrors > 0) {
-        return SmaliFrontEndResult(RuntimeException("syntax errors"), errors)
-    }
-
-    val walker = smaliTreeWalker(ListTokenStream(parsed.n.flatten())).apply {
-        setBuildParseTree(false)
-        setErrorHandler(NoSyncErrorStrategy())
-        setApiLevel(apiLevel)
-        setVerboseErrors(true)
         setDexBuilder(DexBuilder(Opcodes.forApi(apiLevel)))
         removeErrorListeners()
         addErrorListener(listener)
@@ -130,12 +116,12 @@ private fun runSmaliFrontEndPipeline(source: String, apiLevel: Int): SmaliFrontE
 
     var thrown: Throwable? = null
     try {
-        walker.smali_file()
+        parser.smali_file()
     } catch (ex: Throwable) {
         thrown = ex
     }
-    if (thrown == null && walker.numberOfSyntaxErrors > 0) {
-        thrown = RuntimeException("tree walker syntax errors")
+    if (thrown == null && (parser.numberOfSyntaxErrors > 0 || lexer.numberOfSyntaxErrors > 0)) {
+        thrown = RuntimeException("syntax errors")
     }
     return SmaliFrontEndResult(thrown, errors)
 }

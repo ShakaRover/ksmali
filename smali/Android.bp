@@ -23,8 +23,8 @@ genrule {
 // build smali jar
 // ============================================================
 
-// The smali module is Kotlin-only, but ANTLR 4.13.2 has no Kotlin target, so the lexer,
-// parser and tree walker are generated as Java from the .g4 grammars (see
+// The smali module is Kotlin-only, but ANTLR 4.13.2 has no Kotlin target, so the lexer
+// and parser are generated as Java from the .g4 grammars (see
 // third_party/smali/src/main/antlr/).
 //
 // AOSP/Soong cannot run Gradle (and the ANTLR4 tool is not shipped in the platform; only the
@@ -43,7 +43,7 @@ java_binary_host {
     srcs: [
         "src/main/kotlin/**/*.kt",
         ":third_party-smali",
-        // Generated Java: smaliLexer, smaliParser and smaliTreeWalker.
+        // Generated Java: smaliLexer and smaliParser.
         "src/main/antlr-generated/**/*.java",
     ],
 

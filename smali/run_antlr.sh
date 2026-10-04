@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Regenerates the ANTLR4 lexer (smaliLexer.java), parser (smaliParser.java) and tree walker
-# (smaliTreeWalker.java) from the .g4 grammars.
+# Regenerates the ANTLR4 lexer (smaliLexer.java) and parser (smaliParser.java) from the .g4
+# grammars. smali is assembled in a single pass; there is no tree-walker grammar any more.
 #
 # ANTLR 4.13.2 has no Kotlin target, so the generated sources are Java. The smali module is
 # Kotlin-only, so the generated Java is deliberately NOT written into src/main/kotlin (nor into
@@ -39,7 +39,7 @@ REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 GENERATED_DIR="$SCRIPT_DIR/build/generated-src/antlr/main/com/android/tools/smali/smali"
 INSTALL_DIR="$SCRIPT_DIR/src/main/antlr-generated/com/android/tools/smali/smali"
-GENERATED_FILES=(smaliLexer.java smaliParser.java smaliTreeWalker.java)
+GENERATED_FILES=(smaliLexer.java smaliParser.java)
 
 cd "$REPO_DIR"
 ./gradlew :smali:generateGrammarSource
