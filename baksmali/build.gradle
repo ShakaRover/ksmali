@@ -43,6 +43,13 @@ sourceSets {
             srcDirs "${project.rootDir}/third_party/baksmali/src/main/java"
         }
     }
+    test {
+        resources {
+            // FidelityRoundtripTest also round-trips dexlib2's real accessor fixture; expose it
+            // here so the test does not have to reach into a sibling module's source tree.
+            srcDir "${project.rootDir}/dexlib2/src/test/resources"
+        }
+    }
 }
 
 dependencies {

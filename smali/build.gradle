@@ -127,6 +127,21 @@ generateTestGrammarSource {
     arguments = ['-no-listener', '-no-visitor']
 }
 
+// smali-integration-tests/ is not a Gradle project: it was originally an on-device Maven harness that
+// assembled the fixtures with maven-smali-plugin, pushed them through adb and ran them with dalvikvm.
+// The Maven harness is gone, but AssembleIntegrationTest still exercises these fixtures. Copy them
+// (and the bundled examples) in as test resources so the test has a tracked, working-directory
+// independent input instead of reaching out of the module with a relative path.
+tasks.named('processTestResources') {
+    from("${project.rootDir}/smali-integration-tests/src/test/smali") {
+        into 'smali-integration-tests'
+    }
+    from("${project.rootDir}/examples") {
+        include '**/*.smali'
+        into 'examples'
+    }
+}
+
 generateGrammarSource {
     outputDirectory = new File(outputDirectory, 'com/android/tools/smali/smali')
     arguments = ['-no-listener', '-no-visitor']
