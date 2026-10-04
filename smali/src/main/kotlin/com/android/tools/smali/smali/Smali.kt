@@ -52,9 +52,14 @@ import java.nio.charset.StandardCharsets
 import java.util.TreeSet
 
 /**
- * Assemble the specified files, using the given options
+ * Assemble the specified files, using the given options.
  *
- * @param options a SmaliOptions object with the options to run smali with
+ * This is the blocking entry point. It is a thin wrapper around [assembleSuspend] via
+ * [runBlocking], kept for Java callers and for existing Kotlin callers that are not already in a
+ * coroutine (the command line tool uses it). A caller that is already inside a coroutine should
+ * call [assembleSuspend] directly instead of nesting another event loop.
+ *
+ * @param options a [SmaliOptions] object with the options to run smali with
  * @param input The files/directories to process
  * @return true if assembly completed with no errors, or false if errors were encountered
  */
@@ -63,30 +68,60 @@ fun assemble(options: SmaliOptions, vararg input: String): Boolean =
     assemble(options, input.toList())
 
 /**
- * Assemble the specified files, using the given options
+ * Assemble the specified files, using the given options.
  *
- * @param options a SmaliOptions object with the options to run smali with
+ * Blocking variant; see [assemble] and [assembleSuspend].
+ *
+ * @param options a [SmaliOptions] object with the options to run smali with
  * @param input The files/directories to process
  * @return true if assembly completed with no errors, or false if errors were encountered
  */
 @Throws(IOException::class)
-fun assemble(options: SmaliOptions, input: List<String>): Boolean {
+fun assemble(options: SmaliOptions, input: List<String>): Boolean =
+    runBlocking { assembleSuspend(options, input) }
+
+/**
+ * Assemble the specified files, using the given options, without blocking the calling thread.
+ *
+ * This is the coroutine-friendly entry point: it may suspend, so a caller that is already inside
+ * a coroutine can drive assembly directly rather than nesting [runBlocking]. The parallel work
+ * still runs on [Dispatchers.Default] limited to [SmaliOptions.jobs], exactly like the blocking
+ * [assemble] variant, so the two produce byte-identical output.
+ *
+ * @param options a [SmaliOptions] object with the options to run smali with
+ * @param input The files/directories to process
+ * @return true if assembly completed with no errors, or false if errors were encountered
+ */
+@Throws(IOException::class)
+suspend fun assembleSuspend(options: SmaliOptions, vararg input: String): Boolean =
+    assembleSuspend(options, input.toList())
+
+/**
+ * Assemble the specified files, using the given options, without blocking the calling thread.
+ *
+ * Suspend variant of [assemble]; the [options] and [input] parameters have the same semantics as
+ * there, and the dex written to [SmaliOptions.outputDexFile] is identical.
+ *
+ * @param options a [SmaliOptions] object with the options to run smali with
+ * @param input The files/directories to process
+ * @return true if assembly completed with no errors, or false if errors were encountered
+ */
+@Throws(IOException::class)
+suspend fun assembleSuspend(options: SmaliOptions, input: List<String>): Boolean {
     val filesToProcess = collectSmaliFiles(input)
     val dexBuilder = DexBuilder(Opcodes.forApi(options.apiLevel))
 
     // Assemble every file on a dispatcher that honours the requested job count. supervisorScope +
     // runCatching makes sure one failing file does not cancel the others (same behaviour as the
     // old thread-pool implementation, which waited for every task).
-    val results = runBlocking {
-        supervisorScope {
-            filesToProcess
-                .map { file ->
-                    async(assemblyDispatcher(options.jobs)) {
-                        runCatching { assembleSmaliFile(file, dexBuilder, options) }
-                    }
+    val results = supervisorScope {
+        filesToProcess
+            .map { file ->
+                async(assemblyDispatcher(options.jobs)) {
+                    runCatching { assembleSmaliFile(file, dexBuilder, options) }
                 }
-                .awaitAll()
-        }
+            }
+            .awaitAll()
     }
 
     results.firstOrNull { it.isFailure }?.let { throw RuntimeException(it.exceptionOrNull()) }
@@ -122,7 +157,11 @@ private fun collectSmaliFiles(input: List<String>): List<File> {
 /**
  * Prints the lexical tokens for the given files.
  *
- * @param options a SmaliOptions object with the options to use
+ * This dumps the lexer tokens, one line per visible token. Since the smali parser and tree walker
+ * were merged into a single pass there is no AST node stream to print any more, so unlike the old
+ * two-pass front end this no longer dumps an AST `toStringTree()`.
+ *
+ * @param options a [SmaliOptions] object with the options to use
  * @param input The files/directories to process
  * @return true if assembly completed with no errors, or false if errors were encountered
  */

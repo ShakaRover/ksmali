@@ -42,7 +42,26 @@ import javax.xml.XMLConstants
 import javax.xml.parsers.ParserConfigurationException
 import javax.xml.parsers.SAXParserFactory
 
+/**
+ * Mutable configuration bag for the baksmali disassembler, used by [disassembleDexFile] /
+ * [disassembleDexFileSuspend] and the `baksmali` command line commands.
+ *
+ * An instance is filled in by the caller (or by [DisassembleCommand]) and then handed to
+ * [disassembleDexFile]; it is not immutable and is not safe to share between concurrent
+ * disassemblies that configure it differently.
+ *
+ * The worker count is deliberately not part of this class: it is the `jobs` parameter of
+ * [disassembleDexFile], which corresponds to the `-j/--jobs` option of
+ * `baksmali disassemble`. Values below 1 are treated as 1, and it only affects throughput, never
+ * the bytes written.
+ */
 open class BaksmaliOptions {
+    /**
+     * The API level used by the listing commands (`list vtables`, `list field-offsets`, ...) to
+     * build their [com.android.tools.smali.dexlib2.analysis.ClassPath]. It is not consulted by
+     * [disassembleDexFile], which uses the opcodes carried by the [com.android.tools.smali.dexlib2.iface.DexFile];
+     * the `baksmali` command line exposes its `-a/--api` option on the input command instead.
+     */
     var apiLevel = 15
 
     var parameterRegisters = true

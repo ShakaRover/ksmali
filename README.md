@@ -25,6 +25,23 @@ After the fork the first version released was 3.0.0, which was version 2.5.2 fro
 
 All building and testing should be done using a version of OpenJDK 11. Newer OpenJDK versions are currently not supported due to issues with some of the tools used in the build process.
 
+#### Implementation notes (this fork)
+
+* **Kotlin only.** Every module is Kotlin; there are no Java sources left. The only Java in the
+  tree is the ANTLR-generated lexer/parser, which is produced at build time from the grammars
+  under `third_party/smali/src/main/antlr/`.
+* **Single-pass front end.** The smali front end is one ANTLR4 grammar (`smaliParser.g4`). Earlier
+  versions built an explicit AST and ran a second grammar (`smaliTreeWalker.g4`) over a flattened
+  node stream; that walker and its AST were removed, and the semantic actions now run directly in
+  the parser rules. As a result, `SmaliOptions.printTokens` still dumps the lexer tokens but no
+  longer dumps an AST `toStringTree()` (there is no AST any more).
+* **Coroutines.** Parallel assembly/disassembly uses `kotlinx.coroutines`: the work is fanned out
+  with `supervisorScope { async(Dispatchers.Default.limitedParallelism(jobs)) { ... } }`. The
+  `-j/--jobs` option caps the worker count (values below 1 are treated as 1) and only affects
+  throughput, never the bytes. `Smali.assemble`/`Baksmali.disassembleDexFile` are blocking
+  wrappers around `assembleSuspend`/`disassembleDexFileSuspend`, which callers that already run
+  in a coroutine should call directly (the two produce byte-identical output).
+
 #### Building
 ```
 ./gradlew assemble
@@ -37,7 +54,7 @@ jars. The fat jars will be named with the current version followed by the first
 repository was dirty when building and ending in  -fat . The fat jar can be
 invoked with `java -jar`.
 ```
-./gradlew smali:fatJar
+./gradlew :smali:fatJar :baksmali:fatJar --offline -x proguard
 java -jar smali/build/libs/smali-x.y.z-aaaaaaaa-dirty-fat.jar
 ```
 
@@ -45,8 +62,11 @@ java -jar smali/build/libs/smali-x.y.z-aaaaaaaa-dirty-fat.jar
 
 To execute all tests run
 ```
-./gradlew test
+./gradlew test --offline
 ```
+
+The build is self-contained and works offline once the dependencies are in the Gradle cache; the
+same is true for the fat jars above. `clean test --offline --rerun-tasks` forces a full rerun.
 
 #### Testing Maven Release
 Push a release version to your local maven repository (add

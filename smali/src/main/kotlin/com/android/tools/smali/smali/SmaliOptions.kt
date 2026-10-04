@@ -30,12 +30,48 @@
 
 package com.android.tools.smali.smali
 
+/**
+ * Mutable configuration bag for the smali assembler, used by [assemble] / [assembleSuspend] and
+ * the `smali assemble` command line tool.
+ *
+ * An instance is filled in by the caller (or by [AssembleCommand]) and then handed to
+ * [assemble]; it is not immutable and is not safe to share between concurrent assemblies that
+ * configure it differently.
+ */
 open class SmaliOptions {
+    /**
+     * The target API level, passed to [com.android.tools.smali.dexlib2.Opcodes.forApi] and used to
+     * select the opcodes that the lexer/parser accept. Corresponds to the `-a/--api` option and
+     * defaults to 15.
+     */
     var apiLevel = 15
+
+    /**
+     * The dex file that [assemble] / [assembleSuspend] write their output to. Corresponds to the
+     * `-o/--output` option and defaults to `out.dex`.
+     */
     var outputDexFile: String = "out.dex"
 
+    /**
+     * The maximum number of smali files that are assembled in parallel. This is the `-j/--jobs`
+     * option: it caps the [kotlinx.coroutines.Dispatchers.Default] dispatcher used for the
+     * assembly workers, so values below 1 are treated as 1. It does not affect the bytes that are
+     * written, only how quickly they are produced. Defaults to the number of available processors.
+     */
     var jobs = Runtime.getRuntime().availableProcessors()
+
+    /** Whether odexed instructions are accepted instead of rejected as unsupported. */
     var allowOdexOpcodes = false
+
+    /** Whether the parser/lexer print their errors and stack traces while assembling. */
     var verboseErrors = false
+
+    /**
+     * Whether the lexer's token stream is dumped while assembling.
+     *
+     * Note: since the parser and tree-walker were merged into a single pass there is no longer an
+     * AST to print, so this only dumps the lexer tokens, one line per visible token. It is intended
+     * for debugging the front end, not for programmatic consumption.
+     */
     var printTokens = false
 }

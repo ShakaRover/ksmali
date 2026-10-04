@@ -46,10 +46,73 @@ import java.io.IOException
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 
+/**
+ * Disassemble a dex file into [outputDir], using [jobs] parallel workers and [options].
+ *
+ * This is the blocking entry point. It is a thin wrapper around [disassembleDexFileSuspend] via
+ * [runBlocking], kept for Java callers and for existing Kotlin callers that are not already in a
+ * coroutine (the command line tool uses it). A caller that is already inside a coroutine should
+ * call [disassembleDexFileSuspend] directly instead of nesting another event loop.
+ *
+ * @param dexFile the dex file to disassemble
+ * @param outputDir the directory the `.smali` files are written to
+ * @param jobs the number of classes to disassemble in parallel; values below 1 are treated as 1.
+ *   This is the `-j/--jobs` option of the `baksmali disassemble` command.
+ * @param options the [BaksmaliOptions] controlling the output
+ * @return true if every class was written, or false if any class failed
+ */
 fun disassembleDexFile(dexFile: DexFile, outputDir: File, jobs: Int, options: BaksmaliOptions): Boolean =
     disassembleDexFile(dexFile, outputDir, jobs, options, null)
 
+/**
+ * Disassemble a dex file into [outputDir], using [jobs] parallel workers and [options].
+ *
+ * Blocking variant; see [disassembleDexFile] and [disassembleDexFileSuspend].
+ *
+ * @param dexFile the dex file to disassemble
+ * @param outputDir the directory the `.smali` files are written to
+ * @param jobs the number of classes to disassemble in parallel; values below 1 are treated as 1
+ * @param options the [BaksmaliOptions] controlling the output
+ * @param classes if non-null, only classes whose descriptor is in this list are disassembled
+ * @return true if every selected class was written, or false if any of them failed
+ */
 fun disassembleDexFile(
+    dexFile: DexFile, outputDir: File, jobs: Int, options: BaksmaliOptions,
+    classes: List<String>?
+): Boolean = runBlocking { disassembleDexFileSuspend(dexFile, outputDir, jobs, options, classes) }
+
+/**
+ * Disassemble a dex file into [outputDir] without blocking the calling thread.
+ *
+ * This is the coroutine-friendly entry point: it may suspend, so a caller that is already inside
+ * a coroutine can drive disassembly directly rather than nesting [runBlocking]. Classes are still
+ * processed on [Dispatchers.Default] limited to [jobs], exactly like the blocking
+ * [disassembleDexFile] variant, so the two produce byte-identical output.
+ *
+ * @param dexFile the dex file to disassemble
+ * @param outputDir the directory the `.smali` files are written to
+ * @param jobs the number of classes to disassemble in parallel; values below 1 are treated as 1
+ * @param options the [BaksmaliOptions] controlling the output
+ * @return true if every class was written, or false if any class failed
+ */
+suspend fun disassembleDexFileSuspend(
+    dexFile: DexFile, outputDir: File, jobs: Int, options: BaksmaliOptions
+): Boolean = disassembleDexFileSuspend(dexFile, outputDir, jobs, options, null)
+
+/**
+ * Disassemble a dex file into [outputDir] without blocking the calling thread.
+ *
+ * Suspend variant of [disassembleDexFile]; the parameters have the same semantics as there, and
+ * the `.smali` tree written under [outputDir] is identical.
+ *
+ * @param dexFile the dex file to disassemble
+ * @param outputDir the directory the `.smali` files are written to
+ * @param jobs the number of classes to disassemble in parallel; values below 1 are treated as 1
+ * @param options the [BaksmaliOptions] controlling the output
+ * @param classes if non-null, only classes whose descriptor is in this list are disassembled
+ * @return true if every selected class was written, or false if any of them failed
+ */
+suspend fun disassembleDexFileSuspend(
     dexFile: DexFile, outputDir: File, jobs: Int, options: BaksmaliOptions,
     classes: List<String>?
 ): Boolean {
@@ -65,17 +128,15 @@ fun disassembleDexFile(
     // Disassemble each class on a dispatcher that honours the requested job count.
     // supervisorScope + runCatching makes sure one failing class does not cancel the others (same
     // behaviour as the old thread-pool implementation, which waited for every task).
-    val results = runBlocking {
-        supervisorScope {
-            classDefs
-                .filter { classSet == null || it.type in classSet }
-                .map { classDef ->
-                    async(disassemblyDispatcher(jobs)) {
-                        runCatching { disassembleClass(classDef, fileNameHandler, options) }
-                    }
+    val results = supervisorScope {
+        classDefs
+            .filter { classSet == null || it.type in classSet }
+            .map { classDef ->
+                async(disassemblyDispatcher(jobs)) {
+                    runCatching { disassembleClass(classDef, fileNameHandler, options) }
                 }
-                .awaitAll()
-        }
+            }
+            .awaitAll()
     }
 
     results.firstOrNull { it.isFailure }?.let { throw RuntimeException(it.exceptionOrNull()) }
