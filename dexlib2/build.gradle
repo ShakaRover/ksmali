@@ -73,7 +73,7 @@ plugins {
   id("org.spdx.sbom") version "0.8.0"
 }
 
-ext.testAccessorOutputDir = file("${buildDir}/generated-src/accessorTest/java")
+ext.testAccessorOutputDir = file("${layout.buildDirectory.get().asFile}/generated-src/accessorTest/java")
 ext.testAccessorOutputFile = file("${testAccessorOutputDir}/com/android/tools/smali/dexlib2/AccessorTypes.java")
 
 sourceSets {
@@ -110,14 +110,20 @@ dependencies {
 // it ever changes, port the change into the Kotlin implementation by hand.
 
 task generateAccessorTestSource(type: JavaExec) {
-    file(testAccessorOutputFile.parent).mkdirs()
     outputs.dir file(testAccessorOutputDir)
 
     classpath = configurations.accessorTestGenerator
-    main = 'com.android.tools.smali.dexlib2.AccessorTestGenerator'
+    mainClass = 'com.android.tools.smali.dexlib2.AccessorTestGenerator'
     args testAccessorOutputFile
+
+    // Create the output directory at execution time: doing it during configuration
+    // breaks `clean generateAccessorTestSource` in a single invocation.
+    doFirst {
+        file(testAccessorOutputFile.parent).mkdirs()
+    }
 }
 compileAccessorTestJava.dependsOn(generateAccessorTestSource)
+compileAccessorTestKotlin.dependsOn(generateAccessorTestSource)
 
 // NOTE: The old generateAccessorTestDex task (which shelled out to
 // com.google.android.tools:dx:1.7) has been removed. It was only ever a manual
