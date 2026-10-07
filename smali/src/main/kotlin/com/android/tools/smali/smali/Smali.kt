@@ -45,9 +45,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.Token
 import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
-import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.util.TreeSet
 
@@ -113,11 +111,13 @@ suspend fun assembleSuspend(options: SmaliOptions, input: List<String>): Boolean
 
     // Assemble every file on a dispatcher that honours the requested job count. supervisorScope +
     // runCatching makes sure one failing file does not cancel the others (same behaviour as the
-    // old thread-pool implementation, which waited for every task).
+    // old thread-pool implementation, which waited for every task). The dispatcher is created
+    // once instead of once per file.
+    val dispatcher = assemblyDispatcher(options.jobs)
     val results = supervisorScope {
         filesToProcess
             .map { file ->
-                async(assemblyDispatcher(options.jobs)) {
+                async(dispatcher) {
                     runCatching { assembleSmaliFile(file, dexBuilder, options) }
                 }
             }
@@ -187,60 +187,58 @@ private fun getSmaliFilesInDir(dir: File, smaliFiles: MutableSet<File>) {
     }
 }
 
-private fun assembleSmaliFile(smaliFile: File, dexBuilder: DexBuilder, options: SmaliOptions): Boolean =
-    FileInputStream(smaliFile).use { fis ->
-        val lexer = smaliLexer(CharStreams.fromReader(InputStreamReader(fis, StandardCharsets.UTF_8))).apply {
-            setApiLevel(options.apiLevel)
-            setSourceFile(smaliFile)
-        }
-        val tokenStream = CommonTokenStream(lexer)
-
-        if (options.printTokens) {
-            tokenStream.tokens.forEach { token ->
-                if (token.channel != Token.HIDDEN_CHANNEL) {
-                    val name = if (token.type == Token.EOF) "EOF" else smaliParser.tokenName(token.type)
-                    println("$name: ${token.text}")
-                }
-            }
-            System.out.flush()
-        }
-
-        val parser = smaliParser(tokenStream).apply {
-            setBuildParseTree(false)
-            setVerboseErrors(options.verboseErrors)
-            setAllowOdex(options.allowOdexOpcodes)
-            setApiLevel(options.apiLevel)
-            setDexBuilder(dexBuilder)
-        }
-
-        try {
-            parser.smali_file()
-        } catch (ex: RuntimeException) {
-            if (options.verboseErrors) {
-                ex.printStackTrace(System.err)
-            }
-            return@use false
-        }
-
-        parser.getNumberOfSyntaxErrors() == 0 && lexer.getNumberOfSyntaxErrors() == 0
+private fun assembleSmaliFile(smaliFile: File, dexBuilder: DexBuilder, options: SmaliOptions): Boolean {
+    val lexer = smaliLexer(CharStreams.fromStream(smaliFile.inputStream(), StandardCharsets.UTF_8)).apply {
+        setApiLevel(options.apiLevel)
+        setSourceFile(smaliFile)
     }
+    val tokenStream = CommonTokenStream(lexer)
 
-private fun printTokensForSingleFile(smaliFile: File, options: SmaliOptions): Boolean =
-    FileInputStream(smaliFile).use { fis ->
-        val lexer = smaliLexer(CharStreams.fromReader(InputStreamReader(fis, StandardCharsets.UTF_8))).apply {
-            setApiLevel(options.apiLevel)
-            setSourceFile(smaliFile)
-        }
-        val tokenStream = CommonTokenStream(lexer)
-        tokenStream.fill()
-
+    if (options.printTokens) {
         tokenStream.tokens.forEach { token ->
             if (token.channel != Token.HIDDEN_CHANNEL) {
                 val name = if (token.type == Token.EOF) "EOF" else smaliParser.tokenName(token.type)
-                println("$name(\"${StringUtils.escapeString(token.text)}\")")
+                println("$name: ${token.text}")
             }
         }
         System.out.flush()
-
-        lexer.getNumberOfSyntaxErrors() == 0
     }
+
+    val parser = smaliParser(tokenStream).apply {
+        setBuildParseTree(false)
+        setVerboseErrors(options.verboseErrors)
+        setAllowOdex(options.allowOdexOpcodes)
+        setApiLevel(options.apiLevel)
+        setDexBuilder(dexBuilder)
+    }
+
+    try {
+        parser.smali_file()
+    } catch (ex: RuntimeException) {
+        if (options.verboseErrors) {
+            ex.printStackTrace(System.err)
+        }
+        return false
+    }
+
+    return parser.getNumberOfSyntaxErrors() == 0 && lexer.getNumberOfSyntaxErrors() == 0
+}
+
+private fun printTokensForSingleFile(smaliFile: File, options: SmaliOptions): Boolean {
+    val lexer = smaliLexer(CharStreams.fromStream(smaliFile.inputStream(), StandardCharsets.UTF_8)).apply {
+        setApiLevel(options.apiLevel)
+        setSourceFile(smaliFile)
+    }
+    val tokenStream = CommonTokenStream(lexer)
+    tokenStream.fill()
+
+    tokenStream.tokens.forEach { token ->
+        if (token.channel != Token.HIDDEN_CHANNEL) {
+            val name = if (token.type == Token.EOF) "EOF" else smaliParser.tokenName(token.type)
+            println("$name(\"${StringUtils.escapeString(token.text)}\")")
+        }
+    }
+    System.out.flush()
+
+    return lexer.getNumberOfSyntaxErrors() == 0
+}

@@ -127,12 +127,14 @@ suspend fun disassembleDexFileSuspend(
 
     // Disassemble each class on a dispatcher that honours the requested job count.
     // supervisorScope + runCatching makes sure one failing class does not cancel the others (same
-    // behaviour as the old thread-pool implementation, which waited for every task).
+    // behaviour as the old thread-pool implementation, which waited for every task). The
+    // dispatcher is created once instead of once per class.
+    val dispatcher = disassemblyDispatcher(jobs)
     val results = supervisorScope {
         classDefs
             .filter { classSet == null || it.type in classSet }
             .map { classDef ->
-                async(disassemblyDispatcher(jobs)) {
+                async(dispatcher) {
                     runCatching { disassembleClass(classDef, fileNameHandler, options) }
                 }
             }
