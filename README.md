@@ -9,7 +9,7 @@ smali/baksmali is an assembler/disassembler for the dex format used by dalvik, A
 * [`com.android.tools.smali:smali-baksmali:<version>`](https://maven.google.com/web/index.html?q=smali-baksmali#com.android.tools.smali:smali)
 * [`com.android.tools.smali:smali-util:<version>`](https://maven.google.com/web/index.html?q=smali-util#com.android.tools.smali:smali-util)
 
-After the fork the first version released was 3.0.0, which was version 2.5.2 from the original repo with a few patches and the namespace change. 3.0.10 is the last version Google released, and is the point this repository continues from with the 4.x line (currently 4.1.1): Kotlin-only, no Guava, and a single-pass ANTLR4 front end (see the implementation notes below). The 4.x artifacts are **not** published to Google Maven; build them from source as described under [Building and testing](#building-and-testing).
+After the fork the first version released was 3.0.0, which was version 2.5.2 from the original repo with a few patches and the namespace change. 3.0.10 is the last version Google released, and is where this repository picks up: the 4.x line was the ANTLR4 + Kotlin rewrite, and the current release is 5.0.0 (Kotlin-only, no Guava, single-pass front end — see the implementation notes below). The artifacts of this fork are **not** published to Google Maven; build them from source as described under [Building and testing](#building-and-testing).
 
 #### Support
 - [github Issue tracker](https://github.com/ShakaRover/ksmali/issues) - For any bugs/issues/feature requests
@@ -78,7 +78,7 @@ location)
 
 ### Releasing
 
-This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to the 4.x line of this fork. Releasing here means bumping `version` in `build.gradle`, committing, tagging, and building the fat jars locally (see [Command Line Version](#command-line-version)).
+This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to this fork's own releases. Releasing here means bumping `version` in `build.gradle`, committing, tagging, and building the fat jars locally (see [Command Line Version](#command-line-version)).
 
 Building release versions and releasing to [Google Maven](https://maven.google.com) use Google infrastructure and support scripts maintained as part of the [R8](https://r8.googlesource.com/r8/) repository. The tasks below can only be performed by Google employees.
 
