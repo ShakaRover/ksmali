@@ -50,7 +50,7 @@ publish {
                 pom {
                     description = 'This library contains random utilities used by smali/baksmali/dexlib2'
                     scm {
-                        url = 'https://github.com/google/smali/tree/master/util'
+                        url = 'https://github.com/ShakaRover/ksmali/tree/main/util'
                     }
                 }
             }

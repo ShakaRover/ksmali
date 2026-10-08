@@ -155,7 +155,7 @@ publish {
                 pom {
                     description = 'smali is an assembler for dalvik bytecode'
                     scm {
-                        url = 'https://github.com/google/smali/tree/master/smali'
+                        url = 'https://github.com/ShakaRover/ksmali/tree/main/smali'
                     }
                 }
             }

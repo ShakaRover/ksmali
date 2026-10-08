@@ -5,16 +5,12 @@ just a few small guidelines you need to follow.
 
 ## Contributor License Agreement
 
-Contributions to this project must be accompanied by a Contributor License
-Agreement (CLA). You (or your employer) retain the copyright to your
-contribution; this simply gives us permission to use and redistribute your
-contributions as part of the project. Head over to
-<https://cla.developers.google.com/> to see your current agreements on file or
-to sign a new one.
-
-You generally only need to submit a CLA once, so if you've already submitted one
-(even if it was for a different project), you probably don't need to do it
-again.
+No CLA is required. This repository is a fork of
+[google/smali](https://github.com/google/smali), not a Google project, so the
+Google CLA that the upstream repository asks for does not apply here. By
+opening a pull request you agree that your contribution is licensed under the
+same BSD 3-Clause License as the rest of this repository (see
+[LICENSE](LICENSE)).
 
 ## Code Reviews
 

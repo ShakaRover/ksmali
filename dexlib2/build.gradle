@@ -142,7 +142,7 @@ publish {
                 pom {
                     description = 'dexlib2 is a library for reading/modifying/writing Android dex files'
                     scm {
-                        url = 'https://github.com/google/smali/tree/master/dexlib2'
+                        url = 'https://github.com/ShakaRover/ksmali/tree/main/dexlib2'
                     }
                 }
             }
@@ -157,7 +157,7 @@ spdxSbom {
         // and output file (release.spdx.json)
         create("release") {
             scm {
-                uri.set("https://github.com/google/smali")
+                uri.set("https://github.com/ShakaRover/ksmali")
                 revision.set(project.version)
             }
             document {
