@@ -2,17 +2,17 @@
 
 smali/baksmali is an assembler/disassembler for the dex format used by dalvik, Android's Java VM implementation. The syntax is loosely based on Jasmin's/dedexer's syntax, and supports the full functionality of the dex format (annotations, debug info, line info, etc.)
 
-**NOTE**: This is a fork of https://github.com/JesusFreke/smali for patches needed by Google as the original repository is currently not maintained. After forking the namespace was changed from `org.jf` to `com.android.tools.smali`. The artifacts are released on [Google Maven](https://maven.google.com) under the following coordinates:
+**NOTE**: This repository is [ShakaRover/ksmali](https://github.com/ShakaRover/ksmali), a fork of [google/smali](https://github.com/google/smali). The latter was forked from https://github.com/JesusFreke/smali for patches needed by Google, as the original repository was no longer maintained; that fork changed the namespace from `org.jf` to `com.android.tools.smali`, and this fork keeps that namespace so the code stays source- and binary-compatible with the 3.0.x artifacts. The 3.0.x artifacts are Google's releases, published on [Google Maven](https://maven.google.com) under the following coordinates:
 
 * [`com.android.tools.smali:smali:<version>`](https://maven.google.com/web/index.html?q=smali#com.android.tools.smali:smali)
 * [`com.android.tools.smali:smali-dexlib2:<version>`](https://maven.google.com/web/index.html?q=smali-dexlib2#com.android.tools.smali:smali-dexlib2)
 * [`com.android.tools.smali:smali-baksmali:<version>`](https://maven.google.com/web/index.html?q=smali-baksmali#com.android.tools.smali:smali)
 * [`com.android.tools.smali:smali-util:<version>`](https://maven.google.com/web/index.html?q=smali-util#com.android.tools.smali:smali-util)
 
-After the fork the first version released was 3.0.0, which was version 2.5.2 from the original repo with a few patches and the namespace change.
+After the fork the first version released was 3.0.0, which was version 2.5.2 from the original repo with a few patches and the namespace change. 3.0.10 is the last version Google released, and is the point this repository continues from with the 4.x line (currently 4.1.1): Kotlin-only, no Guava, and a single-pass ANTLR4 front end (see the implementation notes below). The 4.x artifacts are **not** published to Google Maven; build them from source as described under [Building and testing](#building-and-testing).
 
 #### Support
-- [github Issue tracker](https://github.com/google/smali/issues) - For any bugs/issues/feature requests
+- [github Issue tracker](https://github.com/ShakaRover/ksmali/issues) - For any bugs/issues/feature requests
 
 #### Some useful links for getting started with smali
 
@@ -77,6 +77,8 @@ location)
 ```
 
 ### Releasing
+
+This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to the 4.x line of this fork. Releasing here means bumping `version` in `build.gradle`, committing, tagging, and building the fat jars locally (see [Command Line Version](#command-line-version)).
 
 Building release versions and releasing to [Google Maven](https://maven.google.com) use Google infrastructure and support scripts maintained as part of the [R8](https://r8.googlesource.com/r8/) repository. The tasks below can only be performed by Google employees.
 
