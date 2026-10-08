@@ -49,10 +49,19 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
+    // Compile against the Java 8 API, not merely to 1.8 bytecode. Without -Xjdk-release, calls to
+    // methods that gained a covariant override in JDK 9+ (ByteBuffer.clear()/flip()/position(),
+    // CharSequence.isEmpty(), ...) are linked against the build JDK's descriptor and fail with
+    // NoSuchMethodError when the result runs on a Java 8 JVM.
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
         kotlinOptions {
             jvmTarget = '1.8'
+            freeCompilerArgs += ['-Xjdk-release=1.8']
         }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.release.set(8)
     }
 
     // Sources also live under third_party/<module>/; keep Kotlin files there in the source set too
