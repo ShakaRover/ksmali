@@ -102,9 +102,9 @@ open class Main : Command(mutableListOf()) {
         }
 
         protected fun version() {
-            System.out.println("baksmali $VERSION (http://smali.org)")
+            System.out.println("baksmali $VERSION (https://github.com/ShakaRover/ksmali)")
             System.out.println("Copyright (C) 2010 Ben Gruver (JesusFreke@JesusFreke.com)")
-            System.out.println("BSD license (http://www.opensource.org/licenses/bsd-license.php)")
+            System.out.println("BSD license (https://opensource.org/license/bsd-3-clause)")
             System.exit(0)
         }
 
