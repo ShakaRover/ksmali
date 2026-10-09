@@ -2,14 +2,14 @@
 
 smali/baksmali is an assembler/disassembler for the dex format used by dalvik, Android's Java VM implementation. The syntax is loosely based on Jasmin's/dedexer's syntax, and supports the full functionality of the dex format (annotations, debug info, line info, etc.)
 
-**NOTE**: This repository is [ShakaRover/ksmali](https://github.com/ShakaRover/ksmali), a fork of [google/smali](https://github.com/google/smali). The latter was forked from https://github.com/JesusFreke/smali for patches needed by Google, as the original repository was no longer maintained; that fork changed the namespace from `org.jf` to `com.android.tools.smali`, and this fork keeps that namespace so the code stays source- and binary-compatible with the 3.0.x artifacts. The 3.0.x artifacts are Google's releases, published on [Google Maven](https://maven.google.com) under the following coordinates:
+**NOTE**: This repository is [ShakaRover/ksmali](https://github.com/ShakaRover/ksmali), a fork of [google/smali](https://github.com/google/smali). The latter was forked from https://github.com/JesusFreke/smali for patches needed by Google, as the original repository was no longer maintained; that fork changed the Java package namespace from `org.jf` to `com.android.tools.smali`, and this fork keeps that namespace so the code stays source- and binary-compatible with the 3.0.x artifacts (its own Maven coordinates are different, see [Publishing to GitHub Packages](#publishing-to-github-packages)). The 3.0.x artifacts are Google's releases, published on [Google Maven](https://maven.google.com) under the following coordinates:
 
 * [`com.android.tools.smali:smali:<version>`](https://maven.google.com/web/index.html?q=smali#com.android.tools.smali:smali)
 * [`com.android.tools.smali:smali-dexlib2:<version>`](https://maven.google.com/web/index.html?q=smali-dexlib2#com.android.tools.smali:smali-dexlib2)
 * [`com.android.tools.smali:smali-baksmali:<version>`](https://maven.google.com/web/index.html?q=smali-baksmali#com.android.tools.smali:smali)
 * [`com.android.tools.smali:smali-util:<version>`](https://maven.google.com/web/index.html?q=smali-util#com.android.tools.smali:smali-util)
 
-After the fork the first version released was 3.0.0, which was version 2.5.2 from the original repo with a few patches and the namespace change. 3.0.10 is the last version Google released, and is where this repository picks up: the 4.x line was the ANTLR4 + Kotlin rewrite, and the current release is 5.0.0 (Kotlin-only, no Guava, single-pass front end — see the implementation notes below). The artifacts of this fork are **not** published to Google Maven; build them from source as described under [Building and testing](#building-and-testing).
+After the fork the first version released was 3.0.0, which was version 2.5.2 from the original repo with a few patches and the namespace change. 3.0.10 is the last version Google released, and is where this repository picks up: the 4.x line was the ANTLR4 + Kotlin rewrite, and the current release is 5.0.0 (Kotlin-only, no Guava, single-pass front end — see the implementation notes below). The artifacts of this fork are **not** on Google Maven: the libraries are published to GitHub Packages as `io.github.shakarover.ksmali:<artifact>:<version>` (see [Publishing to GitHub Packages](#publishing-to-github-packages)), and the ready-to-run CLI fat jars are attached to the [GitHub releases](https://github.com/ShakaRover/ksmali/releases).
 
 #### Support
 - [github Issue tracker](https://github.com/ShakaRover/ksmali/issues) - For any bugs/issues/feature requests
@@ -23,7 +23,9 @@ After the fork the first version released was 3.0.0, which was version 2.5.2 fro
 
 ### Building and testing
 
-All building and testing should be done using a version of OpenJDK 11. Newer OpenJDK versions are currently not supported due to issues with some of the tools used in the build process.
+Building and testing works on OpenJDK 11 or newer; 11, 17 and 21 are what this fork is checked with
+(470 tests pass on each). The sources are compiled against the Java 8 API
+(`-Xjdk-release=1.8`, see `build.gradle`), so the libraries and the fat jars still run on a Java 8 JVM.
 
 #### Implementation notes (this fork)
 
@@ -93,18 +95,23 @@ GPG signing is only required when a signing key is configured — GitHub Package
 signatures.
 
 Consuming these artifacts needs authentication even though they are public: a personal access token
-(classic) with `read:packages`, e.g.
+(classic) with `read:packages`. Pass it as a project property (properties belong to the invocation,
+unlike environment variables, which a reused Gradle daemon may not see):
 
 ```groovy
 repositories {
     maven {
         url = 'https://maven.pkg.github.com/ShakaRover/ksmali'
         credentials {
-            username = System.getenv('GITHUB_ACTOR')
-            password = System.getenv('GITHUB_TOKEN')
+            username = providers.gradleProperty('gpr.user').get()
+            password = providers.gradleProperty('gpr.key').get()
         }
     }
 }
+```
+
+```
+./gradlew build -Pgpr.user=<github username> -Pgpr.key=<token with read:packages>
 ```
 
 ### Releasing
