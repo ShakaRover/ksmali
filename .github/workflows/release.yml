@@ -70,7 +70,10 @@ jobs:
       # Maven Central（Sonatype 的 Portal OSSRH Staging API，maven-publish 直接 PUT）。
       # 放在 GitHub Packages 之前：补发已存在的版本时那边可能因版本重复而失败，Central 这边不该被拖累。
       # 凭据与签名私钥全部来自仓库 secrets（centralUser/centralToken 只用于本地临时发布，不进 CI）。
+      # continue-on-error：Central 的版本不可变，重跑已发布过的 tag 时这一步必然报“版本已存在”；
+      # 那不该中断后面的 GitHub release 附件更新。真正的发布失败由下面的可见性检查兜住。
       - name: Publish to Maven Central
+        continue-on-error: true
         env:
           CENTRAL_USER: ${{ secrets.CENTRAL_USER }}
           CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
@@ -94,24 +97,30 @@ jobs:
           curl --fail-with-body -sS -X POST -H "Authorization: Bearer $auth" \
             'https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.shakarover?publishing_type=automatic'
 
-      # release 之后 repo1.maven.org 是异步同步的（通常几分钟，偶尔更久），这里带重试地匿名拉一次
-      # 确认消费者不需要任何凭据就能拿到；同步慢不算发布失败，所以最后只告警。
+      # release 之后 repo1.maven.org 是异步同步的（通常几分钟，偶尔更久），这里带重试地匿名拉一次，
+      # 既是“消费者不需要任何凭据就能拿到”的验证，也是上面两步 continue-on-error 之后的真正门禁：
+      # 超时说明这次发布没成功（或者慢得离谱），按失败处理。
       - name: Wait for the artifacts to appear on Maven Central
         run: |
           url="https://repo1.maven.org/maven2/io/github/shakarover/ksmali/smali/$TAG/smali-$TAG.pom"
-          for i in $(seq 1 20); do
+          for i in $(seq 1 30); do
             if curl -fsS -o /dev/null "$url"; then
               echo "available: $url"
               exit 0
             fi
-            echo "waiting for $url ($i/20)"
+            echo "waiting for $url ($i/30)"
             sleep 60
           done
-          echo "::warning::$url 还不可见（Central 同步通常 10-30 分钟，稍后会自动出现）"
+          echo "::error::$url 30 分钟内仍未出现，发布可能失败"
+          exit 1
 
       # 凭据用 -P 项目属性传，而不是只靠环境变量：项目属性属于本次 Gradle 调用，不受 daemon 复用
       # 影响（daemon 里 System.getenv 读到的是它启动时的环境），也不依赖 job 级 env 的写法。
+      # continue-on-error：重跑已发布过的 tag 时，GitHub Packages 会因为版本已存在而失败（Central
+      # 那边不可变版本也会拒绝重复发布，但它排在前面，不受影响）。这里不该因此中断后续步骤
+      # —— 真正的发布失败仍会被下面的 “Check that the published artifacts resolve” 抓住。
       - name: Publish to GitHub Packages
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: ./gradlew publish -Pgpr.user="$GITHUB_ACTOR" -Pgpr.key="$GITHUB_TOKEN"
