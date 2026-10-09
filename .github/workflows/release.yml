@@ -67,6 +67,48 @@ jobs:
             java -jar "$jar" --version | head -1 | grep -F " $TAG ("
           done
 
+      # Maven Central（Sonatype 的 Portal OSSRH Staging API，maven-publish 直接 PUT）。
+      # 放在 GitHub Packages 之前：补发已存在的版本时那边可能因版本重复而失败，Central 这边不该被拖累。
+      # 凭据与签名私钥全部来自仓库 secrets（centralUser/centralToken 只用于本地临时发布，不进 CI）。
+      - name: Publish to Maven Central
+        env:
+          CENTRAL_USER: ${{ secrets.CENTRAL_USER }}
+          CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          test -n "$CENTRAL_TOKEN" || { echo "::error::缺少 CENTRAL_TOKEN secret"; exit 1; }
+          ./gradlew publish \
+            -PcentralUser="$CENTRAL_USER" -PcentralToken="$CENTRAL_TOKEN" \
+            -PsigningKey="$SIGNING_KEY" -PsigningPassword="$SIGNING_PASSWORD"
+
+      # 上传到 OSSRH Staging API 之后，必须再调一次 /manual/upload 才会转到 Central Publisher Portal，
+      # 而且这个调用必须和上传来自同一个 IP（所以放在同一个 job 里）。publishing_type=automatic
+      # 让它在校验通过后自动 release 到 Maven Central。
+      - name: Release the deployment on the Central Portal
+        env:
+          CENTRAL_USER: ${{ secrets.CENTRAL_USER }}
+          CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
+        run: |
+          auth=$(printf '%s:%s' "$CENTRAL_USER" "$CENTRAL_TOKEN" | base64 -w0)
+          curl --fail-with-body -sS -X POST -H "Authorization: Bearer $auth" \
+            'https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.shakarover?publishing_type=automatic'
+
+      # release 之后 repo1.maven.org 是异步同步的（通常几分钟，偶尔更久），这里带重试地匿名拉一次
+      # 确认消费者不需要任何凭据就能拿到；同步慢不算发布失败，所以最后只告警。
+      - name: Wait for the artifacts to appear on Maven Central
+        run: |
+          url="https://repo1.maven.org/maven2/io/github/shakarover/ksmali/smali/$TAG/smali-$TAG.pom"
+          for i in $(seq 1 20); do
+            if curl -fsS -o /dev/null "$url"; then
+              echo "available: $url"
+              exit 0
+            fi
+            echo "waiting for $url ($i/20)"
+            sleep 60
+          done
+          echo "::warning::$url 还不可见（Central 同步通常 10-30 分钟，稍后会自动出现）"
+
       # 凭据用 -P 项目属性传，而不是只靠环境变量：项目属性属于本次 Gradle 调用，不受 daemon 复用
       # 影响（daemon 里 System.getenv 读到的是它启动时的环境），也不依赖 job 级 env 的写法。
       - name: Publish to GitHub Packages

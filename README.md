@@ -143,6 +143,11 @@ curl -X POST -H "Authorization: Bearer $(printf '%s:%s' "$USER" "$TOKEN" | base6
 are only registered when their credentials are present, so a plain `./gradlew publish` without
 Central credentials still goes to GitHub Packages only.
 
+Releases do this automatically: the [`Release` workflow](.github/workflows/release.yml) publishes
+to Maven Central using the `CENTRAL_USER`, `CENTRAL_TOKEN`, `SIGNING_KEY` (ASCII armored private
+key) and `SIGNING_PASSWORD` repository secrets, then asks the staging service to release the
+deployment.
+
 ### Releasing
 
 This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to this fork's own releases. Releasing here means bumping `version` in `build.gradle`, committing, and pushing a tag for that commit: the [`Release` workflow](.github/workflows/release.yml) then checks that the tag equals `version`, runs the tests, builds the fat jars, publishes the libraries to GitHub Packages (see above) and creates a GitHub release with the fat jars attached. For an existing tag (the workflow file is not in older tags) run it manually:
