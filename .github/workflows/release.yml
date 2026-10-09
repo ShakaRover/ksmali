@@ -88,7 +88,11 @@ jobs:
       # 上传到 OSSRH Staging API 之后，必须再调一次 /manual/upload 才会转到 Central Publisher Portal，
       # 而且这个调用必须和上传来自同一个 IP（所以放在同一个 job 里）。publishing_type=automatic
       # 让它在校验通过后自动 release 到 Maven Central。
+      # continue-on-error：重跑已发布过的 tag 时 Portal 会以“版本已存在”拒绝这次 deployment，
+      # 那不该让整个 release 变红；校验失败（签名/POM 不合格）会打印在日志里，并且构件不会出现在
+      # Maven Central —— 由下面的可见性检查兜住。
       - name: Release the deployment on the Central Portal
+        continue-on-error: true
         env:
           CENTRAL_USER: ${{ secrets.CENTRAL_USER }}
           CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
