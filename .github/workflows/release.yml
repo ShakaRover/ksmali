@@ -12,6 +12,10 @@ on:
         description: '要发布的已存在 tag，例如 5.0.0'
         required: true
         type: string
+      checkout:
+        description: '可选：从哪个 ref 构建，默认就是上面的 tag。只用于补发那些 tree 里还没有当前发布配置的老 tag。'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -22,10 +26,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TAG: ${{ inputs.tag || github.ref_name }}
+      CHECKOUT: ${{ inputs.checkout || inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ env.TAG }}
+          ref: ${{ env.CHECKOUT }}
 
       - name: Set up OpenJDK 11
         uses: actions/setup-java@v5
@@ -62,9 +67,8 @@ jobs:
             java -jar "$jar" --version | head -1 | grep -F " $TAG ("
           done
 
-      # 凭据用 -P 项目属性传：Gradle daemon 是在本 job 更早的步骤里起来的，System.getenv 读到的是
-      # daemon 启动时的环境，这一步新加的 GITHUB_TOKEN 到不了它（首次跑就因为这样静默空跑了一次，
-      # 被下面那步消费校验抓出来）。-P 属于本次调用，不受 daemon 环境影响。
+      # 凭据用 -P 项目属性传，而不是只靠环境变量：项目属性属于本次 Gradle 调用，不受 daemon 复用
+      # 影响（daemon 里 System.getenv 读到的是它启动时的环境），也不依赖 job 级 env 的写法。
       - name: Publish to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ github.token }}

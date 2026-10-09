@@ -115,6 +115,14 @@ This section describes the release process of the upstream google/smali reposito
 gh workflow run release.yml -f tag=5.0.0
 ```
 
+For a tag whose tree predates the publish configuration (5.0.0 is one, its library sources are identical to the current ones) build from the current branch instead:
+
+```
+gh workflow run release.yml -f tag=5.0.0 -f checkout=main
+```
+
+The tag/version check still applies to whatever is checked out, so this cannot publish a version that does not match the tag.
+
 Building release versions and releasing to [Google Maven](https://maven.google.com) use Google infrastructure and support scripts maintained as part of the [R8](https://r8.googlesource.com/r8/) repository. The tasks below can only be performed by Google employees.
 
 #### Prepare and build a release version
