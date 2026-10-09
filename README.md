@@ -72,44 +72,43 @@ same is true for the fat jars above. `clean test --offline --rerun-tasks` forces
 #### Testing Maven Release
 Push a release version to your local maven repository (add
 `-Dmaven.repo.local=<dir>` to override the default local maven repository
-location)
+location). This writes to the local repository only — remote publishing happens in CI, see below.
 ```
 ./gradlew release publishToMavenLocal
 ```
 
 #### Publishing to Maven Central
 
-The libraries are also publishable to Maven Central (no authentication needed to consume them
-there) through Sonatype's [Portal OSSRH Staging API](https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/),
-which the built-in `maven-publish` plugin can upload to directly. Prerequisites:
+The libraries are published to Maven Central (no authentication needed to consume them there)
+through Sonatype's [Portal OSSRH Staging API](https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/),
+which the built-in `maven-publish` plugin uploads to directly. **Publishing only happens inside
+GitHub Actions**: `build.gradle` registers the remote repository only when `GITHUB_ACTIONS=true` and
+credentials are present, so a local `./gradlew publish` never touches a remote repository.
 
-* the namespace `io.github.shakarover` verified on <https://central.sonatype.com> (signing in with
-  GitHub grants `io.github.<username>` automatically),
+One-time setup, all on <https://central.sonatype.com>:
+
+* the namespace `io.github.shakarover` verified (signing in with GitHub grants `io.github.<username>`
+  automatically),
 * a Central Portal *User Token* (Account → Generate User Token),
-* a GPG signing key — Maven Central rejects unsigned artifacts. The key can be passed as
-  `-PsigningKey=<ascii armored private key>`/`-PsigningPassword=<passphrase>`, or the classic way
-  through `signing.secretKeyRingFile`/`signing.password`/`signing.keyId`.
+* a GPG signing key — Maven Central rejects unsigned artifacts.
 
-Upload with the Central credentials, then tell the staging service to push the deployment to the
-Portal (this second call must come from the same IP as the upload):
+They are stored as the `CENTRAL_USER`, `CENTRAL_TOKEN`, `SIGNING_KEY` (ASCII armored private key) and
+`SIGNING_PASSWORD` repository secrets, and the [`Release` workflow](.github/workflows/release.yml)
+uses them for every tag:
 
-```
-./gradlew publish -PcentralUser=<token username> -PcentralToken=<token password> \
-    -PsigningKey="$(cat secret.asc)" -PsigningPassword=<passphrase>
-
-curl -X POST -H "Authorization: Bearer $(printf '%s:%s' "$USER" "$TOKEN" | base64 -w0)" \
-    'https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.shakarover?publishing_type=automatic'
-```
-
-`publishing_type=automatic` releases the deployment once validation passes; with `user_managed`
-(default) it waits for you at <https://central.sonatype.com/publishing> instead. The repository is
-only registered when those credentials are present, so a plain `./gradlew publish` without Central
-credentials is a no-op (and `publishToMavenLocal` never touches it).
-
-Releases do this automatically: the [`Release` workflow](.github/workflows/release.yml) publishes
-to Maven Central using the `CENTRAL_USER`, `CENTRAL_TOKEN`, `SIGNING_KEY` (ASCII armored private
-key) and `SIGNING_PASSWORD` repository secrets, then asks the staging service to release the
-deployment.
+1. upload the signed artifacts —
+   `./gradlew publish -PcentralUser=… -PcentralToken=… -PsigningKey=… -PsigningPassword=…`;
+2. tell the staging service to push the deployment to the Portal (this call must come from the same
+   IP as the upload, hence the same job):
+   ```
+   curl -X POST -H "Authorization: Bearer $(printf '%s:%s' "$USER" "$TOKEN" | base64 -w0)" \
+       'https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.shakarover?publishing_type=automatic'
+   ```
+   `publishing_type=automatic` releases the deployment once validation passes; with `user_managed`
+   (default) it waits for you at <https://central.sonatype.com/publishing> instead;
+3. wait until the artifacts are anonymously fetchable from `repo1.maven.org` — that is the real gate,
+   because the two steps above are `continue-on-error` (re-running an already published tag cannot
+   succeed, Central versions are immutable).
 
 ### Releasing
 
