@@ -49,13 +49,12 @@ All building and testing should be done using a version of OpenJDK 11. Newer Ope
 #### Command Line Version
 
 To run the `smali` and `baksmali` tools from the command line build the fat
-jars. The fat jars will be named with the current version followed by the first
-8 characters of the current git hash followed by an optional `-dirty` if the
-repository was dirty when building and ending in  -fat . The fat jar can be
-invoked with `java -jar`.
+jars. A fat jar is named `<tool>-<version>-fat.jar` after `version` in
+`build.gradle` (no git hash, e.g. `smali-5.0.0-fat.jar`) and can be invoked with
+`java -jar`.
 ```
 ./gradlew :smali:fatJar :baksmali:fatJar --offline -x proguard
-java -jar smali/build/libs/smali-x.y.z-aaaaaaaa-dirty-fat.jar
+java -jar smali/build/libs/smali-x.y.z-fat.jar
 ```
 
 #### Testing
@@ -78,7 +77,11 @@ location)
 
 ### Releasing
 
-This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to this fork's own releases. Releasing here means bumping `version` in `build.gradle`, committing, tagging, and building the fat jars locally (see [Command Line Version](#command-line-version)).
+This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to this fork's own releases. Releasing here means bumping `version` in `build.gradle`, committing, and pushing a tag for that commit: the [`Release` workflow](.github/workflows/release.yml) then checks that the tag equals `version`, runs the tests, builds the fat jars and creates a GitHub release with them attached. For an existing tag (the workflow file is not in older tags) run it manually:
+
+```
+gh workflow run release.yml -f tag=5.0.0
+```
 
 Building release versions and releasing to [Google Maven](https://maven.google.com) use Google infrastructure and support scripts maintained as part of the [R8](https://r8.googlesource.com/r8/) repository. The tasks below can only be performed by Google employees.
 
