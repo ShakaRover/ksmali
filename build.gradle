@@ -103,11 +103,19 @@ subprojects {
         apply plugin: 'maven-publish'
         apply plugin: 'signing'
 
-        group = 'com.android.tools.smali'
+        // 本 fork 自己的坐标。上游 google/smali 的 com.android.tools.smali 是 Google 的命名空间，
+        // 第三方无法在 Maven Central 证明归属，故不能沿用。
+        group = 'io.github.shakarover.ksmali'
         def artifact = project.name
         if (artifact != 'smali') {
             artifact = 'smali-' + artifact
         }
+
+        // 发布目标：GitHub Packages。凭据来自 -Pgpr.user/-Pgpr.key，或 CI 里的
+        // GITHUB_ACTOR/GITHUB_TOKEN；没有凭据时不注册仓库，publish 就是空跑（publishToMavenLocal
+        // 本来也不碰它），这样本地 `./gradlew release publishToMavenLocal` 不会因为缺凭据失败。
+        def ghUser = project.findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR')
+        def ghToken = project.findProperty('gpr.key') ?: System.getenv('GITHUB_TOKEN')
 
         publishing {
             publications {
@@ -151,21 +159,27 @@ subprojects {
                     }
                 }
             }
-            if (rootProject.hasProperty('sonatypeUsername') && rootProject.hasProperty('sonatypePassword')) {
+            if (ghUser && ghToken) {
                 repositories {
                     maven {
-                        url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                        name = 'GitHubPackages'
+                        url = uri('https://maven.pkg.github.com/ShakaRover/ksmali')
                         credentials {
-                            username sonatypeUsername
-                            password sonatypePassword
+                            username = ghUser
+                            password = ghToken
                         }
                     }
                 }
             }
         }
 
+        // GitHub Packages 不要求 GPG 签名，所以只有真的配了密钥（-PsigningKey/-PsigningPassword，
+        // 或 ~/.gradle/gradle.properties 里的 signing.*）时才把签名设为必需；缺密钥时跳过签名而不是
+        // 让 publish 直接失败。将来要发 Maven Central（强制签名）时，配好密钥即恢复强制。
+        def signingConfigured = project.hasProperty('signingKey') ||
+                project.hasProperty('signing.secretKeyRingFile')
         signing {
-            required { gradle.taskGraph.hasTask('publish') }
+            required { gradle.taskGraph.hasTask('publish') && signingConfigured }
             sign(publishing.publications["mavenJava"])
         }
 

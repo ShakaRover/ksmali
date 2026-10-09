@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   release:
@@ -60,6 +61,45 @@ jobs:
           for jar in smali/build/libs/smali-*-fat.jar baksmali/build/libs/baksmali-*-fat.jar; do
             java -jar "$jar" --version | head -1 | grep -F " $TAG ("
           done
+
+      # 发布到 GitHub Packages（io.github.shakarover.ksmali），凭据用 workflow 自带的 token
+      # （build.gradle 从 GITHUB_ACTOR/GITHUB_TOKEN 取，故这里只需给 env）。
+      - name: Publish to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./gradlew publish
+
+      # 上传成功不等于能消费：另起一个一次性项目，从 GitHub Packages 把刚发布的构件拉下来，
+      # 连传递依赖一起解析后真的跑一次 --version。
+      - name: Check that the published artifacts resolve
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          proj="$RUNNER_TEMP/consumer"
+          mkdir -p "$proj"
+          cat > "$proj/settings.gradle" <<'EOF'
+          rootProject.name = 'consumer'
+          EOF
+          cat > "$proj/build.gradle" <<EOF
+          plugins { id 'java' }
+          repositories {
+              maven {
+                  url = 'https://maven.pkg.github.com/ShakaRover/ksmali'
+                  credentials {
+                      username = System.getenv('GITHUB_ACTOR')
+                      password = System.getenv('GITHUB_TOKEN')
+                  }
+              }
+              mavenCentral()
+          }
+          dependencies { implementation 'io.github.shakarover.ksmali:smali-baksmali:$TAG' }
+          tasks.register('runIt', JavaExec) {
+              classpath = configurations.runtimeClasspath
+              mainClass = 'com.android.tools.smali.baksmali.Main'
+              args '--version'
+          }
+          EOF
+          ./gradlew -p "$proj" runIt
 
       # 已经发过的 tag 重跑（补发、或改完 workflow 再验证）不应该失败，改为覆盖附件。
       - name: Create or update the GitHub release

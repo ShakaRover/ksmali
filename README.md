@@ -75,9 +75,41 @@ location)
 ./gradlew release publishToMavenLocal
 ```
 
+#### Publishing to GitHub Packages
+
+The `Release` workflow publishes the four libraries to
+[GitHub Packages](https://github.com/ShakaRover/ksmali/packages) under the `io.github.shakarover.ksmali`
+group, alongside the GitHub release:
+
+* `io.github.shakarover.ksmali:smali:<version>`
+* `io.github.shakarover.ksmali:smali-baksmali:<version>`
+* `io.github.shakarover.ksmali:smali-dexlib2:<version>`
+* `io.github.shakarover.ksmali:smali-util:<version>`
+
+The `com.android.tools.smali` coordinates of the Google fork are Google's namespace and cannot be
+published by this fork. Locally `./gradlew publish` takes credentials from `-Pgpr.user`/`-Pgpr.key`
+(or `GITHUB_ACTOR`/`GITHUB_TOKEN`); without them no repository is registered and `publish` is a no-op.
+GPG signing is only required when a signing key is configured — GitHub Packages does not require
+signatures.
+
+Consuming these artifacts needs authentication even though they are public: a personal access token
+(classic) with `read:packages`, e.g.
+
+```groovy
+repositories {
+    maven {
+        url = 'https://maven.pkg.github.com/ShakaRover/ksmali'
+        credentials {
+            username = System.getenv('GITHUB_ACTOR')
+            password = System.getenv('GITHUB_TOKEN')
+        }
+    }
+}
+```
+
 ### Releasing
 
-This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to this fork's own releases. Releasing here means bumping `version` in `build.gradle`, committing, and pushing a tag for that commit: the [`Release` workflow](.github/workflows/release.yml) then checks that the tag equals `version`, runs the tests, builds the fat jars and creates a GitHub release with them attached. For an existing tag (the workflow file is not in older tags) run it manually:
+This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to this fork's own releases. Releasing here means bumping `version` in `build.gradle`, committing, and pushing a tag for that commit: the [`Release` workflow](.github/workflows/release.yml) then checks that the tag equals `version`, runs the tests, builds the fat jars, publishes the libraries to GitHub Packages (see above) and creates a GitHub release with the fat jars attached. For an existing tag (the workflow file is not in older tags) run it manually:
 
 ```
 gh workflow run release.yml -f tag=5.0.0
