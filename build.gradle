@@ -117,6 +117,12 @@ subprojects {
         def ghUser = project.findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR')
         def ghToken = project.findProperty('gpr.key') ?: System.getenv('GITHUB_TOKEN')
 
+        // 发布目标：Maven Central（走 Sonatype 的 Portal OSSRH Staging API，与 maven-publish 兼容）。
+        // 凭据是 Central Portal 的 User Token，来自 -PcentralUser/-PcentralToken 或
+        // CENTRAL_USER/CENTRAL_TOKEN；同样是没有凭据就不注册仓库。
+        def centralUser = project.findProperty('centralUser') ?: System.getenv('CENTRAL_USER')
+        def centralToken = project.findProperty('centralToken') ?: System.getenv('CENTRAL_TOKEN')
+
         publishing {
             publications {
                 mavenJava(MavenPublication) {
@@ -171,14 +177,34 @@ subprojects {
                     }
                 }
             }
+            if (centralUser && centralToken) {
+                repositories {
+                    maven {
+                        // Sonatype 的 Portal OSSRH Staging API：maven-publish 直接 PUT 到这里，
+                        // 之后还要调 POST /manual/upload/defaultRepository/<namespace> 才会
+                        // 出现在 Central Publisher Portal（见 README）。
+                        name = 'CentralPortal'
+                        url = uri('https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/')
+                        credentials {
+                            username = centralUser
+                            password = centralToken
+                        }
+                    }
+                }
+            }
         }
 
-        // GitHub Packages 不要求 GPG 签名，所以只有真的配了密钥（-PsigningKey/-PsigningPassword，
-        // 或 ~/.gradle/gradle.properties 里的 signing.*）时才把签名设为必需；缺密钥时跳过签名而不是
-        // 让 publish 直接失败。将来要发 Maven Central（强制签名）时，配好密钥即恢复强制。
-        def signingConfigured = project.hasProperty('signingKey') ||
-                project.hasProperty('signing.secretKeyRingFile')
+        // Maven Central 强制要求 GPG 签名。密钥可以来自 -PsigningKey（ASCII armored 私钥内容，
+        // CI 里从 secret 注入，走 useInMemoryPgpKeys）或传统的 signing.secretKeyRingFile
+        // （文件式密钥环，~/.gradle/gradle.properties 里配 signing.*）；两者都没有时跳过签名，
+        // 这样只发 GitHub Packages 的流程不受影响。
+        def signingKey = project.findProperty('signingKey')
+        def signingPassword = project.findProperty('signingPassword')
+        def signingConfigured = (signingKey != null) || project.hasProperty('signing.secretKeyRingFile')
         signing {
+            if (signingKey != null) {
+                useInMemoryPgpKeys(signingKey, signingPassword ?: '')
+            }
             required { gradle.taskGraph.hasTask('publish') && signingConfigured }
             sign(publishing.publications["mavenJava"])
         }

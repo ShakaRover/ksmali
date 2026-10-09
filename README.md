@@ -114,6 +114,35 @@ repositories {
 ./gradlew build -Pgpr.user=<github username> -Pgpr.key=<token with read:packages>
 ```
 
+#### Publishing to Maven Central
+
+The libraries are also publishable to Maven Central (no authentication needed to consume them
+there) through Sonatype's [Portal OSSRH Staging API](https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/),
+which the built-in `maven-publish` plugin can upload to directly. Prerequisites:
+
+* the namespace `io.github.shakarover` verified on <https://central.sonatype.com> (signing in with
+  GitHub grants `io.github.<username>` automatically),
+* a Central Portal *User Token* (Account → Generate User Token),
+* a GPG signing key — Maven Central rejects unsigned artifacts. The key can be passed as
+  `-PsigningKey=<ascii armored private key>`/`-PsigningPassword=<passphrase>`, or the classic way
+  through `signing.secretKeyRingFile`/`signing.password`/`signing.keyId`.
+
+Upload with the Central credentials, then tell the staging service to push the deployment to the
+Portal (this second call must come from the same IP as the upload):
+
+```
+./gradlew publish -PcentralUser=<token username> -PcentralToken=<token password> \
+    -PsigningKey="$(cat secret.asc)" -PsigningPassword=<passphrase>
+
+curl -X POST -H "Authorization: Bearer $(printf '%s:%s' "$USER" "$TOKEN" | base64 -w0)" \
+    'https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.shakarover?publishing_type=automatic'
+```
+
+`publishing_type=automatic` releases the deployment once validation passes; with `user_managed`
+(default) it waits for you at <https://central.sonatype.com/publishing> instead. Both repositories
+are only registered when their credentials are present, so a plain `./gradlew publish` without
+Central credentials still goes to GitHub Packages only.
+
 ### Releasing
 
 This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to this fork's own releases. Releasing here means bumping `version` in `build.gradle`, committing, and pushing a tag for that commit: the [`Release` workflow](.github/workflows/release.yml) then checks that the tag equals `version`, runs the tests, builds the fat jars, publishes the libraries to GitHub Packages (see above) and creates a GitHub release with the fat jars attached. For an existing tag (the workflow file is not in older tags) run it manually:
