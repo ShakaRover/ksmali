@@ -22,17 +22,24 @@ jobs:
     env:
       TAG: ${{ inputs.tag || github.ref_name }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.TAG }}
 
       - name: Set up OpenJDK 11
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '11'
 
-      - uses: gradle/actions/setup-gradle@v4
+      # 停在 v5：v6 起 setup-gradle 的缓存组件 gradle-actions-caching 变成商业授权组件
+      # （gradle.com/legal/terms-of-use），升级等于替本仓库接受那份条款，故不升。
+      # cache-cleanup 关掉：清理步骤用 runner 自带的 Gradle（9.x，要求 JVM 17+）跑，
+      # 而本仓库在 JVM 11 上构建，必然报 "Gradle requires JVM 17 or later"；不清理只是
+      # 让缓存里留着旧条目，GitHub 会在 7 天后回收未被使用的缓存。
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-cleanup: never
 
       # tag 与 build.gradle 的 version 不一致就停在测试之前，避免发布出对不上号的 jar。
       - name: Check that the tag matches build.gradle
@@ -54,12 +61,14 @@ jobs:
             java -jar "$jar" --version | head -1 | grep -F " $TAG ("
           done
 
-      - name: Create the GitHub release
+      # 已经发过的 tag 重跑（补发、或改完 workflow 再验证）不应该失败，改为覆盖附件。
+      - name: Create or update the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$TAG" \
-            --title "$TAG" \
-            --generate-notes \
-            smali/build/libs/smali-*-fat.jar \
-            baksmali/build/libs/baksmali-*-fat.jar
+          jars=(smali/build/libs/smali-*-fat.jar baksmali/build/libs/baksmali-*-fat.jar)
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" --clobber "${jars[@]}"
+          else
+            gh release create "$TAG" --title "$TAG" --generate-notes "${jars[@]}"
+          fi
