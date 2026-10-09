@@ -2,14 +2,14 @@
 
 smali/baksmali is an assembler/disassembler for the dex format used by dalvik, Android's Java VM implementation. The syntax is loosely based on Jasmin's/dedexer's syntax, and supports the full functionality of the dex format (annotations, debug info, line info, etc.)
 
-**NOTE**: This repository is [ShakaRover/ksmali](https://github.com/ShakaRover/ksmali), a fork of [google/smali](https://github.com/google/smali). The latter was forked from https://github.com/JesusFreke/smali for patches needed by Google, as the original repository was no longer maintained; that fork changed the Java package namespace from `org.jf` to `com.android.tools.smali`, and this fork keeps that namespace so the code stays source- and binary-compatible with the 3.0.x artifacts (its own Maven coordinates are different, see [Publishing to GitHub Packages](#publishing-to-github-packages)). The 3.0.x artifacts are Google's releases, published on [Google Maven](https://maven.google.com) under the following coordinates:
+**NOTE**: This repository is [ShakaRover/ksmali](https://github.com/ShakaRover/ksmali), a fork of [google/smali](https://github.com/google/smali). The latter was forked from https://github.com/JesusFreke/smali for patches needed by Google, as the original repository was no longer maintained; that fork changed the Java package namespace from `org.jf` to `com.android.tools.smali`, and this fork keeps that namespace so the code stays source- and binary-compatible with the 3.0.x artifacts (the Maven coordinates of this fork are different, see [Publishing to Maven Central](#publishing-to-maven-central)). The 3.0.x artifacts are Google's releases, published on [Google Maven](https://maven.google.com) under the following coordinates:
 
 * [`com.android.tools.smali:smali:<version>`](https://maven.google.com/web/index.html?q=smali#com.android.tools.smali:smali)
 * [`com.android.tools.smali:smali-dexlib2:<version>`](https://maven.google.com/web/index.html?q=smali-dexlib2#com.android.tools.smali:smali-dexlib2)
 * [`com.android.tools.smali:smali-baksmali:<version>`](https://maven.google.com/web/index.html?q=smali-baksmali#com.android.tools.smali:smali)
 * [`com.android.tools.smali:smali-util:<version>`](https://maven.google.com/web/index.html?q=smali-util#com.android.tools.smali:smali-util)
 
-After the fork the first version released was 3.0.0, which was version 2.5.2 from the original repo with a few patches and the namespace change. 3.0.10 is the last version Google released, and is where this repository picks up: the 4.x line was the ANTLR4 + Kotlin rewrite, and the current release is 5.0.0 (Kotlin-only, no Guava, single-pass front end — see the implementation notes below). The artifacts of this fork are **not** on Google Maven: the libraries are published to GitHub Packages as `io.github.shakarover.ksmali:<artifact>:<version>` (see [Publishing to GitHub Packages](#publishing-to-github-packages)), and the ready-to-run CLI fat jars are attached to the [GitHub releases](https://github.com/ShakaRover/ksmali/releases).
+After the fork the first version released was 3.0.0, which was version 2.5.2 from the original repo with a few patches and the namespace change. 3.0.10 is the last version Google released, and is where this repository picks up: the 4.x line was the ANTLR4 + Kotlin rewrite, and the current release is 5.0.0 (Kotlin-only, no Guava, single-pass front end — see the implementation notes below). The artifacts of this fork are **not** on Google Maven: the libraries are on [Maven Central](https://central.sonatype.com/artifact/io.github.shakarover.ksmali/smali) as `io.github.shakarover.ksmali:<artifact>:<version>` (see [Publishing to Maven Central](#publishing-to-maven-central)), and the ready-to-run CLI fat jars are attached to the [GitHub releases](https://github.com/ShakaRover/ksmali/releases).
 
 #### Support
 - [github Issue tracker](https://github.com/ShakaRover/ksmali/issues) - For any bugs/issues/feature requests
@@ -77,43 +77,6 @@ location)
 ./gradlew release publishToMavenLocal
 ```
 
-#### Publishing to GitHub Packages
-
-The `Release` workflow publishes the four libraries to
-[GitHub Packages](https://github.com/ShakaRover/ksmali/packages) under the `io.github.shakarover.ksmali`
-group, alongside the GitHub release:
-
-* `io.github.shakarover.ksmali:smali:<version>`
-* `io.github.shakarover.ksmali:smali-baksmali:<version>`
-* `io.github.shakarover.ksmali:smali-dexlib2:<version>`
-* `io.github.shakarover.ksmali:smali-util:<version>`
-
-The `com.android.tools.smali` coordinates of the Google fork are Google's namespace and cannot be
-published by this fork. Locally `./gradlew publish` takes credentials from `-Pgpr.user`/`-Pgpr.key`
-(or `GITHUB_ACTOR`/`GITHUB_TOKEN`); without them no repository is registered and `publish` is a no-op.
-GPG signing is only required when a signing key is configured — GitHub Packages does not require
-signatures.
-
-Consuming these artifacts needs authentication even though they are public: a personal access token
-(classic) with `read:packages`. Pass it as a project property (properties belong to the invocation,
-unlike environment variables, which a reused Gradle daemon may not see):
-
-```groovy
-repositories {
-    maven {
-        url = 'https://maven.pkg.github.com/ShakaRover/ksmali'
-        credentials {
-            username = providers.gradleProperty('gpr.user').get()
-            password = providers.gradleProperty('gpr.key').get()
-        }
-    }
-}
-```
-
-```
-./gradlew build -Pgpr.user=<github username> -Pgpr.key=<token with read:packages>
-```
-
 #### Publishing to Maven Central
 
 The libraries are also publishable to Maven Central (no authentication needed to consume them
@@ -139,9 +102,9 @@ curl -X POST -H "Authorization: Bearer $(printf '%s:%s' "$USER" "$TOKEN" | base6
 ```
 
 `publishing_type=automatic` releases the deployment once validation passes; with `user_managed`
-(default) it waits for you at <https://central.sonatype.com/publishing> instead. Both repositories
-are only registered when their credentials are present, so a plain `./gradlew publish` without
-Central credentials still goes to GitHub Packages only.
+(default) it waits for you at <https://central.sonatype.com/publishing> instead. The repository is
+only registered when those credentials are present, so a plain `./gradlew publish` without Central
+credentials is a no-op (and `publishToMavenLocal` never touches it).
 
 Releases do this automatically: the [`Release` workflow](.github/workflows/release.yml) publishes
 to Maven Central using the `CENTRAL_USER`, `CENTRAL_TOKEN`, `SIGNING_KEY` (ASCII armored private
@@ -150,7 +113,7 @@ deployment.
 
 ### Releasing
 
-This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to this fork's own releases. Releasing here means bumping `version` in `build.gradle`, committing, and pushing a tag for that commit: the [`Release` workflow](.github/workflows/release.yml) then checks that the tag equals `version`, runs the tests, builds the fat jars, publishes the libraries to GitHub Packages (see above) and creates a GitHub release with the fat jars attached. For an existing tag (the workflow file is not in older tags) run it manually:
+This section describes the release process of the upstream google/smali repository and is kept for reference: it applies to the 3.0.x artifacts on [Google Maven](https://maven.google.com), not to this fork's own releases. Releasing here means bumping `version` in `build.gradle`, committing, and pushing a tag for that commit: the [`Release` workflow](.github/workflows/release.yml) then checks that the tag equals `version`, runs the tests, builds the fat jars, publishes the libraries to Maven Central (see above) and creates a GitHub release with the fat jars attached. For an existing tag (the workflow file is not in older tags) run it manually:
 
 ```
 gh workflow run release.yml -f tag=5.0.0

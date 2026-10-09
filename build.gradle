@@ -111,15 +111,9 @@ subprojects {
             artifact = 'smali-' + artifact
         }
 
-        // 发布目标：GitHub Packages。凭据来自 -Pgpr.user/-Pgpr.key，或 CI 里的
-        // GITHUB_ACTOR/GITHUB_TOKEN；没有凭据时不注册仓库，publish 就是空跑（publishToMavenLocal
-        // 本来也不碰它），这样本地 `./gradlew release publishToMavenLocal` 不会因为缺凭据失败。
-        def ghUser = project.findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR')
-        def ghToken = project.findProperty('gpr.key') ?: System.getenv('GITHUB_TOKEN')
-
         // 发布目标：Maven Central（走 Sonatype 的 Portal OSSRH Staging API，与 maven-publish 兼容）。
         // 凭据是 Central Portal 的 User Token，来自 -PcentralUser/-PcentralToken 或
-        // CENTRAL_USER/CENTRAL_TOKEN；同样是没有凭据就不注册仓库。
+        // CENTRAL_USER/CENTRAL_TOKEN；没有凭据就不注册仓库。
         def centralUser = project.findProperty('centralUser') ?: System.getenv('CENTRAL_USER')
         def centralToken = project.findProperty('centralToken') ?: System.getenv('CENTRAL_TOKEN')
 
@@ -165,18 +159,6 @@ subprojects {
                     }
                 }
             }
-            if (ghUser && ghToken) {
-                repositories {
-                    maven {
-                        name = 'GitHubPackages'
-                        url = uri('https://maven.pkg.github.com/ShakaRover/ksmali')
-                        credentials {
-                            username = ghUser
-                            password = ghToken
-                        }
-                    }
-                }
-            }
             if (centralUser && centralToken) {
                 repositories {
                     maven {
@@ -197,7 +179,7 @@ subprojects {
         // Maven Central 强制要求 GPG 签名。密钥可以来自 -PsigningKey（ASCII armored 私钥内容，
         // CI 里从 secret 注入，走 useInMemoryPgpKeys）或传统的 signing.secretKeyRingFile
         // （文件式密钥环，~/.gradle/gradle.properties 里配 signing.*）；两者都没有时跳过签名，
-        // 这样只发 GitHub Packages 的流程不受影响。
+        // 这样只跑 publishToMavenLocal（或没配 Central 凭据时的空跑 publish）不会因为缺密钥失败。
         def signingKey = project.findProperty('signingKey')
         def signingPassword = project.findProperty('signingPassword')
         def signingConfigured = (signingKey != null) || project.hasProperty('signing.secretKeyRingFile')
