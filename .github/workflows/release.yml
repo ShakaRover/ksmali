@@ -62,12 +62,13 @@ jobs:
             java -jar "$jar" --version | head -1 | grep -F " $TAG ("
           done
 
-      # 发布到 GitHub Packages（io.github.shakarover.ksmali），凭据用 workflow 自带的 token
-      # （build.gradle 从 GITHUB_ACTOR/GITHUB_TOKEN 取，故这里只需给 env）。
+      # 凭据用 -P 项目属性传：Gradle daemon 是在本 job 更早的步骤里起来的，System.getenv 读到的是
+      # daemon 启动时的环境，这一步新加的 GITHUB_TOKEN 到不了它（首次跑就因为这样静默空跑了一次，
+      # 被下面那步消费校验抓出来）。-P 属于本次调用，不受 daemon 环境影响。
       - name: Publish to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: ./gradlew publish
+        run: ./gradlew publish -Pgpr.user="$GITHUB_ACTOR" -Pgpr.key="$GITHUB_TOKEN"
 
       # 上传成功不等于能消费：另起一个一次性项目，从 GitHub Packages 把刚发布的构件拉下来，
       # 连传递依赖一起解析后真的跑一次 --version。
@@ -86,8 +87,8 @@ jobs:
               maven {
                   url = 'https://maven.pkg.github.com/ShakaRover/ksmali'
                   credentials {
-                      username = System.getenv('GITHUB_ACTOR')
-                      password = System.getenv('GITHUB_TOKEN')
+                      username = providers.gradleProperty('gpr.user').get()
+                      password = providers.gradleProperty('gpr.key').get()
                   }
               }
               mavenCentral()
@@ -99,7 +100,7 @@ jobs:
               args '--version'
           }
           EOF
-          ./gradlew -p "$proj" runIt
+          ./gradlew -p "$proj" runIt -Pgpr.user="$GITHUB_ACTOR" -Pgpr.key="$GITHUB_TOKEN"
 
       # 已经发过的 tag 重跑（补发、或改完 workflow 再验证）不应该失败，改为覆盖附件。
       - name: Create or update the GitHub release
